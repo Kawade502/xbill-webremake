@@ -953,7 +953,7 @@
 
   function rulesBox(hideOnShort) {
     return el('div', { class: hideOnShort ? 'rules hide-on-short' : 'rules' },
-      el('p', { class: 'hl' }, '🕹️ ルール (原作 XBill 2.1 準拠):'),
+      el('p', { class: 'hl' }, '🕹️ ルール (オリジナル XBill 2.1 準拠):'),
       el('p', {}, '1. ', el('strong', {}, 'ビルを叩く'),
         ': クリック/タップで倒す。重なったビルを一度に倒すほど高得点（倒した数の2乗×5点）。'),
       el('p', {}, '2. ', el('strong', {}, 'OSを取り戻す'),
@@ -970,7 +970,7 @@
 
   function creditLine() {
     return el('p', { class: 'dialog-msg' },
-      'XBill 2.1  Copyright (C) Brian Wellington, Matias Duarte (GPL)。ルールと絵は原作のものです。',
+      'XBill 2.1  Copyright (C) Brian Wellington, Matias Duarte (GPL)。ルールと絵はオリジナルのものです。',
       el('br'),
       'このゲームのソース (GPL-3.0以降): ',
       el('a', { href: CONFIG.SOURCE_URL, target: '_blank', rel: 'noopener' }, CONFIG.SOURCE_URL));
@@ -1040,7 +1040,7 @@
     closeHelp = close;
 
     showDialog({
-      title: 'XBill ガイド (原作仕様)',
+      title: 'XBill ガイド (オリジナル仕様)',
       body: [
         rulesBox(),
         el('p', { class: 'dialog-msg' }, 'キー操作: P / Esc = ポーズ、M = サウンド切替'),
