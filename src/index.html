@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<!--
+  SPDX-License-Identifier: GPL-3.0-or-later
+  Copyright (C) 2026 Kawade502
+  Based on XBill 2.1 (Copyright (C) Brian Wellington, Matias Duarte; GPL). See NOTICE.md.
+-->
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>XBill - Web Remake Edition</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <!-- @include styles -->
+</head>
+<body>
+  <!-- Main Motif Window -->
+  <div class="motif-window">
+    <div class="titlebar">
+      <div class="titlebar-title">
+        <span class="titlebar-icon"></span>
+        <span class="font-pixel">XBill 1994 Parody - Web Edition</span>
+      </div>
+      <div class="titlebar-actions">
+        <button type="button" id="btnSoundToggle" class="motif-btn" aria-label="サウンドの切り替え">🔊 SOUND: ON</button>
+        <button type="button" id="btnHelp" class="motif-btn" aria-label="遊び方">?</button>
+      </div>
+    </div>
+
+    <!-- Score / Status header -->
+    <div class="hud">
+      <div class="hud-group">
+        <span>SCORE: <strong id="scoreDisplay" class="v-score">0</strong></span>
+        <span>LEVEL: <strong id="levelDisplay" class="v-level">1/10</strong></span>
+      </div>
+      <div class="hud-group">
+        <span>SAFE OS: <strong id="safeOsDisplay" class="v-safe">- / -</strong></span>
+        <span>HI-SCORE: <strong id="hiScoreDisplay" class="v-hi">0</strong></span>
+      </div>
+    </div>
+
+    <!-- Canvas play area -->
+    <div class="play-area" id="playArea">
+      <canvas id="gameCanvas"></canvas>
+
+      <!-- Title / Level clear / Game over / Help dialog (built by game.html) -->
+      <div id="modalOverlay" class="overlay" hidden>
+        <div class="motif-dialog" role="dialog" aria-modal="true" aria-labelledby="dialogTitle">
+          <h1 id="dialogTitle" class="dialog-title"></h1>
+          <div id="dialogBody" class="dialog-body"></div>
+          <div id="dialogActions" class="dialog-actions"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Controls bar -->
+    <div class="bottom-bar">
+      <div class="status">
+        <span class="status-dot"></span>
+        <span id="statusMessage" aria-live="polite">SYSTEM READY: ビルの侵入を監視中...</span>
+      </div>
+      <div class="bottom-actions">
+        <button type="button" id="btnPause" class="motif-btn">ポーズ (II)</button>
+        <button type="button" id="btnReset" class="motif-btn">リセット</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- @include assets -->
+  <!-- @include sound -->
+  <!-- @include sprites -->
+  <!-- @include game -->
+</body>
+</html>

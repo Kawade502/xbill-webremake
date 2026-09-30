@@ -1,0 +1,13 @@
+# XBill Web Remake のランキング API（Cloudflare Workers + KV）
+name = "xbill-ranking"
+main = "src/index.js"
+compatibility_date = "2026-09-01"
+
+[vars]
+# ブラウザからの呼び出しを許す Origin（カンマ区切り）。GitHub Pages と、手元での確認用
+ALLOWED_ORIGINS = "https://kawade502.github.io,http://127.0.0.1:8000,http://localhost:8000"
+
+[[kv_namespaces]]
+binding = "RANKING"
+# `npx wrangler kv namespace create RANKING` で出た id に置き換える（秘密ではない）
+id = "a73595e9f37a45ee93f97bb53e28f664"

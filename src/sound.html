@@ -1,0 +1,109 @@
+<script>
+  // SPDX-License-Identifier: GPL-3.0-or-later
+  // Copyright (C) 2026 Kawade502
+  // Based on XBill 2.1 (Copyright (C) Brian Wellington, Matias Duarte; GPL). See NOTICE.md.
+
+  // Embedded Audio Synthesizer
+  class SoundEngine {
+    constructor() {
+      this.ctx = null;
+      this.enabled = true;
+    }
+
+    init() {
+      if (!this.ctx) {
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        if (AudioContextClass) {
+          try {
+            this.ctx = new AudioContextClass();
+          } catch (e) {
+            this.ctx = null;
+          }
+        }
+      }
+      if (this.ctx && this.ctx.state === 'suspended') {
+        this.ctx.resume();
+      }
+    }
+
+    /**
+     * 単音を鳴らす。
+     * freq から glideTo へ指数的に変化させる／steps ([経過秒, 周波数] の配列) で階段状に変える。
+     */
+    tone({ type, freq, glideTo = null, steps = [], volume, duration, delay = 0 }) {
+      if (!this.enabled) return;
+      this.init();
+      if (!this.ctx) return;
+
+      const t = this.ctx.currentTime + delay;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+
+      osc.type = type;
+      osc.frequency.setValueAtTime(freq, t);
+      if (glideTo !== null) {
+        osc.frequency.exponentialRampToValueAtTime(glideTo, t + duration);
+      }
+      steps.forEach(([after, f]) => osc.frequency.setValueAtTime(f, t + after));
+
+      gain.gain.setValueAtTime(volume, t);
+      gain.gain.exponentialRampToValueAtTime(0.01, t + duration);
+
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+
+      osc.start(t);
+      osc.stop(t + duration);
+    }
+
+    arpeggio(notes, { type, volume, interval, duration }) {
+      notes.forEach((freq, i) => {
+        this.tone({ type, freq, volume, duration, delay: i * interval });
+      });
+    }
+
+    playSlap() {
+      this.tone({ type: 'sawtooth', freq: 390, glideTo: 35, volume: 0.85, duration: 0.13 });
+      this.tone({ type: 'square', freq: 130, glideTo: 25, volume: 0.4, duration: 0.17 });
+    }
+
+    playInfect() {
+      this.tone({
+        type: 'square', freq: 160, steps: [[0.08, 110], [0.16, 65]],
+        volume: 0.4, duration: 0.38
+      });
+    }
+
+    playRestore() {
+      this.arpeggio([523.25, 659.25, 783.99, 1046.5],
+        { type: 'triangle', volume: 0.28, interval: 0.055, duration: 0.14 });
+    }
+
+    playLevelUp() {
+      this.arpeggio([440, 554.37, 659.25, 880, 1108.73],
+        { type: 'sine', volume: 0.3, interval: 0.08, duration: 0.2 });
+    }
+
+    playSparkZap() {
+      this.tone({
+        type: 'sawtooth', freq: 950 + Math.random() * 300, glideTo: 180,
+        volume: 0.25, duration: 0.08
+      });
+    }
+
+    playSparkAlarm() {
+      this.tone({
+        type: 'sawtooth', freq: 800, steps: [[0.05, 400]],
+        volume: 0.12, duration: 0.1
+      });
+    }
+
+    // バケツの水しぶき用（ノイズの代わりに高めの下降音）
+    playSplash() {
+      this.tone({ type: 'triangle', freq: 1400, glideTo: 300, volume: 0.25, duration: 0.18 });
+      this.tone({ type: 'sine', freq: 900, glideTo: 200, volume: 0.15, duration: 0.25, delay: 0.04 });
+    }
+  }
+
+  const sound = new SoundEngine();
+</script>

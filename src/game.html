@@ -1,0 +1,1565 @@
+<script>
+  // SPDX-License-Identifier: GPL-3.0-or-later
+  // Copyright (C) 2026 Kawade502
+  // Based on XBill 2.1 (Copyright (C) Brian Wellington, Matias Duarte; GPL). See NOTICE.md.
+
+  'use strict';
+
+  // ============================================================
+  // 設定値
+  // ============================================================
+  // 原作 XBill 2.1（C 言語）のルールを移植している。座標と大きさは、原作の画面（400x400）の単位。
+  // XBill is free software (GPL). Copyright (C) Brian Wellington, Matias Duarte.
+  const CONFIG = {
+    FIELD: 400,              // 画面の短い辺の長さ（原作は 400x400 の正方形）。長い辺は画面に合わせて伸ばす
+    MAX_ASPECT: 1.6,         // 長い辺は短い辺の何倍まで伸ばすか（それ以上は両脇を空ける）
+    TICK: 0.2,               // 原作の 1 コマ (秒)。歩く・やられる絵のコマ送りと、稼働率の計算に使う
+
+    // 最終レベルをクリアすると全クリア
+    MAX_LEVEL: 10,
+    ALL_CLEAR_BONUS: 1000,
+
+    // 原作の値
+    BILL_OFFSET_X: 20,       // ビルが PC に着く位置（PC の右上からの距離）
+    BILL_OFFSET_Y: 3,
+    BORDER: 40,              // PC は画面の端からこれ以上離して置く
+    MAX_COMPUTERS: 20,
+    SCORE_BILLPOINTS: 5,     // 一度のクリックで倒した数の 2 乗 × これ
+    GRAVITY: 3,
+    OUT_SPEED_RATIO: 1.25,   // 逃げるビルは速い
+
+    // 当たり判定の余裕。原作は絵の大きさぴったりだが、指でも触れるよう少し広げている
+    HIT_PAD_BILL: 6,
+    HIT_PAD_OS: 6,
+    HIT_PAD_PC: 10,
+    HIT_PAD_BUCKET: 10,
+    HIT_PAD_SPARK: 6,
+    TOUCH_DRAG_OFFSET: -28,  // 画面の px。指で隠れないよう、タッチ操作ではドラッグ中の絵を少し上に出す
+
+    MAX_DPR: 3,
+
+    SOURCE_URL: 'https://github.com/Kawade502/xbill-webremake',   // このゲームのソース (GPL)
+
+    RANKING_TIMEOUT_MS: 10000,
+    RANKING_LOCAL_MAX: 10,
+    TITLE_RANKING_ROWS: 5,
+    NAME_MAX: 12
+  };
+
+  // レベルごとの難易度。どの項目も、上のレベルほど確実に厳しくなる。
+  //   bills: そのレベルで倒すビルの総数。逃げ切られたビルは戻ってくるので、全員を倒すとレベル終了
+  //   rate: 1 秒あたりに画面へ出てくるビルの平均数
+  //   group: 1 回に同時に出てくるビルの最大数（1〜group 体。実際の数は乱数）
+  //   speed: ビルの歩く速さ（画面の px/s。実際は 1.0〜1.2 倍でばらつく。原作は 60〜75）
+  //   steal: ビルが PC の前で OS を入れ替える時間（秒。原作は 2.6）
+  //   spark: 火花の進む速さ（画面の px/s。原作は 20）
+  // PC の台数（8+レベル、最大20）とケーブルの本数（レベル、または台数の半分）は原作の式のまま。
+  // 調整するときはここだけ触ればよい（bills・rate・group・speed・spark は増やすと難しく、steal は減らすと難しい）。
+  const LEVELS = [
+    { bills:  24, rate: 0.70, group: 2, speed:  33, steal: 1.80, spark: 20 },
+    { bills:  28, rate: 0.75, group: 2, speed:  39, steal: 1.75, spark: 25 },
+    { bills:  33, rate: 0.81, group: 3, speed:  45, steal: 1.68, spark: 30 },
+    { bills:  38, rate: 0.87, group: 3, speed:  54, steal: 1.60, spark: 35 },
+    { bills:  43, rate: 0.92, group: 3, speed:  64, steal: 1.52, spark: 40 },
+    { bills:  52, rate: 1.19, group: 3, speed:  70, steal: 1.41, spark: 44 },
+    { bills:  62, rate: 1.47, group: 3, speed:  78, steal: 1.31, spark: 49 },
+    { bills:  74, rate: 1.84, group: 4, speed:  86, steal: 1.21, spark: 54 },
+    { bills:  84, rate: 2.18, group: 5, speed:  94, steal: 1.13, spark: 59 },
+    { bills:  97, rate: 2.58, group: 6, speed: 100, steal: 1.04, spark: 64 }
+  ];
+
+  /** 出現イベントの平均間隔 (ms)。1 回に平均 (1+group)/2 体出るので、rate から逆算する。 */
+  function spawnIntervalMs(params) {
+    return ((1 + params.group) / 2) / params.rate * 1000;
+  }
+
+  function levelParams(level) {
+    return LEVELS[clamp(level, 1, LEVELS.length) - 1];
+  }
+
+  const FONT_CSS_URL =
+    'https://fonts.googleapis.com/css2?family=VT323&family=Press+Start+2P&family=Inter:wght@400;600;700&display=swap';
+
+  // Web フォントは後から読み込む（取得できなくても起動を待たせない）
+  (function loadFonts() {
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = FONT_CSS_URL;
+    document.head.appendChild(link);
+  })();
+
+  // ============================================================
+  // ユーティリティ
+  // ============================================================
+  const clamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
+  const dist = (ax, ay, bx, by) => Math.hypot(ax - bx, ay - by);
+
+  /** DOM 要素を作る。文字列の子は textContent 相当で入るので、外部入力を渡しても安全。 */
+  function el(tag, props, ...children) {
+    const node = document.createElement(tag);
+    Object.entries(props || {}).forEach(([key, value]) => {
+      if (value === false || value == null) return;
+      if (key === 'class') node.className = value;
+      else node.setAttribute(key, value === true ? '' : value);
+    });
+    children.flat().forEach((child) => {
+      if (child != null) node.append(child);
+    });
+    return node;
+  }
+
+  function vibrate(pattern) {
+    try {
+      if (navigator.vibrate) navigator.vibrate(pattern);
+    } catch (e) { /* 未対応・ポリシーで拒否されても無視 */ }
+  }
+
+  // ブラウザの設定（プライベートブラウズや、サイトデータの遮断）で localStorage が例外になることがある。
+  // その場合はメモリだけで動かす。
+  const storage = (() => {
+    const memory = {};
+    return {
+      get(key, fallback) {
+        try {
+          const v = window.localStorage.getItem(key);
+          if (v !== null) return v;
+        } catch (e) { /* fall through */ }
+        return Object.prototype.hasOwnProperty.call(memory, key) ? memory[key] : fallback;
+      },
+      set(key, value) {
+        memory[key] = String(value);
+        try {
+          window.localStorage.setItem(key, String(value));
+        } catch (e) { /* メモリのみ */ }
+      }
+    };
+  })();
+
+  // ============================================================
+  // DOM 参照
+  // ============================================================
+  const canvas = document.getElementById('gameCanvas');
+  const ctx = canvas.getContext('2d');
+  const playArea = document.getElementById('playArea');
+
+  const scoreDisplay = document.getElementById('scoreDisplay');
+  const levelDisplay = document.getElementById('levelDisplay');
+  const safeOsDisplay = document.getElementById('safeOsDisplay');
+  const hiScoreDisplay = document.getElementById('hiScoreDisplay');
+  const statusMessage = document.getElementById('statusMessage');
+
+  const modalOverlay = document.getElementById('modalOverlay');
+  const dialogTitle = document.getElementById('dialogTitle');
+  const dialogBody = document.getElementById('dialogBody');
+  const dialogActions = document.getElementById('dialogActions');
+
+  const btnSoundToggle = document.getElementById('btnSoundToggle');
+  const btnHelp = document.getElementById('btnHelp');
+  const btnPause = document.getElementById('btnPause');
+  const btnReset = document.getElementById('btnReset');
+
+  // ============================================================
+  // 原作の定数と、ゲームの状態
+  // ============================================================
+  const OS_WINGDOWS = 0;
+  const OS_OFF = -1;
+  const OS_PC = 6;         // OS の番号が 6 以上なら PC 用の OS（PC 用 OS はどの PC にも入る）
+  const OS_NAMES = ['Wingdows', 'Mac OS', 'NeXT', 'SGI', 'Solaris', 'Palm', 'OS/2', 'BSD', 'Linux', 'Red Hat', 'Hurd'];
+
+  // ビルの状態
+  const BILL_IN = 1;       // PC へ向かっている
+  const BILL_AT = 2;       // PC の前で OS を入れ替えている
+  const BILL_OUT = 3;      // 盗んだ OS を持って逃げている
+  const BILL_DYING = 4;    // やられている
+  const BILL_STRAY = 5;    // 落とした OS（拾ってドラッグできる）
+
+  const WCELS = 4;         // 歩く絵のコマ数
+  const DCELS = 5;         // やられる絵のコマ数
+  const ACELS = 13;        // OS を入れ替える絵のコマ数
+
+  // phase: 'title' | 'playing' | 'paused' | 'levelClear' | 'gameClear' | 'gameOver'
+  const state = {
+    phase: 'title',
+    score: 0,
+    level: 1,
+    hiScore: parseInt(storage.get('xbill_hi_score', '0'), 10) || 0,
+    params: LEVELS[0],
+
+    computers: [],         // { type, os, x, y, busy, stray }
+    cables: [],            // { c1, c2, x1, y1, x2, y2, x, y, active, index, spin }
+    net: { base: 0, off: 0, win: 0 },   // 自分の OS で動いている台数 / 電源が切れた台数 / Wingdows の台数
+
+    bills: [],             // 生きているビル
+    strays: [],            // 落とされた OS
+    hordeOn: 0,            // 画面の中にいるビル
+    hordeOff: 0,           // これから出てくるビル（逃げたビルもここに戻る）
+
+    spawnTimer: 0,
+    nextSpawnMs: 0,
+    efficiency: 0,         // 稼働率の積算（レベル終了ボーナスに使う）
+    iteration: 0,
+    tickTimer: 0,
+
+    drag: null,            // { kind: 'os' | 'bucket', pointerId, x, y, offsetY, bill }
+    splashes: [],
+    billsKilled: 0,
+    lastTime: 0,
+
+    width: 800,            // 遊ぶ領域の大きさ (CSS px)
+    height: 600,
+    scale: 1,              // 原作の 1 単位が何 CSS px か
+    dpr: 1,
+    fieldW: 400,           // ゲームの世界の大きさ（原作の単位）。遊ぶ領域いっぱいに広げる
+    fieldH: 400,
+    offsetX: 0,
+    offsetY: 0
+  };
+
+  hiScoreDisplay.textContent = state.hiScore;
+
+  const rand = (lb, ub) => Math.floor(Math.random() * (ub - lb + 1)) + lb;
+  const intersects = (x1, y1, w1, h1, x2, y2, w2, h2) =>
+    x1 < x2 + w2 && x2 < x1 + w1 && y1 < y2 + h2 && y2 < y1 + h1;
+
+  function updateLevelDisplay() {
+    levelDisplay.textContent = `${state.level}/${CONFIG.MAX_LEVEL}`;
+  }
+
+  function setStatus(text) {
+    statusMessage.textContent = text;
+  }
+
+  function setPhase(phase) {
+    state.phase = phase;
+    btnPause.textContent = phase === 'paused' ? '再開 (▶)' : 'ポーズ (II)';
+    btnPause.disabled = phase !== 'playing' && phase !== 'paused';
+  }
+
+  // ============================================================
+  // 画面の大きさ（短い辺が原作の 400 になるよう拡大し、長い辺は遊ぶ領域いっぱいまで広げる）
+  // ============================================================
+  function resizeCanvas() {
+    const rect = playArea.getBoundingClientRect();
+    if (rect.width < 1 || rect.height < 1) return;
+
+    const dpr = Math.min(window.devicePixelRatio || 1, CONFIG.MAX_DPR);
+    state.width = Math.floor(rect.width);
+    state.height = Math.floor(rect.height);
+    state.dpr = dpr;
+
+    canvas.width = Math.round(state.width * dpr);
+    canvas.height = Math.round(state.height * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+    const short = CONFIG.FIELD;
+    const cap = Math.floor(short * CONFIG.MAX_ASPECT);
+    state.scale = Math.min(state.width, state.height) / short;
+    state.fieldW = Math.min(cap, Math.floor(state.width / state.scale));
+    state.fieldH = Math.min(cap, Math.floor(state.height / state.scale));
+    state.offsetX = Math.floor((state.width - state.fieldW * state.scale) / 2);
+    state.offsetY = Math.floor((state.height - state.fieldH * state.scale) / 2);
+
+    refitField();
+  }
+
+  /** 遊ぶ領域の大きさが変わったとき、はみ出したものを中に戻す（大きく動かさない）。 */
+  function refitField() {
+    if (state.computers.length === 0) return;
+
+    const border = CONFIG.BORDER;
+    state.computers.forEach((c) => {
+      c.x = clamp(c.x, border, Math.max(border, state.fieldW - border - DIM.cpuW));
+      c.y = clamp(c.y, border, Math.max(border, state.fieldH - border - DIM.cpuH));
+    });
+    state.cables.forEach((cable) => {
+      const a = state.computers[cable.c1];
+      const b = state.computers[cable.c2];
+      cable.x1 = a.x + Math.floor(DIM.cpuW / 3);
+      cable.y1 = a.y + Math.floor(DIM.cpuH / 2);
+      cable.x2 = b.x + Math.floor(DIM.cpuW / 3);
+      cable.y2 = b.y + Math.floor(DIM.cpuH / 2);
+    });
+    state.bills.forEach((bill) => {
+      if (bill.state !== BILL_IN) return;
+      const comp = state.computers[bill.target_c];
+      bill.target_x = comp.x + DIM.cpuW - CONFIG.BILL_OFFSET_X;
+      bill.target_y = comp.y + CONFIG.BILL_OFFSET_Y;
+    });
+    state.strays.forEach((bill) => {
+      bill.x = clamp(bill.x, 0, state.fieldW - DIM.osW);
+      bill.y = clamp(bill.y, 0, state.fieldH - DIM.osH);
+    });
+  }
+
+  /** 画面上の位置（CSS px）を、原作の座標に直す。 */
+  function fieldPoint(e) {
+    const rect = canvas.getBoundingClientRect();
+    return {
+      x: (e.clientX - rect.left - state.offsetX) / state.scale,
+      y: (e.clientY - rect.top - state.offsetY) / state.scale
+    };
+  }
+
+  // ============================================================
+  // コンピュータとケーブル（原作の Computer.c / Network.c / Cable.c）
+  // ============================================================
+  function setupComputer() {
+    const border = CONFIG.BORDER;
+    const tw = DIM.cpuW - CONFIG.BILL_OFFSET_X + DIM.billW;   // ビルが立つ分も含めた幅
+
+    for (let tries = 0; tries < 4000; tries++) {
+      const x = rand(border, state.fieldW - border - DIM.cpuW);
+      const y = rand(border, state.fieldH - border - DIM.cpuH);
+      if (state.computers.some((c) => intersects(x, y, tw, DIM.cpuH, c.x, c.y, tw, DIM.cpuH))) continue;
+
+      const type = rand(1, SPRITES.cpu.length - 1);   // 0 番（トースター）は最後の画面だけ
+      return {
+        type,
+        os: type < OS_PC ? type : rand(OS_PC, OS_NAMES.length - 1),
+        x, y, busy: false, stray: null
+      };
+    }
+    return null;
+  }
+
+  function setupCable() {
+    const n = state.computers.length;
+    const c1 = rand(0, n - 1);
+    let c2;
+    do {
+      c2 = rand(0, n - 1);
+    } while (c2 === c1);
+    const a = state.computers[c1];
+    const b = state.computers[c2];
+    return {
+      c1, c2,
+      x1: a.x + Math.floor(DIM.cpuW / 3), y1: a.y + Math.floor(DIM.cpuH / 2),
+      x2: b.x + Math.floor(DIM.cpuW / 3), y2: b.y + Math.floor(DIM.cpuH / 2),
+      x: 0, y: 0, active: false, index: 0, spin: 0
+    };
+  }
+
+  function setupNetwork() {
+    const n = Math.min(8 + state.level, CONFIG.MAX_COMPUTERS);
+    state.computers = [];
+    for (let i = 0; i < n; i++) {
+      const comp = setupComputer();
+      if (!comp) break;
+      state.computers.push(comp);
+    }
+    const units = state.computers.length;
+    state.net = { base: units, off: 0, win: 0 };
+
+    state.cables = [];
+    const ncables = units >= 2 ? Math.min(state.level, Math.floor(units / 2)) : 0;
+    for (let i = 0; i < ncables; i++) state.cables.push(setupCable());
+  }
+
+  /** この OS は、その PC に入るか。同じ種類か、PC 用の OS 同士なら入る。 */
+  function compatible(comp, os) {
+    return comp.type === os || (comp.type >= OS_PC && os >= OS_PC);
+  }
+
+  function computerHit(comp, x, y) {
+    const p = CONFIG.HIT_PAD_PC;
+    return x > comp.x - p && x < comp.x + DIM.cpuW + p && y > comp.y - p && y < comp.y + DIM.cpuH + p;
+  }
+
+  function reverseCable(cable) {
+    [cable.c1, cable.c2] = [cable.c2, cable.c1];
+    [cable.x1, cable.x2] = [cable.x2, cable.x1];
+    [cable.y1, cable.y2] = [cable.y2, cable.y1];
+  }
+
+  /** 片方の PC だけが Wingdows なら、ケーブルを火花が走って、もう片方へ感染させる。 */
+  function updateCable(cable, dt) {
+    const comp1 = state.computers[cable.c1];
+    const comp2 = state.computers[cable.c2];
+    const win1 = comp1.os === OS_WINGDOWS;
+    const win2 = comp2.os === OS_WINGDOWS;
+
+    if (cable.active) {
+      if (win1 === win2) {
+        cable.active = false;
+        return;
+      }
+      if (win2) reverseCable(cable);
+
+      const target = state.computers[cable.c2];
+      const xdist = cable.x2 - cable.x;
+      const ydist = cable.y2 - cable.y;
+      const step = state.params.spark * dt;
+      if (Math.hypot(xdist, ydist) <= step) {
+        cable.x = cable.x2;
+        cable.y = cable.y2;
+        if (!target.busy) {
+          state.net[target.os === OS_OFF ? 'off' : 'base']--;
+          state.net.win++;
+          target.os = OS_WINGDOWS;
+          sound.playInfect();
+        }
+        cable.active = false;
+      } else {
+        // 原作と同じく、x と y の距離の比で進む
+        const total = Math.abs(xdist) + Math.abs(ydist);
+        cable.x += (Math.abs(xdist) * step * Math.sign(xdist)) / total;
+        cable.y += (Math.abs(ydist) * step * Math.sign(ydist)) / total;
+      }
+      cable.spin += dt;
+      cable.index = Math.floor(cable.spin / CONFIG.TICK) % 2;
+    } else if (win1 !== win2) {
+      cable.active = true;
+      if (win2) reverseCable(cable);
+      cable.x = cable.x1;
+      cable.y = cable.y1;
+    }
+  }
+
+  // ============================================================
+  // ビル（原作の Bill.c / Horde.c）
+  // ============================================================
+  /** 画面の外の、ランダムな縁の位置（ここから歩いてくる・ここへ逃げる）。 */
+  function getBorder() {
+    const side = rand(0, 3);
+    let x;
+    let y;
+    if (side % 2 === 0) x = rand(0, state.fieldW - DIM.billW);
+    else y = rand(0, state.fieldH - DIM.billH);
+
+    switch (side) {
+      case 0: y = -DIM.billH - 16; break;
+      case 1: x = state.fieldW + 1; break;
+      case 2: y = state.fieldH + 1; break;
+      default: x = -DIM.billW - 2;
+    }
+    return [x, y];
+  }
+
+  function enterBill() {
+    const [x, y] = getBorder();
+    const ci = rand(0, state.computers.length - 1);
+    const comp = state.computers[ci];
+    state.bills.push({
+      state: BILL_IN,
+      index: 0,
+      cels: 'L',
+      x, y,
+      cargo: OS_WINGDOWS,          // 最初は Wingdows を持っている
+      x_offset: -2,
+      y_offset: -15,
+      sx: 0, sy: 0,
+      target_c: ci,
+      target_x: comp.x + DIM.cpuW - CONFIG.BILL_OFFSET_X,
+      target_y: comp.y + CONFIG.BILL_OFFSET_Y,
+      speed: state.params.speed * (1 + Math.random() * 0.2),
+      clock: 0
+    });
+    state.hordeOn++;
+    state.hordeOff--;
+  }
+
+  function launch(max) {
+    if (max === 0 || state.hordeOff === 0) return;
+    const n = 1 + Math.floor(Math.random() * Math.min(max, state.hordeOff));
+    for (let i = 0; i < n; i++) enterBill();
+  }
+
+  function clearStray(bill) {
+    state.computers.forEach((c) => {
+      if (c.stray === bill) c.stray = null;
+    });
+  }
+
+  function removeBill(bill) {
+    let i = state.bills.indexOf(bill);
+    if (i >= 0) state.bills.splice(i, 1);
+    i = state.strays.indexOf(bill);
+    if (i >= 0) state.strays.splice(i, 1);
+    clearStray(bill);
+  }
+
+  /** 目的地へ向かって進む。動けたかどうかを返す。 */
+  function moveBill(bill, dt, fast) {
+    let xdist = bill.target_x - bill.x;
+    let ydist = bill.target_y - bill.y;
+    const signx = xdist >= 0 ? 1 : -1;
+    const signy = ydist >= 0 ? 1 : -1;
+    xdist = Math.abs(xdist);
+    ydist = Math.abs(ydist);
+    if (xdist === 0 && ydist === 0) return false;
+
+    const step = bill.speed * dt * (fast ? CONFIG.OUT_SPEED_RATIO : 1);
+    if (xdist < step && ydist < step) {
+      bill.x = bill.target_x;
+      bill.y = bill.target_y;
+    } else {
+      const dx = (xdist * step * signx) / (xdist + ydist);
+      const dy = (ydist * step * signy) / (xdist + ydist);
+      bill.x += dx;
+      bill.y += dy;
+      if (dx < 0) bill.cels = 'L';
+      else if (dx > 0) bill.cels = 'R';
+    }
+    return true;
+  }
+
+  /** 歩く絵のコマ送り（原作は 1 コマ 0.2 秒）と、持っている OS の上下の揺れ。 */
+  function walkFrames(bill, dt) {
+    bill.clock += dt;
+    while (bill.clock >= CONFIG.TICK) {
+      bill.clock -= CONFIG.TICK;
+      bill.index = (bill.index + 1) % WCELS;
+      bill.y_offset += 8 * (bill.index % 2) - 4;
+    }
+  }
+
+  function updateIn(bill, dt) {
+    const moved = moveBill(bill, dt, false);
+    const comp = state.computers[bill.target_c];
+
+    if (!moved && comp.os !== OS_WINGDOWS && !comp.busy) {
+      comp.busy = true;
+      bill.cels = 'A';
+      bill.index = 0;
+      bill.state = BILL_AT;
+      bill.clock = 0;
+      return;
+    }
+    if (!moved) {
+      // 着いたが、もう Wingdows か、ほかのビルが作業中。別の PC へ向かう
+      let i;
+      do {
+        i = rand(0, state.computers.length - 1);
+      } while (i === bill.target_c);
+      const next = state.computers[i];
+      bill.target_c = i;
+      bill.target_x = next.x + DIM.cpuW - CONFIG.BILL_OFFSET_X;
+      bill.target_y = next.y + CONFIG.BILL_OFFSET_Y;
+    }
+    walkFrames(bill, dt);
+  }
+
+  /** OS を入れ替える 1 コマ分（原作の update_at をそのまま移したもの）。 */
+  function stepAt(bill) {
+    const comp = state.computers[bill.target_c];
+
+    if (bill.index === 0 && comp.os === OS_OFF) {
+      // 電源が切れた PC に着いた。近くに落ちている OS があれば拾う
+      bill.index = 6;
+      if (comp.stray === null) {
+        bill.cargo = -1;
+      } else {
+        bill.cargo = comp.stray.cargo;
+        removeBill(comp.stray);
+        comp.stray = null;
+      }
+    } else {
+      bill.index++;
+    }
+
+    if (bill.index === 13) {
+      bill.y_offset = -15;
+      bill.x_offset = -2;
+      [bill.target_x, bill.target_y] = getBorder();
+      bill.index = 0;
+      bill.cels = 'L';
+      bill.state = BILL_OUT;
+      bill.clock = 0;
+      comp.busy = false;
+      return;
+    }
+
+    bill.y_offset = DIM.billH - DIM.osH;
+    switch (bill.index) {
+      case 1:
+      case 2:
+        bill.x -= 8;
+        bill.x_offset += 8;
+        break;
+      case 3:
+        bill.x -= 10;
+        bill.x_offset += 10;
+        break;
+      case 4:
+        bill.x += 3;
+        bill.x_offset -= 3;
+        break;
+      case 5:
+        bill.x += 2;
+        bill.x_offset -= 2;
+        break;
+      case 6:
+        if (comp.os !== OS_OFF) {
+          state.net.base--;
+          state.net.off++;
+          bill.cargo = comp.os;
+        } else {
+          bill.x -= 21;
+          bill.x_offset += 21;
+        }
+        comp.os = OS_OFF;
+        bill.y_offset = -15;
+        bill.x += 20;
+        bill.x_offset -= 20;
+        break;
+      case 7:
+        bill.sy = bill.y_offset;
+        bill.sx = -2;
+        break;
+      case 8:
+        bill.sy = -15;
+        bill.sx = -2;
+        break;
+      case 9:
+        bill.sy = -7;
+        bill.sx = -7;
+        bill.x -= 8;
+        bill.x_offset += 8;
+        break;
+      case 10:
+        bill.sy = 0;
+        bill.sx = -7;
+        bill.x -= 15;
+        bill.x_offset += 15;
+        break;
+      case 11:
+        bill.sy = 0;
+        bill.sx = -7;
+        comp.os = OS_WINGDOWS;
+        state.net.off--;
+        state.net.win++;
+        sound.playInfect();
+        break;
+      case 12:
+        bill.x += 11;
+        bill.x_offset -= 11;
+        break;
+      default:
+    }
+  }
+
+  function updateAt(bill, dt) {
+    const frame = state.params.steal / ACELS;   // 13 コマで 1 回の入れ替え
+    bill.clock += dt;
+    while (bill.clock >= frame && bill.state === BILL_AT) {
+      bill.clock -= frame;
+      stepAt(bill);
+    }
+  }
+
+  function updateOut(bill, dt) {
+    if (intersects(bill.x, bill.y, DIM.billW, DIM.billH, 0, 0, state.fieldW, state.fieldH)) {
+      moveBill(bill, dt, true);
+      walkFrames(bill, dt);
+    } else {
+      // 画面の外へ逃げ切った。戻ってきて、また PC を狙う
+      removeBill(bill);
+      state.hordeOn--;
+      state.hordeOff++;
+    }
+  }
+
+  function stepDying(bill) {
+    if (bill.index < DCELS - 1) {
+      bill.y_offset += bill.index * CONFIG.GRAVITY;
+      bill.index++;
+      return;
+    }
+    bill.y += bill.y_offset;
+    if (bill.cargo < 0 || bill.cargo === OS_WINGDOWS) {
+      removeBill(bill);
+    } else {
+      // 盗んだ OS を落とした。拾ってドラッグできる
+      state.bills.splice(state.bills.indexOf(bill), 1);
+      state.strays.push(bill);
+      bill.state = BILL_STRAY;
+    }
+    state.hordeOn--;
+  }
+
+  function updateDying(bill, dt) {
+    bill.clock += dt;
+    while (bill.clock >= CONFIG.TICK && bill.state === BILL_DYING) {
+      bill.clock -= CONFIG.TICK;
+      stepDying(bill);
+    }
+  }
+
+  function updateBill(bill, dt) {
+    switch (bill.state) {
+      case BILL_IN: updateIn(bill, dt); break;
+      case BILL_AT: updateAt(bill, dt); break;
+      case BILL_OUT: updateOut(bill, dt); break;
+      case BILL_DYING: updateDying(bill, dt); break;
+      default:
+    }
+  }
+
+  function setDying(bill) {
+    bill.index = -1;
+    bill.cels = 'D';
+    bill.x_offset = -2;
+    bill.y_offset = -15;
+    bill.state = BILL_DYING;
+    bill.clock = 0;
+  }
+
+  function billHit(bill, x, y) {
+    const p = CONFIG.HIT_PAD_BILL;
+    return x > bill.x - p && x < bill.x + DIM.billW + p && y > bill.y - p && y < bill.y + DIM.billH + p;
+  }
+
+  function strayHit(bill, x, y) {
+    const p = CONFIG.HIT_PAD_OS;
+    return x > bill.x - p && x < bill.x + DIM.osW + p && y > bill.y - p && y < bill.y + DIM.osH + p;
+  }
+
+  /** クリックした場所にいるビルを、全員倒す。倒した数を返す。 */
+  function killAt(x, y) {
+    let counter = 0;
+    state.bills.slice().forEach((bill) => {
+      if (bill.state === BILL_DYING || !billHit(bill, x, y)) return;
+      if (bill.state === BILL_AT) {
+        // 作業の途中で倒した。PC はもう作業中ではなく、落とした OS を後から拾える
+        const comp = state.computers[bill.target_c];
+        comp.busy = false;
+        comp.stray = bill;
+      }
+      setDying(bill);
+      counter++;
+    });
+    return counter;
+  }
+
+  // ============================================================
+  // 更新
+  // ============================================================
+  function updateEffects(dt) {
+    for (let i = state.splashes.length - 1; i >= 0; i--) {
+      state.splashes[i].life -= dt;
+      if (state.splashes[i].life <= 0) state.splashes.splice(i, 1);
+    }
+  }
+
+  function updateGame(dt) {
+    if (state.phase === 'paused') return;
+
+    updateEffects(dt);
+    if (state.phase !== 'playing') return;
+
+    // ビルの出現
+    state.spawnTimer += dt * 1000;
+    if (state.spawnTimer >= state.nextSpawnMs) {
+      state.spawnTimer = 0;
+      state.nextSpawnMs = spawnIntervalMs(state.params) * (0.6 + Math.random() * 0.8);
+      launch(state.params.group);
+    }
+
+    state.cables.forEach((cable) => updateCable(cable, dt));
+    state.bills.slice().forEach((bill) => updateBill(bill, dt));
+
+    // 稼働率の積算（1 コマ = 0.2 秒ごと）
+    state.tickTimer += dt;
+    while (state.tickTimer >= CONFIG.TICK) {
+      state.tickTimer -= CONFIG.TICK;
+      state.iteration++;
+      state.efficiency += (100 * state.net.base - 10 * state.net.win) / state.computers.length;
+    }
+
+    updateStatusHeader();
+
+    // 動いている PC が 1 台以下になったら終わり。全員倒せばレベル終了（両方なら終わりが優先）
+    if (state.net.base + state.net.off <= 1) gameOver();
+    else if (state.hordeOn + state.hordeOff === 0) finishLevel();
+  }
+
+  // ============================================================
+  // 入力（原作の Game_button_press / Game_button_release）
+  // ============================================================
+  function bucketHit(p) {
+    const pad = CONFIG.HIT_PAD_BUCKET;
+    return p.x > -pad && p.x < DIM.bucketW + pad && p.y > -pad && p.y < DIM.bucketH + pad;
+  }
+
+  function onPointerDown(e) {
+    if (state.phase !== 'playing') return;
+
+    const p = fieldPoint(e);
+    if (!state.drag) {
+      if (bucketHit(p)) {
+        startDrag('bucket', e, p, null);
+        return;
+      }
+      const stray = state.strays.find((b) => strayHit(b, p.x, p.y));
+      if (stray) {
+        state.strays.splice(state.strays.indexOf(stray), 1);
+        startDrag('os', e, p, stray);
+        return;
+      }
+    }
+
+    const counter = killAt(p.x, p.y);
+    if (counter > 0) {
+      state.billsKilled += counter;
+      addScore(counter * counter * CONFIG.SCORE_BILLPOINTS);
+      sound.playSlap();
+      vibrate([30, 20, 40]);
+    }
+  }
+
+  function startDrag(kind, e, p, bill) {
+    const offsetY = e.pointerType === 'touch' ? CONFIG.TOUCH_DRAG_OFFSET / state.scale : 0;
+    state.drag = { kind, pointerId: e.pointerId, x: p.x, y: p.y + offsetY, offsetY, bill };
+
+    if (kind === 'os') {
+      sound.playRestore();
+      setStatus(`${OS_NAMES[bill.cargo]}を拾った！同じ種類のPCにドラッグして戻そう！`);
+    } else {
+      setStatus('バケツを持った！火花にかけると、火花が最初からやり直しになる！');
+    }
+
+    try {
+      canvas.setPointerCapture(e.pointerId);
+    } catch (err) { /* 合成イベントなどでは失敗する */ }
+  }
+
+  function onPointerMove(e) {
+    if (!state.drag || e.pointerId !== state.drag.pointerId) return;
+    const p = fieldPoint(e);
+    state.drag.x = p.x;
+    state.drag.y = p.y + state.drag.offsetY;
+  }
+
+  function onPointerUp(e) {
+    if (!state.drag || e.pointerId !== state.drag.pointerId) return;
+    finishDrag(state.phase !== 'playing');
+  }
+
+  function onPointerCancel(e) {
+    if (!state.drag || e.pointerId !== state.drag.pointerId) return;
+    finishDrag(true);
+  }
+
+  /** cancelled のときは、何も起こさず持っていたものを元に戻す。 */
+  function finishDrag(cancelled) {
+    const drag = state.drag;
+    state.drag = null;
+    if (!drag) return;
+
+    if (drag.kind === 'bucket') {
+      if (!cancelled) useBucket(drag.x, drag.y);
+      return;
+    }
+
+    const bill = drag.bill;
+    if (!cancelled) {
+      const comp = state.computers.find((c) =>
+        computerHit(c, drag.x, drag.y) && compatible(c, bill.cargo) &&
+        (c.os === OS_WINGDOWS || c.os === OS_OFF));
+      if (comp) {
+        state.net.base++;
+        state.net[comp.os === OS_WINGDOWS ? 'win' : 'off']--;
+        comp.os = bill.cargo;
+        clearStray(bill);
+        sound.playRestore();
+        setStatus(`${OS_NAMES[bill.cargo]}を戻した！`);
+        updateStatusHeader();
+        return;
+      }
+    }
+    // 戻せなかったら、落ちていた場所に戻る
+    state.strays.push(bill);
+  }
+
+  /** 火花にバケツの水をかける。火花は消えて、感染元の PC からやり直しになる。 */
+  function useBucket(x, y) {
+    state.splashes.push({ x, y, life: 0.4, maxLife: 0.4 });
+    sound.playSplash();
+
+    const pad = CONFIG.HIT_PAD_SPARK;
+    let count = 0;
+    state.cables.forEach((cable) => {
+      if (cable.active && Math.abs(x - cable.x) < DIM.sparkW + pad && Math.abs(y - cable.y) < DIM.sparkH + pad) {
+        cable.active = false;
+        count++;
+      }
+    });
+    setStatus(count > 0 ? '火花に水をかけた！' : 'バケツは空振り…火花にかけよう');
+  }
+
+  // ============================================================
+  // スコア / HUD
+  // ============================================================
+  function addScore(pts) {
+    state.score += pts;
+    scoreDisplay.textContent = state.score;
+    if (state.score > state.hiScore) {
+      state.hiScore = state.score;
+      hiScoreDisplay.textContent = state.hiScore;
+      storage.set('xbill_hi_score', state.hiScore);
+    }
+  }
+
+  /** 原作の下の行と同じ内容（Bill: 画面内/これから、System: 動いている/電源切れ/Wingdows）。 */
+  function statusLine() {
+    const n = state.net;
+    return `Bill:${state.hordeOn}/${state.hordeOff}  System:${n.base}/${n.off}/${n.win}  ` +
+      `Level:${state.level}  Score:${state.score}`;
+  }
+
+  function updateStatusHeader() {
+    safeOsDisplay.textContent = `${state.net.base} / ${state.computers.length}`;
+    safeOsDisplay.classList.toggle('danger', state.net.base + state.net.off <= 2);
+  }
+
+  // ============================================================
+  // ダイアログ
+  // ============================================================
+  let activeDialog = null;   // ヘルプから戻るときに再表示するダイアログ
+  let primaryButton = null;
+  let helpOpen = false;
+
+  function showDialog(spec, options) {
+    const isHelp = !!(options && options.isHelp);
+    if (!isHelp) activeDialog = spec;
+
+    dialogTitle.textContent = spec.title;
+    dialogBody.textContent = '';
+    spec.body.forEach((node) => dialogBody.append(node));
+
+    primaryButton = null;
+    dialogActions.textContent = '';
+    spec.actions.forEach((action) => {
+      const btn = el('button', {
+        type: 'button',
+        class: 'motif-btn ' + (action.primary ? 'btn-primary' : 'btn-secondary')
+      }, action.label);
+      btn.addEventListener('click', action.onClick);
+      if (action.primary) primaryButton = btn;
+      dialogActions.append(btn);
+    });
+
+    modalOverlay.hidden = false;
+    dialogBody.scrollTop = 0;
+    if (primaryButton) primaryButton.focus({ preventScroll: true });
+  }
+
+  function hideDialog() {
+    modalOverlay.hidden = true;
+    activeDialog = null;
+    primaryButton = null;
+    helpOpen = false;
+  }
+
+  function rulesBox(hideOnShort) {
+    return el('div', { class: hideOnShort ? 'rules hide-on-short' : 'rules' },
+      el('p', { class: 'hl' }, '🕹️ ルール (原作 XBill 2.1 準拠):'),
+      el('p', {}, '1. ', el('strong', {}, 'ビルを叩く'),
+        ': クリック/タップで倒す。重なったビルを一度に倒すほど高得点（倒した数の2乗×5点）。'),
+      el('p', {}, '2. ', el('strong', {}, 'OSを取り戻す'),
+        ': ビルはPCのOSをWingdowsに入れ替え、盗んだOSを頭に載せて逃げる。叩くとOSを落とすので、ドラッグして同じ種類のPCに戻す。逃げ切られたビルはまた戻ってくる。'),
+      el('p', {}, '3. ', el('strong', {}, '火花を止める'),
+        ': ケーブルでつながったPCの片方だけがWingdowsだと、そこから相手へ火花が走る。左上のバケツをドラッグして火花にかけると、火花が最初からやり直しになるだけ。' +
+        '火花を止めるには、Wingdowsになっている側のPCに、落ちているOSをドラッグして戻す（両方がWingdowsでなくなれば止まる）。' +
+        '火花でWingdowsになったPCは元のOSが落ちないので、ほかのビルを叩いて落としたOSを使う。'),
+      el('p', {}, '4. 動いているPCが1台以下になるとゲームオーバー。レベルが終わるたびに、稼働率に応じたボーナス。'),
+      el('p', {}, '5. ', el('strong', {}, 'レベル10をクリアで全クリア！'),
+        ' 上のレベルほど、ビルは何体も同時に、多く・速く押し寄せ、OSを抜くのも速くなる。')
+    );
+  }
+
+  function creditLine() {
+    return el('p', { class: 'dialog-msg' },
+      'XBill 2.1  Copyright (C) Brian Wellington, Matias Duarte (GPL)。ルールと絵は原作のものです。',
+      el('br'),
+      'このゲームのソース (GPL-3.0以降): ',
+      el('a', { href: CONFIG.SOURCE_URL, target: '_blank', rel: 'noopener' }, CONFIG.SOURCE_URL));
+  }
+
+  function subtitle(...lines) {
+    const parts = [];
+    lines.forEach((line, i) => {
+      if (i > 0) parts.push(el('br'));
+      parts.push(line);
+    });
+    return el('p', { class: 'dialog-subtitle' }, parts);
+  }
+
+  function showTitleDialog() {
+    setPhase('title');
+
+    const rankingBox = el('div', { class: 'ranking-box' });
+    renderRanking(rankingBox, { status: 'loading' });
+    fetchRanking().then(
+      (res) => renderRanking(rankingBox, {
+        status: 'ok', list: res.list.slice(0, CONFIG.TITLE_RANKING_ROWS), source: res.source
+      }),
+      () => renderRanking(rankingBox, { status: 'error' })
+    );
+
+    const actions = [{
+      label: '🎮 スタート (START)',
+      primary: true,
+      onClick: () => {
+        sound.init();
+        startNewGame();
+      }
+    }];
+    if (document.fullscreenEnabled) {
+      actions.push({ label: '⛶ フルスクリーン切替', onClick: toggleFullscreen });
+    }
+
+    const logo = el('img', { class: 'title-logo', src: XBILL_ASSETS.logo, alt: 'XBill' });
+    showDialog({
+      title: 'WEB REMAKE',
+      body: [
+        logo,
+        subtitle('ビル軍団からオープンソースOSを守れ！', 'Wingdowsの強制インストールを叩き潰して阻止せよ！'),
+        rulesBox(true),
+        rankingBox,
+        creditLine()
+      ],
+      actions
+    });
+  }
+
+  let closeHelp = () => {};
+
+  function openHelp() {
+    if (helpOpen) return;
+    const previous = { phase: state.phase, dialog: activeDialog };
+    if (state.phase === 'playing') setPhase('paused');
+    helpOpen = true;
+
+    const close = () => {
+      helpOpen = false;
+      if (previous.dialog) showDialog(previous.dialog);
+      else hideDialog();
+      setPhase(previous.phase);
+    };
+    closeHelp = close;
+
+    showDialog({
+      title: 'XBill ガイド (原作仕様)',
+      body: [
+        rulesBox(),
+        el('p', { class: 'dialog-msg' }, 'キー操作: P / Esc = ポーズ、M = サウンド切替'),
+        creditLine()
+      ],
+      actions: [{ label: '閉じる', primary: true, onClick: close }]
+    }, { isHelp: true });
+  }
+
+  function levelClear(bonus) {
+    if (state.phase !== 'playing') return;
+
+    const cleared = state.level;
+    setPhase('levelClear');
+    sound.playLevelUp();
+    state.drag = null;
+    state.level++;
+    updateLevelDisplay();
+    setStatus(`LEVEL ${cleared} クリア！`);
+
+    const next = state.level === CONFIG.MAX_LEVEL ? `最終 LEVEL ${state.level}` : `LEVEL ${state.level}`;
+    showDialog({
+      title: `LEVEL ${cleared} CLEAR!`,
+      body: [subtitle(
+        'すべてのビルを撃退しました！',
+        `倒したビル: ${state.billsKilled}体`,
+        el('span', {}, `稼働率ボーナス: `, el('strong', {}, `+${bonus} pts`)),
+        el('span', {}, `スコア: `, el('strong', {}, String(state.score)))
+      )],
+      actions: [{ label: `▶ ${next} に進む`, primary: true, onClick: startLevel }]
+    });
+  }
+
+  /** 最終レベルのクリア。全クリアボーナスを加えて結果画面へ。 */
+  function allClear(bonus) {
+    addScore(CONFIG.ALL_CLEAR_BONUS);
+    setPhase('gameClear');
+    state.drag = null;
+    sound.playLevelUp();
+    setStatus('ALL CLEAR! すべてのレベルをクリアしました！');
+
+    showResultDialog({
+      cleared: true,
+      finalScore: state.score,
+      finalLevel: state.level,
+      lines: [
+        `稼働率ボーナス: +${bonus} pts`,
+        `全クリアボーナス: +${CONFIG.ALL_CLEAR_BONUS} pts`
+      ]
+    });
+  }
+
+  function gameOver() {
+    if (state.phase !== 'playing') return;
+    setPhase('gameOver');
+    state.drag = null;
+
+    // 原作の最後の画面: すべてのコンピュータがトースターになる
+    state.computers.forEach((comp) => {
+      comp.type = 0;
+      comp.os = OS_OFF;
+    });
+    state.cables = [];
+    state.bills = [];
+    state.strays = [];
+    setStatus('ゲームオーバー: 動いているコンピュータが1台以下になりました');
+
+    showResultDialog({ cleared: false, finalScore: state.score, finalLevel: state.level, lines: [] });
+  }
+
+  /** ゲームオーバー・全クリア共通の結果画面（スコア登録とランキング）。 */
+  function showResultDialog({ cleared, finalScore, finalLevel, lines }) {
+    const rankingBox = el('div', { class: 'ranking-box' });
+    const msg = el('p', { class: 'dialog-msg' });
+    const input = el('input', {
+      class: 'name-input',
+      type: 'text',
+      maxlength: CONFIG.NAME_MAX,
+      placeholder: 'なまえ (最大12文字)',
+      autocomplete: 'off',
+      'aria-label': 'ランキングに載せる名前'
+    });
+    input.value = storage.get('xbill_name', '');
+    const submitBtn = el('button', { type: 'button', class: 'motif-btn' }, '🏆 登録');
+    const nameRow = el('div', { class: 'name-row' }, input, submitBtn);
+
+    let submitted = false;
+
+    const setMsg = (text, isError) => {
+      msg.textContent = text;
+      msg.classList.toggle('error', !!isError);
+    };
+
+    const onSubmit = async () => {
+      if (submitted || submitBtn.disabled) return;
+      input.disabled = submitBtn.disabled = true;
+      setMsg('送信中...');
+      try {
+        const res = await postScore(input.value.trim(), finalScore, finalLevel, cleared);
+        submitted = true;
+        storage.set('xbill_name', input.value.trim());
+        rankingPromise = Promise.resolve({ source: res.source, list: res.ranking });
+        applyRankingBest(res.ranking);
+
+        nameRow.hidden = true;
+        setMsg(res.rank > 0 ? `第${res.rank}位にランクイン！` : 'ランク外でした。また挑戦しよう！');
+        renderRanking(rankingBox, {
+          status: 'ok', list: res.ranking, source: res.source, highlightIndex: res.rank - 1
+        });
+      } catch (err) {
+        input.disabled = submitBtn.disabled = false;
+        setMsg('登録できませんでした。通信状況を確認して、もう一度お試しください。', true);
+      }
+    };
+
+    submitBtn.addEventListener('click', onSubmit);
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        onSubmit();
+      }
+    });
+
+    renderRanking(rankingBox, { status: 'loading' });
+    fetchRanking(true).then(
+      (res) => {
+        if (!submitted) renderRanking(rankingBox, { status: 'ok', list: res.list, source: res.source });
+      },
+      () => {
+        if (!submitted) renderRanking(rankingBox, { status: 'error' });
+      }
+    );
+
+    const headline = cleared
+      ? 'おめでとう！全レベルをクリアし、Wingdowsの野望を打ち砕きました！'
+      : '動いているPCが1台以下になってしまいました...';
+    const scoreLine = el('span', {}, `最終スコア: `, el('strong', {}, String(finalScore)),
+      cleared ? '  (ALL CLEAR)' : `  (LEVEL ${finalLevel})`);
+    const body = [subtitle(headline, ...lines, scoreLine)];
+    if (!cleared) {
+      body.push(el('p', { class: 'dialog-msg quote' },
+        'Module xBill has caused a segmentation fault at memory address 097E:F1A0. Core dumped. ' +
+        'We apologize for the inconvenience.'));
+    }
+    if (finalScore > 0) body.push(nameRow);
+    body.push(msg, rankingBox);
+
+    showDialog({
+      title: cleared ? 'ALL CLEAR!' : 'SYSTEM OVERRUN!',
+      body,
+      actions: [{
+        label: cleared ? '🔄 もう一度遊ぶ' : '🔄 もう一度遊ぶ (RETRY)',
+        primary: true,
+        onClick: startNewGame
+      }]
+    });
+  }
+
+  // ============================================================
+  // ランキング（Cloudflare Workers の API。API の URL が無いときは、この端末内だけ）
+  // ============================================================
+  const LOCAL_RANKING_KEY = 'xbill_local_ranking';
+  let rankingPromise = null;
+
+  /** ビルドが注入する、ランキング API（Cloudflare Workers）の URL。空なら、この端末だけのランキングにする。 */
+  function rankingApiUrl() {
+    const url = window.XBILL_CONFIG && window.XBILL_CONFIG.rankingApi;
+    return typeof url === 'string' ? url.replace(/\/+$/, '') : '';
+  }
+
+  /** ランキングの保存先: 'api'（Cloudflare の API）、'local'（この端末だけ）。 */
+  function rankingTransport() {
+    return rankingApiUrl() ? 'api' : 'local';
+  }
+
+  /** ランキング API を fetch で呼ぶ。失敗（通信エラー・タイムアウト・エラー応答）は例外。 */
+  async function callApi(method, path, body) {
+    const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
+    const timer = setTimeout(() => controller && controller.abort(), CONFIG.RANKING_TIMEOUT_MS);
+    try {
+      const res = await fetch(rankingApiUrl() + path, {
+        method,
+        headers: body === undefined ? undefined : { 'Content-Type': 'application/json' },
+        body: body === undefined ? undefined : JSON.stringify(body),
+        signal: controller ? controller.signal : undefined
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
+      return data;
+    } finally {
+      clearTimeout(timer);
+    }
+  }
+
+  function readLocalRanking() {
+    try {
+      const list = JSON.parse(storage.get(LOCAL_RANKING_KEY, '[]'));
+      return Array.isArray(list) ? list : [];
+    } catch (e) {
+      return [];
+    }
+  }
+
+  function postScoreLocal(name, score, level, cleared) {
+    const cleanName = Array.from(name || '').slice(0, CONFIG.NAME_MAX).join('') || 'NO NAME';
+    const entry = { name: cleanName, score, level, cleared: cleared === true, at: Date.now() };
+    const list = readLocalRanking();
+    list.push(entry);
+    list.sort((a, b) => (b.score - a.score) || (a.at - b.at));
+    const top = list.slice(0, CONFIG.RANKING_LOCAL_MAX);
+    storage.set(LOCAL_RANKING_KEY, JSON.stringify(top));
+    return { ranking: top, rank: top.indexOf(entry) + 1 };
+  }
+
+  async function loadRanking() {
+    if (rankingTransport() === 'api') {
+      return { source: 'server', list: (await callApi('GET', '/ranking')).ranking };
+    }
+    return { source: 'local', list: readLocalRanking() };
+  }
+
+  async function postScore(name, score, level, cleared) {
+    if (rankingTransport() === 'api') {
+      const res = await callApi('POST', '/score', { name, score, level, cleared });
+      return { source: 'server', ranking: res.ranking, rank: res.rank };
+    }
+    return Object.assign({ source: 'local' }, postScoreLocal(name, score, level, cleared));
+  }
+
+  /** 起動時とタイトル表示で二重に呼ばないよう、結果を共有する。 */
+  function fetchRanking(force) {
+    if (force || !rankingPromise) {
+      rankingPromise = loadRanking().then(
+        (res) => {
+          applyRankingBest(res.list);
+          return res;
+        },
+        (err) => {
+          rankingPromise = null;
+          throw err;
+        }
+      );
+    }
+    return rankingPromise;
+  }
+
+  /** HUD の HI-SCORE を、ランキングの1位が上回っていればそちらにする。 */
+  function applyRankingBest(list) {
+    if (list.length > 0 && list[0].score > state.hiScore) {
+      state.hiScore = list[0].score;
+      hiScoreDisplay.textContent = state.hiScore;
+    }
+  }
+
+  function rankingTable(list, highlightIndex) {
+    const rows = list.map((entry, i) => el('tr', { class: i === highlightIndex ? 'me' : null },
+      el('td', { class: 'r-rank' }, String(i + 1)),
+      el('td', { class: 'r-name' }, String(entry.name)),
+      el('td', { class: 'r-score' }, String(entry.score)),
+      el('td', { class: 'r-level' }, entry.cleared ? 'CLEAR' : `Lv${entry.level}`)
+    ));
+    return el('table', { class: 'ranking-table' }, el('tbody', {}, rows));
+  }
+
+  /** view: { status: 'loading' | 'error' | 'ok', list?, source?, highlightIndex? } */
+  function renderRanking(box, view) {
+    box.textContent = '';
+    box.append(el('p', { class: 'ranking-title' },
+      view.source === 'local' ? '🏆 ランキング (この端末のみ)' : '🏆 ランキング'));
+
+    if (view.status === 'loading') {
+      box.append(el('p', { class: 'ranking-empty' }, '読み込み中...'));
+    } else if (view.status === 'error') {
+      box.append(el('p', { class: 'ranking-empty' }, 'ランキングを取得できませんでした'));
+    } else if (view.list.length === 0) {
+      box.append(el('p', { class: 'ranking-empty' }, 'まだ記録がありません'));
+    } else {
+      box.append(rankingTable(view.list, view.highlightIndex));
+    }
+  }
+
+  // ============================================================
+  // ゲーム進行
+  // ============================================================
+  function startLevel() {
+    hideDialog();
+
+    state.params = levelParams(state.level);
+    setupNetwork();
+
+    state.bills = [];
+    state.strays = [];
+    state.hordeOn = 0;
+    state.hordeOff = state.params.bills;
+    state.billsKilled = 0;
+    state.spawnTimer = 0;
+    state.nextSpawnMs = 500;          // 原作と同じく、始まってすぐに最初のビルが出てくる
+    state.efficiency = 0;
+    state.iteration = 0;
+    state.tickTimer = 0;
+    state.drag = null;
+    state.splashes = [];
+
+    setPhase('playing');
+    updateLevelDisplay();
+    updateStatusHeader();
+    setStatus(state.level === CONFIG.MAX_LEVEL
+      ? `LEVEL ${state.level} (最終): ビル軍団の総攻撃！PCを守り抜け！`
+      : `LEVEL ${state.level}: ビル軍団の襲来！PCを守れ！`);
+  }
+
+  function startNewGame() {
+    state.score = 0;
+    state.level = 1;
+    scoreDisplay.textContent = '0';
+    startLevel();
+  }
+
+  /** ビルを全員倒した。原作どおり、稼働率 × レベルをボーナスに加える。 */
+  function finishLevel() {
+    const bonus = Math.floor(state.level * state.efficiency / Math.max(1, state.iteration));
+    addScore(bonus);
+    if (state.level >= CONFIG.MAX_LEVEL) allClear(bonus);
+    else levelClear(bonus);
+  }
+
+  function pauseGame() {
+    if (state.phase !== 'playing') return;
+    setPhase('paused');
+    setStatus('一時停止中');
+  }
+
+  function resumeGame() {
+    if (state.phase !== 'paused' || helpOpen) return;
+    setPhase('playing');
+    setStatus('ゲーム再開');
+  }
+
+  function togglePause() {
+    if (state.phase === 'paused') resumeGame();
+    else pauseGame();
+  }
+
+  function toggleSound() {
+    sound.enabled = !sound.enabled;
+    storage.set('xbill_sound', sound.enabled ? 'on' : 'off');
+    syncSoundButton();
+  }
+
+  function syncSoundButton() {
+    btnSoundToggle.textContent = sound.enabled ? '🔊 SOUND: ON' : '🔇 SOUND: OFF';
+  }
+
+  function toggleFullscreen() {
+    try {
+      const request = !document.fullscreenElement
+        ? document.documentElement.requestFullscreen()
+        : document.exitFullscreen();
+      if (request && request.catch) request.catch(() => {});
+    } catch (e) { /* 未対応 */ }
+  }
+
+  // ============================================================
+  // 描画（原作の Game_update の描画順: バケツ → ケーブルと PC → 落ちた OS → ビル → 下の行）
+  // ============================================================
+  function render() {
+    const FW = state.fieldW;
+    const FH = state.fieldH;
+    ctx.clearRect(0, 0, state.width, state.height);
+
+    ctx.save();
+    ctx.translate(state.offsetX, state.offsetY);
+    ctx.scale(state.scale, state.scale);
+    // 倍率が整数なら、ドットの絵をそのまま拡大する。端数のときは、ぎざぎざにならないよう滑らかに拡大縮小する
+    const deviceScale = state.scale * state.dpr;
+    ctx.imageSmoothingEnabled = Math.abs(deviceScale - Math.round(deviceScale)) > 0.02;
+    ctx.imageSmoothingQuality = 'high';
+
+    ctx.beginPath();
+    ctx.rect(0, 0, FW, FH);
+    ctx.clip();
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, FW, FH);
+
+    const drag = state.drag;
+    if (!(drag && drag.kind === 'bucket')) drawBucket(ctx, 0, 0);
+
+    state.cables.forEach((cable) => drawCable(ctx, cable));
+    state.computers.forEach((comp) => drawComputer(ctx, comp));
+
+    // OS をドラッグしている間は、戻せる PC に印を付ける
+    if (drag && drag.kind === 'os') {
+      ctx.strokeStyle = '#16a34a';
+      ctx.lineWidth = 2;
+      state.computers.forEach((comp) => {
+        if (compatible(comp, drag.bill.cargo) && (comp.os === OS_WINGDOWS || comp.os === OS_OFF)) {
+          ctx.strokeRect(comp.x - 2, comp.y - 2, DIM.cpuW + 4, DIM.cpuH + 4);
+        }
+      });
+    }
+
+    for (let i = state.strays.length - 1; i >= 0; i--) drawBill(ctx, state.strays[i]);
+    for (let i = state.bills.length - 1; i >= 0; i--) drawBill(ctx, state.bills[i]);
+    state.splashes.forEach((splash) => drawSplash(ctx, splash));
+
+    if (drag) {
+      if (drag.kind === 'bucket') drawBucket(ctx, drag.x - DIM.bucketW / 2, drag.y - DIM.bucketH / 2);
+      else drawOs(ctx, drag.bill.cargo, drag.x - DIM.osW / 2, drag.y - DIM.osH / 2);
+    }
+
+    if (state.phase !== 'title') {
+      ctx.fillStyle = '#000000';
+      ctx.font = '12px "Courier New", monospace';
+      ctx.textBaseline = 'alphabetic';
+      ctx.fillText(statusLine(), 5, FH - 5);
+    }
+    ctx.restore();
+
+    if (state.phase === 'paused' && modalOverlay.hidden) {
+      ctx.save();
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+      ctx.fillRect(0, 0, state.width, state.height);
+      ctx.fillStyle = '#facc15';
+      ctx.font = '20px "Press Start 2P", monospace';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('PAUSED', state.width / 2, state.height / 2);
+      ctx.restore();
+    }
+  }
+
+  let lastLoopError = '';
+
+  function gameLoop(timestamp) {
+    // 例外が出ても次のフレームを予約し、ゲームが固まらないようにする
+    requestAnimationFrame(gameLoop);
+
+    try {
+      if (!state.lastTime) state.lastTime = timestamp;
+      const dt = Math.min((timestamp - state.lastTime) / 1000, 0.1);
+      state.lastTime = timestamp;
+
+      updateGame(dt);
+      render();
+    } catch (err) {
+      const text = String(err && err.stack || err);
+      if (text !== lastLoopError) {
+        lastLoopError = text;
+        console.error(err);
+      }
+    }
+  }
+
+  // ============================================================
+  // イベント登録 / 起動
+  // ============================================================
+  canvas.addEventListener('pointerdown', (e) => {
+    e.preventDefault();
+    onPointerDown(e);
+  });
+  canvas.addEventListener('pointermove', (e) => {
+    e.preventDefault();
+    onPointerMove(e);
+  });
+  canvas.addEventListener('pointerup', (e) => {
+    e.preventDefault();
+    onPointerUp(e);
+  });
+  canvas.addEventListener('pointercancel', onPointerCancel);
+
+  btnSoundToggle.addEventListener('click', toggleSound);
+  btnHelp.addEventListener('click', openHelp);
+  btnPause.addEventListener('click', togglePause);
+  btnReset.addEventListener('click', startNewGame);
+
+  window.addEventListener('keydown', (e) => {
+    if (e.repeat || e.ctrlKey || e.metaKey || e.altKey) return;
+    const target = e.target;
+    if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA')) return;
+
+    const onControl = target && target.closest && target.closest('button, a');
+    if ((e.key === 'Enter' || e.key === ' ') && !modalOverlay.hidden && !onControl && primaryButton) {
+      e.preventDefault();
+      primaryButton.click();
+      return;
+    }
+
+    if (e.key === 'Escape' && helpOpen) {
+      closeHelp();
+    } else if (e.key === 'p' || e.key === 'P' || e.key === 'Escape') {
+      if (!helpOpen) togglePause();
+    } else if (e.key === 'm' || e.key === 'M') {
+      toggleSound();
+    }
+  });
+
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) pauseGame();
+  });
+
+  if (typeof ResizeObserver !== 'undefined') {
+    new ResizeObserver(resizeCanvas).observe(playArea);
+  } else {
+    window.addEventListener('resize', resizeCanvas);
+  }
+
+  sound.enabled = storage.get('xbill_sound', 'on') !== 'off';
+  syncSoundButton();
+  updateLevelDisplay();
+  setPhase('title');
+  safeOsDisplay.textContent = '- / -';
+  resizeCanvas();
+
+  // 原作の絵を読み込んでから始める
+  loadSprites().then(() => {
+    showTitleDialog();
+    requestAnimationFrame(gameLoop);
+  }).catch((err) => {
+    console.error(err);
+    setStatus('画像を読み込めませんでした。ページを再読み込みしてください。');
+  });
+</script>

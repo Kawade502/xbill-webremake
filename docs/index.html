@@ -1,0 +1,2368 @@
+<!DOCTYPE html>
+<!--
+  SPDX-License-Identifier: GPL-3.0-or-later
+  Copyright (C) 2026 Kawade502
+  Based on XBill 2.1 (Copyright (C) Brian Wellington, Matias Duarte; GPL). See NOTICE.md.
+-->
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="description" content="1994年の名作ゲーム XBill をブラウザで。ビルが PC の OS を Wingdows に入れ替える前に、叩いて守ろう。ログイン不要・スマホ対応・ランキングあり（GPL-3.0以降で公開）">
+  <meta name="theme-color" content="#1a1e29">
+  <link rel="icon" type="image/png" href="favicon.png">
+  <link rel="canonical" href="https://kawade502.github.io/xbill-webremake/">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="XBill Web Remake">
+  <meta property="og:locale" content="ja_JP">
+  <meta property="og:title" content="XBill Web Remake - ビルを叩いて、OSを守れ">
+  <meta property="og:description" content="1994年の名作ゲーム XBill をブラウザで。ビルが PC の OS を Wingdows に入れ替える前に、叩いて守ろう。ログイン不要・スマホ対応・ランキングあり（GPL-3.0以降で公開）">
+  <meta property="og:url" content="https://kawade502.github.io/xbill-webremake/">
+  <meta property="og:image" content="https://kawade502.github.io/xbill-webremake/ogp.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="XBill のロゴと、PC・ケーブル・OS を頭に載せたビルの絵">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="XBill Web Remake - ビルを叩いて、OSを守れ">
+  <meta name="twitter:description" content="1994年の名作ゲーム XBill をブラウザで。ビルが PC の OS を Wingdows に入れ替える前に、叩いて守ろう。ログイン不要・スマホ対応・ランキングあり（GPL-3.0以降で公開）">
+  <meta name="twitter:image" content="https://kawade502.github.io/xbill-webremake/ogp.png">
+  <script>window.XBILL_CONFIG = {"rankingApi": "https://xbill-ranking.xbill-ranking.workers.dev"};</script>
+  <title>XBill Web Remake - ビルを叩いて、OSを守れ</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <style>
+  /*
+   * SPDX-License-Identifier: GPL-3.0-or-later
+   * Copyright (C) 2026 Kawade502
+   * Based on XBill 2.1 (Copyright (C) Brian Wellington, Matias Duarte; GPL). See NOTICE.md.
+   */
+
+  /* ---------- Base ---------- */
+  *, *::before, *::after { box-sizing: border-box; }
+
+  [hidden] { display: none !important; }
+
+  html, body { margin: 0; }
+
+  body {
+    height: 100vh;
+    height: 100dvh;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #1a1e29;
+    color: #e2e8f0;
+    font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+    overflow: hidden;
+  }
+
+  @media (min-width: 640px) {
+    body { padding: 16px; }
+  }
+
+  * {
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+    touch-action: manipulation;
+  }
+
+  /* iOS Safari は user-select:none の input に文字を入力できない */
+  input {
+    user-select: text;
+    -webkit-user-select: text;
+  }
+
+  .font-retro { font-family: 'VT323', monospace; }
+  .font-pixel { font-family: 'Press Start 2P', monospace; }
+
+  /* ---------- Motif window ---------- */
+  .motif-window {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 56rem;
+    height: 100%;
+    background-color: #b2b2b2;
+    border: 4px solid #dfdfdf;
+    border-right-color: #4f4f4f;
+    border-bottom-color: #4f4f4f;
+    box-shadow: 4px 4px 16px rgba(0, 0, 0, 0.7);
+    overflow: hidden;
+  }
+
+  .titlebar {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 4px 8px;
+    background: linear-gradient(90deg, #000080, #1084d0);
+    color: #ffffff;
+    font-size: 12px;
+    font-weight: bold;
+    text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.8);
+  }
+
+  .titlebar-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+  }
+
+  .titlebar-title .font-pixel {
+    font-size: 11px;
+    letter-spacing: 0.05em;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .titlebar-icon {
+    flex-shrink: 0;
+    width: 12px;
+    height: 12px;
+    background: #dc2626;
+    border: 1px solid #ffffff;
+  }
+
+  .titlebar-actions {
+    flex-shrink: 0;
+    display: flex;
+    gap: 4px;
+  }
+
+  .motif-btn {
+    background-color: #c0c0c0;
+    border: 2px solid #ffffff;
+    border-right-color: #404040;
+    border-bottom-color: #404040;
+    color: #000000;
+    font: inherit;
+    font-size: 12px;
+    font-weight: bold;
+    padding: 2px 8px;
+    cursor: pointer;
+    text-shadow: none;
+  }
+
+  .motif-btn:active {
+    border: 2px solid #404040;
+    border-right-color: #ffffff;
+    border-bottom-color: #ffffff;
+  }
+
+  .motif-btn:disabled {
+    color: #6b7280;
+    cursor: default;
+  }
+
+  .motif-btn:focus-visible,
+  .name-input:focus-visible {
+    outline: 2px dotted #000080;
+    outline-offset: 1px;
+  }
+
+  #btnSoundToggle {
+    font-family: 'VT323', monospace;
+    font-size: 14px;
+  }
+
+  /* ---------- HUD ---------- */
+  .hud {
+    flex-shrink: 0;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 2px 16px;
+    padding: 6px 12px;
+    background: #242c38;
+    color: #90cdf4;
+    border-bottom: 2px solid #151a22;
+    font-family: 'VT323', monospace;
+    font-size: 18px;
+  }
+
+  .hud-group { display: flex; gap: 16px; align-items: center; }
+  .hud strong { font-size: 20px; }
+
+  .v-score { color: #fde047; }
+  .v-level { color: #4ade80; }
+  .v-safe  { color: #67e8f9; }
+  .v-safe.danger { color: #ef4444; animation: pulse 1s ease-in-out infinite; }
+  .v-hi    { color: #fdba74; }
+
+  @keyframes pulse {
+    50% { opacity: 0.4; }
+  }
+
+  /* ---------- Play area ---------- */
+  .play-area {
+    position: relative;
+    flex: 1 1 0%;
+    min-height: 0;
+    background: #000000;
+    overflow: hidden;
+  }
+
+  #gameCanvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+    background-color: #152219;
+    cursor: crosshair;
+    touch-action: none;
+  }
+
+  /* ---------- Dialog ---------- */
+  .overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px;
+    background: rgba(0, 0, 0, 0.8);
+  }
+
+  /* 高さは内容に合わせ、足りなければ本文だけスクロールする（ボタンは常に見える） */
+  .motif-dialog {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 28rem;
+    max-height: 100%;
+    padding: 12px 16px;
+    background: #c0c0c0;
+    color: #000000;
+    text-align: center;
+    border: 4px solid #dfdfdf;
+    border-right-color: #4f4f4f;
+    border-bottom-color: #4f4f4f;
+    box-shadow: 4px 4px 16px rgba(0, 0, 0, 0.7);
+  }
+
+  .dialog-title {
+    flex-shrink: 0;
+    margin: 0 0 8px;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 18px;
+    line-height: 1.3;
+    color: #1e3a8a;
+  }
+
+  .dialog-body {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .dialog-actions {
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding-top: 10px;
+  }
+
+  .dialog-subtitle {
+    margin: 0 0 12px;
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1.5;
+    color: #1f2937;
+  }
+
+  .dialog-msg {
+    margin: 6px 0;
+    font-size: 13px;
+    font-weight: 600;
+    color: #1f2937;
+  }
+
+  .dialog-msg.error { color: #b91c1c; }
+  .dialog-subtitle strong { color: #15803d; }
+
+  .title-logo {
+    display: block;
+    width: 100%;
+    max-width: 260px;
+    height: auto;
+    margin: 0 auto 8px;
+    image-rendering: pixelated;
+  }
+
+  .dialog-msg.quote {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 11px;
+    font-weight: 400;
+    font-style: italic;
+    color: #374151;
+  }
+
+  .rules {
+    margin: 0 0 12px;
+    padding: 12px;
+    background: #111827;
+    color: #4ade80;
+    text-align: left;
+    border: 1px solid #4b5563;
+    border-radius: 4px;
+    font-family: 'VT323', monospace;
+    font-size: 16px;
+    line-height: 1.3;
+  }
+
+  .rules p { margin: 0 0 4px; }
+  .rules p:last-child { margin-bottom: 0; }
+  .rules .hl { color: #fde047; font-weight: bold; }
+
+  .btn-primary {
+    padding: 10px 16px;
+    background-color: #1d4ed8;
+    color: #ffffff;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 12px;
+    line-height: 1.4;
+  }
+
+  .btn-primary:hover { background-color: #1e40af; }
+  .btn-secondary { padding: 6px 12px; color: #1f2937; }
+
+  /* ---------- Ranking ---------- */
+  .ranking-box { margin: 0 0 8px; }
+
+  .ranking-title {
+    margin: 0 0 4px;
+    font-size: 12px;
+    font-weight: 700;
+    color: #1f2937;
+  }
+
+  .ranking-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #111827;
+    color: #e5e7eb;
+    font-family: 'VT323', monospace;
+    font-size: 16px;
+  }
+
+  .ranking-table td { padding: 1px 6px; }
+  .ranking-table .r-rank  { width: 2.5em; text-align: right; color: #fde047; }
+  .ranking-table .r-name  { text-align: left; max-width: 9em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .ranking-table .r-score { text-align: right; color: #4ade80; }
+  .ranking-table .r-level { width: 3.5em; text-align: right; color: #90cdf4; }
+  .ranking-table tr.me td { background: #1d4ed8; color: #ffffff; }
+
+  .ranking-empty {
+    margin: 0;
+    padding: 6px;
+    background: #111827;
+    color: #9ca3af;
+    font-family: 'VT323', monospace;
+    font-size: 16px;
+  }
+
+  .name-row {
+    display: flex;
+    gap: 6px;
+    margin: 8px 0;
+  }
+
+  .name-input {
+    flex: 1 1 auto;
+    min-width: 0;
+    padding: 6px 8px;
+    background: #ffffff;
+    color: #000000;
+    border: 2px solid #404040;
+    border-right-color: #ffffff;
+    border-bottom-color: #ffffff;
+    font-size: 16px; /* 16px 未満だと iOS が入力時にズームする */
+  }
+
+  .name-row .motif-btn { flex-shrink: 0; padding: 6px 10px; }
+
+  /* ---------- Bottom bar ---------- */
+  .bottom-bar {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 6px 12px;
+    background: #dcdcdc;
+    color: #1f2937;
+    border-top: 2px solid #ffffff;
+    font-size: 12px;
+  }
+
+  .status {
+    flex: 1 1 auto;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .status-dot {
+    flex-shrink: 0;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #22c55e;
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  #statusMessage {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 11px;
+    color: #374151;
+  }
+
+  .bottom-actions {
+    flex-shrink: 0;
+    display: flex;
+    gap: 6px;
+  }
+
+  .bottom-actions .motif-btn { padding: 6px 10px; white-space: nowrap; }
+
+  @media (min-width: 640px) {
+    .bottom-bar { font-size: 12px; }
+    #statusMessage { font-size: 12px; }
+    .dialog-title { font-size: 24px; }
+    .motif-dialog { padding: 16px 24px; }
+  }
+
+  /* 横向きスマホなど、高さが足りない画面ではダイアログを詰める（ルールは「?」で見られる） */
+  @media (max-height: 480px) {
+    .hud { padding: 2px 12px; font-size: 16px; }
+    .hud strong { font-size: 18px; }
+    .bottom-bar { padding: 3px 12px; }
+    .bottom-actions .motif-btn { padding: 3px 10px; }
+
+    .motif-dialog { padding: 8px 12px; }
+    .dialog-title { margin-bottom: 4px; font-size: 14px; }
+    .dialog-subtitle { margin-bottom: 6px; font-size: 12px; line-height: 1.4; }
+    .dialog-actions { flex-direction: row; gap: 6px; padding-top: 6px; }
+    .dialog-actions .motif-btn { flex: 1 1 0; }
+    .btn-primary { padding: 8px 10px; font-size: 11px; }
+    .hide-on-short { display: none; }
+  }
+
+  /* スマホ（縦向き）では、余白と上下の帯を詰めて、遊ぶ領域を広げる */
+  @media (max-width: 480px) {
+    body { padding: 0; }
+    .motif-window { border-width: 2px; }
+    .titlebar { padding: 2px 6px; }
+    .hud { padding: 2px 8px; gap: 0 10px; font-size: 14px; }
+    .hud strong { font-size: 15px; }
+    .hud-group { gap: 8px; }
+    .bottom-bar { padding: 3px 8px; }
+    .bottom-actions .motif-btn { padding: 5px 9px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .status-dot, .v-safe.danger { animation: none; }
+  }
+</style>
+
+</head>
+<body>
+  <!-- Main Motif Window -->
+  <div class="motif-window">
+    <div class="titlebar">
+      <div class="titlebar-title">
+        <span class="titlebar-icon"></span>
+        <span class="font-pixel">XBill 1994 Parody - Web Edition</span>
+      </div>
+      <div class="titlebar-actions">
+        <button type="button" id="btnSoundToggle" class="motif-btn" aria-label="サウンドの切り替え">🔊 SOUND: ON</button>
+        <button type="button" id="btnHelp" class="motif-btn" aria-label="遊び方">?</button>
+      </div>
+    </div>
+
+    <!-- Score / Status header -->
+    <div class="hud">
+      <div class="hud-group">
+        <span>SCORE: <strong id="scoreDisplay" class="v-score">0</strong></span>
+        <span>LEVEL: <strong id="levelDisplay" class="v-level">1/10</strong></span>
+      </div>
+      <div class="hud-group">
+        <span>SAFE OS: <strong id="safeOsDisplay" class="v-safe">- / -</strong></span>
+        <span>HI-SCORE: <strong id="hiScoreDisplay" class="v-hi">0</strong></span>
+      </div>
+    </div>
+
+    <!-- Canvas play area -->
+    <div class="play-area" id="playArea">
+      <canvas id="gameCanvas"></canvas>
+
+      <!-- Title / Level clear / Game over / Help dialog (built by game.html) -->
+      <div id="modalOverlay" class="overlay" hidden>
+        <div class="motif-dialog" role="dialog" aria-modal="true" aria-labelledby="dialogTitle">
+          <h1 id="dialogTitle" class="dialog-title"></h1>
+          <div id="dialogBody" class="dialog-body"></div>
+          <div id="dialogActions" class="dialog-actions"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Controls bar -->
+    <div class="bottom-bar">
+      <div class="status">
+        <span class="status-dot"></span>
+        <span id="statusMessage" aria-live="polite">SYSTEM READY: ビルの侵入を監視中...</span>
+      </div>
+      <div class="bottom-actions">
+        <button type="button" id="btnPause" class="motif-btn">ポーズ (II)</button>
+        <button type="button" id="btnReset" class="motif-btn">リセット</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+  // 自動生成: tools/make_assets.py（原作 XBill 2.1 の pixmaps を PNG に変換したもの）。手で編集しない。
+  // XBill is free software (GPL). Copyright (C) Brian Wellington, Matias Duarte.
+  // SPDX-License-Identifier: GPL-3.0-or-later. See NOTICE.md.
+  const XBILL_ASSETS = {
+    billL_0: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAmCAYAAADeB1slAAABM0lEQVR42r2W2RGDMAxEKSyt0FpKoRWKyGc+nDiDGLGsZCHsMONwWN6nIwhPk3HMj7lYY+pxVKF14SMN0l5a4ggJwyKiLaDoDAEIRMNoeu6KU0AP762U3fa8CRklngJ8Az6MywBPoN7j0YIcAJ4Am/MAp7/rdnEZIDYYtfU+uAIeoLxfZV0X3j7UTRpQxSuE9qUIoC725t3WXn9EAEV0+FaNtOeSJh3RpB+I0A7bnrE5FBdHT+nCkEp5/gbzCM/MXhf8VAsxlgXa2BNH+z09rGV7iyxxsW1+5ayFLLdohyD303kQB+8s4ZA4QvCM1wwQ3l0wQBdxlqa/ACL5TwEwimEAT3w4ILVX9Vpwtx13JDWpd0BvZCOFDkditW6robFnqbyzNKRqES3krUIPB1iwliOWxgfGJ0tTAfZbjAAAAABJRU5ErkJggg==',
+    billL_1: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAmCAYAAADeB1slAAABIUlEQVR42s2WURLCIAxEOZhX6dU8Sq/SQ/jpB4rTICxhSSlYmcHWEvaFkAk4V2nLbfGsu94mAtvKexfMIsxgU8TNoLOAdL4KscbeAiggI8KjAaeJZ5AjgLc/WT8MYALhP7YWJAMwAW3MDJB96AGIDa5anMZ0pQIM4J8Pv21rJrw79s3/M4AgHiBqfbIAwmQ2Tqtu+BEBFEmXX9uj1PMYpmRFLv0gQhG2f9PGUFwcxXAVB4v390/XPMKnZp9ueFHsxFgmZNlBxNE+hkerqGxSTVxsm8dqbaIWW7RDED3ZMnHwriZsEkcIPvFdA5gPfw0wRFwL008Alvh3AXAV0wBMfDqg677auvwOuQwPD82lgFqdcmcbg/w3YGoGHU3R6RCm8wKEzxiTOFVoUQAAAABJRU5ErkJggg==',
+    billL_2: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAmCAYAAADeB1slAAABKklEQVR42r2WXRKDIAyEOViv4tV6FK/iIfrYB1o6xgnrJiCGOkP9IeyXLBZJyTiWx5KtliKOIrStvA2DdJaWOEK6YT2iLaDoTAEIRMOoPXfFKSAie8uy25k3IbPEhwDfgqt2GeAJlHs8WpAK4AmwPg9wel33i8sAicGqrf+DK+AB8vuVt23ly4e6GQYU8QKh61IPoAz2+t2lvfyIAIro8q050pmLTbqipB+I0AHbn7E+FJdET3ZhSTk/f41lhGcWryf8NBcSLAN0sCeO8Yc9bMn2BlniEtv8ylkDmbcYhyD301mJQ3aWcJc4QvCM1wzQvbtggBBxZtNfAD3+DwGwimkAT3w6YGiv6i3BYTvucGtQXFfiWXPbHks81H9PPAwQPsFT3yAGYuDW+A9dFywDqn4w9QAAAABJRU5ErkJggg==',
+    billR_0: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAmCAYAAADeB1slAAABMUlEQVR42r2W3Q3CMAyEOxirdDVG6SodgkceQotwZV/9l7glUgTI6X0+J7iZpo4xP+ZmzakySGRd9DkEwAwtcQ4J3VAwIxjBVHEKVsRDQBWilumKrE0Xd4gLJ3cBDhcZwGZUzEsBuyAOhFgJCIAF0gAc4iWgAjAba0QAcVSxLbT3q63rEgI8d35T28R3SAUgjqnTgu3yOA5PAMqYysOdWDW2ynicpC0mHBCEAggRG/9bxyFaTLQLDLT2/E6En9Yp60/vBs0BPWBBeFLa+vBdyx/wnITiCEFhtO6Ju4AMBGtMv1PiHOKJ43f+2XWjiCB/AXSXJwPQ9uE2QPr09AJww4cAGRfDgOgmXb5dZ0p0SeaZDeYX5vQ/WWsHUSNMlyuqsdf7h11okNKGVwDDx9SLezofAdtJjzYyOAsAAAAASUVORK5CYII=',
+    billR_1: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAmCAYAAADeB1slAAABHElEQVR42r2W2w3DIAxFGayrZLWOklUYop/9oFDVkW3wA4JrCZEIuMc2TiAlpx2Po2gtrRgWyKfepkBeUQkUImxCsPBdSAfggncAw73YkRYxighxAvEAqh+kbQU0QW4cIjmwDMAQzQECgJ57I5kFIJWEAa0v71fJ+TQBWnT6f6eKN8gdwPU9GH9IOT1KhB0APIb04EikHEtpvCqpjpEIAAIDHEI2/jcPQ0Zj5GvmA6U8v43Du3mD+d1BNIoAFkgQ7NRovnkc4gVaJKY4h3BhHromrgI8EJ5jeHeJY4gmzp9xP3WbsCB/AUynxwMY7UMYwF09swC+4UsATxTLAM9ld9vl15OqtGrhAAmyXJ4ewFbxcEBoFc2WaThE0vgAWYYWz/cVmw4AAAAASUVORK5CYII=',
+    billR_2: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAmCAYAAADeB1slAAABLklEQVR42r2X2w3CMAxFOxirdDVG6Sodgk8+QotwZd/6lReRIkBO7/G1ozQsS8VYH2ux5tIzSGTf9NkEwAwtcQ4J3VAwIxjBVHEK9oiHgF6IWqYRWZsuZogLJ7MAl4sM4DAq5lDAKYgDIVYCAmCBNACHeAmoAMzGGhFAbFU8Fsr7VfZ9CwGeO/9QO8RPSA9AbFPnCLbL4zi8AShjKg93YtXYKuO1k46YcEAQCiBENP63jkO0mDguMFDK8zsRflunrL+9GzQH9IAF4Ulp68N3LX/AcxKKIwSF0bon7gIyEKwx/U6Jc4gnjt/5Z9WNIoL8BVBdngxA68M0QHr31AKw4U2AjItmQHSTHna7zpaq68puQXjmXdd3rd7u0dzqQGtqdx+shk4HDP2PpgnVCH8ALZwqPyBgExMAAAAASUVORK5CYII=',
+    billD_0: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAmCAYAAADeB1slAAABZUlEQVR42rVXiQ3DMAj0YJU6SdTNOko6SkZJ40pE5HIH5KkllBSbO8A2Ja0FY3gMcxemQ/2pgUD9fRo5eEjKvDIwAzRBgnJEaOwJTO/fPTjq/LMxjxGQEbB5Gg1OeKMjwiKU3l8Ruhd3EbAjfSuJ3IcqwbJsI6VogFEC9N84FAlNjQE8X58dAJtTBPKYVggUiReaeyPoxgrAD3Sij2ka56hWNeUlEticPX9RLuB9HCbwxhYhiw5rUlT8dgQWvjxFhdRg5dukxSIwEhBahXeniBW9rjPvULcCk3mvb6iY5/cqETHq2Pz69D88gZGYx95ztdavW6NQEXhDL6arOtPQGI2y94gk/GdToAqcRRs2AAo4S2W5H2IEEfjhhkuF/leCKPeXCCqbe6ovrRCU20bsN7N7wI502viyssHqTZamjcNVgIqwYihvcXZLq+vSKKJNjO6L7C7K9SSxSwnOfGrd+v1W/TD8At2CyRCVVb2WAAAAAElFTkSuQmCC',
+    billD_1: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAmCAYAAADeB1slAAABqUlEQVR42q1XiY3DMAzLYAVukuI2623SVTJKrg5Ml5Ioy0FrwAj8iNQPZ9uScb/djyv7l0YD4en3PgLEen++J68VYUk6A1QEap2S8QGDrk5FONX+kyld9S2CaRy+QVLGoQJ4XTNzhcwEeQbQ1n5kJFL7AUBAADjPMAuC1D0lwXszkPBMs2imZXCPU6KNfX+OWsiyKQWQZ/17WvkCb4MJoOyUgIW3xDoAMSiv/35+BQkRwHyVRawlA2dBHiTsFlgAknFG4E1LaHq6qcdDNrzjeJjpK7MTDY0B7lu9URyMh8mkSMCCDI57rECwwggwUXcDBBU4CBhcW9AvQ5jJvIUMnpGEXuQFlDVKe3XH10AIOAQ9SUa6RHJF0CeDdy27eFMHpaaJe7w3fCWbg5C6wlUzZWK3E1qW1kwyz5CoTSPgsor3udAU0SZbK+U6F5cCZwKlnHQVB8enp3EDtZOlADNj0FZYwUVavov4AoR8xSK7slYh8dKO6TpqRcAkBk+9jpUwLDJ1kpCEF94KAazgAPq76fNxZgVfVmmnZMv/hOxS1oZL8Mu/RMUvGI9/OpWvJ7pi6GAAAAAASUVORK5CYII=',
+    billD_2: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAmCAYAAADeB1slAAABgklEQVR42q1WgW0EIQxjsEqd5NXNukpHow9SaHDsBE5Fj/7uCDZxQqA10vr86TbGfz6/UpuFw8AygjFmBGjn37cxHHhCIMFvSTIPSnlt0BO8Pl59dLMZz1kMJIEDxb6ReA8SDO3EbPY/H8OEsAC1+vnu3VcEbmLH1pJYLU03AusRJBs7joWfuR6H3jNryBjxMoLbBwbS/gKK2lACuQd6/165XRIQG59FksSk8FkCmyqVpyTAXdoZQUyj0C1xwl7xXihC9A7HISvzOlN1tLMyktZw8+CExGz8HPB21/6meyC1mLDiTH8FmHkqs+iJF1ZxsTeSJceEVZxCcJ8EugTONtwtaAmOe+HfPcgyp4oFsy1lufFg2GKZ2E41dqjfSrThvMt/KtMwfEpylDVGUEmmtN+IGDiTiT1vBG9ZwoVNHCytWi0SYDVYct0WMFWq2QIbuwqe7gF2AqIXE1NNwsJncVG2SuZwaVUEygO0owQn1z5WZ9S3AIwfbgiur/D94jJ7YvsLA+s2XHO9P+8AAAAASUVORK5CYII=',
+    billD_3: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAmCAYAAADeB1slAAABI0lEQVR42r1WiQ2DMAzMYJU6CeqoHQ2aSkau8XOXkCIQn+Pze3HbW/ucv4f37S9HB5br/XztldwSAC1zAclQ7UIPwMqc+vSLfe737bGdC+QZMeIr5320YBrAcz3ScfHAU+B4lv4vc4BaCSuPhLP4VtaXNVuBIF678Y9K1nqJhK10n2m6JRSTGXULUNZsvW9uUUTxEMOKw52sF3UyQyrMY9mSi5jqyqyHwyQezeZoLFFMlUThmQYa6eKK5st6zngIJbwyqdnkwNJHi3qA7fLhHQ1RLhzk6mCbJNoD7ICQVgYaCshDxHqddDuAVXwFbZ0aQApBA6RhnQWQ9zZSdhGYnVGnpuoozh4ADOKR3zKAjG0tIMVJLIAGoSmc2ZupqSJLcqXjAIsSuwTv3xQ+AAAAAElFTkSuQmCC',
+    billD_4: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAmCAYAAADeB1slAAAArklEQVR42u1WiwqAIAz0z/qUPrVPswyKkGy322YGjSBE590enqaktLx9ef8FGQJgIiE5H/MUiORYb36uuw4QdhQBJCwLOMyQmTNv0qV1VWnRsAll/ts4Ft6mbmLnJYrfS1vfbgiRALYo0HrLHUCrqatsd2+ld28n0OeR5LD1EKNohYWCir5WgGWaZd+Qk+xZSHfAsmGdGtU5Yl7SBZAWwVrOW2vuCk49KUNyrgVYAYJL9IUoNF3bAAAAAElFTkSuQmCC',
+    billA_0: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADoAAAApCAYAAABk+TodAAABO0lEQVR42u3ZUQ7CIAwGYK7lVTzcbrKr7Bo+osw06Tpaus2Y/gwSMkznw2eBQkxptNH+2p6PZ7Z6N8Bltjs02gO00F0j4cBXofz7obHetemBhsX+YtrW4N0jQ2KPQD+vbzos1IKUz7K1sCGhFqQWg4MS9iQ01WYB/XhRy4yaNS1G8ZxfeVnmDTByLT0NLciCRTn/mhlrxSmjCMfdHYYjtDWMhtyBOYJjZRz+jrpuLLTBMKx8wl/CC2CzmwokxbuAcqxEdjFlv8Bp7RIr4/QO6JTlyGmXQY6ExHJY7SnHsNgW1ELCYLWs8enqySwEVANpaxMOK2tmbVf1QMOXHDoQlDFhPZmT65eXoPBHPrlePZuQdnIKv075+EiHQLZ2Yk85gf7TCb5uXqmtXSE92AFFvK55+i2Qt8Km0VJ6A7E90Pyyhv2dAAAAAElFTkSuQmCC',
+    billA_1: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADoAAAApCAYAAABk+TodAAABV0lEQVR42u3aUQ6CMAwGYK7lVTgcN+EqXMPH6YiNpbRrUUj6LyxZxGwxfunWFXQY7na3U9v4GIvVu4Mus97hsTxqFpJjIaMcwXlw+pyuoYRNv7SjS9ZDpoaeEc30CevfSMJgr0JCQ9/TNx0W2oLU97J52JTQFkQba0HTHjOfL3QYSnPkKsh+njYhLWgpz7Is8waYuWj4GVqRFYtS9zYj5o1TRBHq+h2GI6w9jIbcgTmCY+U4/A35mlgowTCsfO3iJnyTTQWSxrt52qBFsotnSF/gtHaJleM0B3TJcuS0iyBHQmI5THuV17BYD9pCwmCtqPHlGoksBNQCWXsTDivPTC2rRqDpjxwqCOo1YSORk/uXH0HpSz65XyNJyKqc0u9Tfn2kQyC9TBzpUCWhjKqXkOCA2nK1QPIogivwrb2nnY/Qv4Z7ySYyD3b5HoHC33xriK7/wHFFewEeSwh6hWD3SQAAAABJRU5ErkJggg==',
+    billA_2: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADoAAAApCAYAAABk+TodAAABP0lEQVR42u3ZUQ6DIAwGYK+1q3g4b+JVvIaPbJhUa4VadA/9G0iILLCHzwKFbRh66aWpjJ8xaTUMcJn1Co22ADV0aCQc+C2Uf9811ro2LVC32H9M2xI8PNIltgX6G36qsFANkj/Lcod1CdUgpT44KGGfQGmMnAX08rymGRWiQVNa07LMJ6DnXPoYmpEZi3L+VSN2108RRTnXVxG1NYyI3LHHdF33aUlY2Q9/R902FtpgGFY+4S/hGXDaTQWS+kNAOVYi4X9aOYDTViVW9vMxgFOWA6ZL9DgSEsthpadsl7AhoBoSBluLGp+ulshCQGug2tqEw8qcWdpVLVD36YYOBLlNWEvk5PrlKcj9kU+uV8smVDs5uV+nvN1SIZB3O7EWTflyQA/24HnzTW4NhbRgOxTxuhb6L/7WtNIj2ou9fAGOQtn1w4JjTgAAAABJRU5ErkJggg==',
+    billA_3: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADoAAAApCAYAAABk+TodAAABN0lEQVR42u3ZYQ6DIAwFYK61q3i43cSreI39ZLKkjnS0CLKkr0hC4jZD/HwIyEL4Q1keSwyeSgKV6rZ+j10AE4hQdMwrLFZDaVgocC8SLt0eKGRX5s+mS+iINE1DR6QIgR2NnAZquuvW5seWmwEHTd9TOQstLRzMwGvQ/ZRP1dLNf/tpe1ttpCxdOCF5kRb6UtsxvqKpVPlSToISln8utRfj0+Y6mCWk4rSkEzCvVgeoI00+INWgHGgZGWjw4Tg6lp7REtI69MDmqZ5BoSGDNLC0VDhkK3AqJNROQw8SKs0rSBisNhe6hvZMKeax+ZsGv1AtaWnxYHeXYUfm82Zv0hBY/XWrrStD/lWR3wTX0J7pxy0U6T30EvKGekJq58Bhp4BKK6AS4uxWKBSSQ1r2fN0lGu4ytrwBdqV1n2aP3VQAAAAASUVORK5CYII=',
+    billA_4: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADoAAAApCAYAAABk+TodAAABJElEQVR42u3awQ3DIAwFUNbqKhmum2SVrNGjW1JZciIMmHDwd4KEeuHyZGPsqClNWstrIW0n9MWI/Lut+oaGM66F1OAQwBEcFHYWEgI6A3kbqPvCNDOiEhwe6jqFS9grRQqi+srU27Y17JtKpW3BonRJlNcO+0UzL45qD1a2jzBQRkpsb8Xl8+6xpYha3lGiD06jb0lf6FFOS98S+H/2vW/I0e2YjqRGjpESCzuMa6jShhzELUCZunDIXiDk/bQCIVN2FAmFvYqsQXMTEQbpPqI15EhBgqqwI1XXLfY8bTBMjlvwUAZK8HmWbKW01gq6jWjP3W31t/I+Q/a64fvc0acnJDTciFYrRg80CrJ2BnLwDg+1/FED+gtga7fO3iKi6Vlz1xc4SmnJioQ4HwAAAABJRU5ErkJggg==',
+    billA_5: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADoAAAApCAYAAABk+TodAAABKUlEQVR42u3YwQ3DMAgFUK/VVTJcNskqWSWVD1bpLzi24wOfGgmlak9POICb0ooVK0Zje21XydDI8/gkNVhWDKr3lQimxZ3nceXIzwzDoMMWWA58WkgN6hqrIcvnUtEeqFvsHbK3om4bFFYUkQWkpYZ0W1XZfGQFe1A00N7uSgsdfRepoBL7F9BZFS0rout5Oquirvdf6/iGObY4ZnC89CJJ1sD9wmtYKGQGymzBWvdSx2NlV6GtWPf/NlhIxEqwcRn3ff+sIWvosMg7PBVyFO+28cgxgkeSHgqLwM+fYE+Pr6f9NWWk1URG0a7e0dYOKbciLWma0MyZGhZJ0WmfQq1OHQpa+z4M1OrC4ZDW77TNqAdK2XWteakh6G4tLUiEUF7PZlU0rZgbbwiTF0+fcPvaAAAAAElFTkSuQmCC',
+    billA_6: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADoAAAApCAYAAABk+TodAAABTklEQVR42u3ZbQ6DIAwGYK61q3g4b+JVvIY/2VhsVpu24L7SFyQhyyZZeGypqCld7Wp/a9NtylbvDrkueofH8qhZSI6FjHILrgan/+kaStjwqd2asjVkaOg3ohm+YH0aSRjsr5DQ0MfwQ4eFepDyXbYaNiTUg2jHPGjYy8w+odNQGiOzIPr11IV40Jy3vK5L7G0hm9Tb0IIs2ND73hZoQXjHIW7pymQIIjE8La01zCNJ6csjHKvq7hMj0Au9mcckkk5Y2DSWqZbz/OxahOSnNp4XprBrlSZNE+eT9pByfLi0PYP1kDQW5qmDBdDWnhwnwRCPVI7IWV3D0EhenCRU4i0o3NNADdoVUkvfoaAt6xMaKqPaPdRDDgOFfvnk3Xp194atJWWhr6H8hVFLQYKLrHXLZm3ctd+g16WWntBrtbXgdFGQhoFa6NoJSVdL6Q6d9kLY8foKTAAAAABJRU5ErkJggg==',
+    billA_7: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADoAAAApCAYAAABk+TodAAABPUlEQVR42u3ZbQ7CIAwG4F3Lq+xwu8musmv4k4mxsRQo3cePvgwSMgxo8ligoNM0yiij3F3m1xy02g1wW/UKjbYANXTXSDjwVSh/v2usdW1aoG6xd0zbErx7pEvsEehneFJhoRokvpalhXUJ1SClPjgoYc9AaYycBfTleU0zKkSDhvAO27YmQM+59DQ0IiMW5fyrRqzVTxFFOO5mGI6orWE0ZAbmCI6V/aXp+psBQFc22mAYVj7hL+ERkOymAkn9XUA5ViLhf1b5A5dvlVjZT2NApyxHLlkEORISy2Glp2zDYltQDQmDrUWNT1dLZCGgNVBtbcJhZc4s7aoWqPuUQweC2CasJXJy/fIU5P7IJ9erZROqnZzcr1PePlIhkK2d2JJOoP90gs+bV3JrV0gLdkARr2uW+gjko7Ctz9oBan7Y7BcpsOEAAAAASUVORK5CYII=',
+    billA_8: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADoAAAApCAYAAABk+TodAAABNklEQVR42u3Z2w2DMAwFUNbqKgzHJqzCGnymTYVVc2Ub6Eu2k0gRVETIp3Z4hGHorbe/tfE2Fq2ngy6z3MODedY0JGLDoc/gjuB0ntRQwnK067L9FOka+o1saqWcJpNhsL9ChoY+hu96WKgFqb+xHWFdQi2IdMyCur3NbAFdhtIYrALv91MTYkFLWcuyzL4fC1lQb0MrsmJdP/eegVaEdTzEK10NhiCI4WWpzWGeSSpfnmFfV90tMAK90Kt6DJH0h7ktYyy1UqZnlzKEW2k8vzC5nasUNAXOg7aQON5d2V7BWkgaG2bVQQNIcw/HITjEksoeOYlzODQSsbjFfQkabjVQgqZCSuXbFPTM/AwNxaymh1rIZqChv8VYr17pvrClLdkOVeZpqo/CFrZDs151m0A2hT061x1ByjVoG0gVPgAAAABJRU5ErkJggg==',
+    billA_9: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADoAAAApCAYAAABk+TodAAABUElEQVR42u3ZbQ6CMAwGYK7lVTgcN+EqXIOf0xkaS9OWgZj0rVuy+MFi9tiuwBiG3nrr7WwbH2OxejroMusdHsyjZiElFg7dgjuC0++khhKWo0On7bfI0NA7ommlcppIwmB/hYSGvobvOizUg9TPsh1hQ0I9iHbMg4Y9zWwTOg2lMTILop9PXYgHLWUtyzLHvixkk7oMrciKDX3d2wKtCO84xC1dnQxBJIanpbWGeSQpfXmEY1XdbWIE+qBX85hE0h8WNo1lqpUyvbsWIfmqjeeFKexapUnTxPmkPaQcHy5tz2A9JI2F2XWwANrak+MkGGJLZY+c1DUMjZRY+Srfa1C43UANmiJlvfRthULu72rV9Gh9QkNlVNNDPeTfQNM8h2npA3JrSVnocyh/YNRSkOAia92yWRfu2nfQ61JLT+i12lpwUhSkq1D4qmtB7kQ+AZKVPRTUK/KpAAAAAElFTkSuQmCC',
+    billA_10: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADoAAAApCAYAAABk+TodAAABDElEQVR42u3Yyw3DIAwGYNbKKhkum2QV1ujRFQenqLIbHByV38GSFQnl8gljHik5xbqspGVCD0aUb971hIYz7gypwSGAV3BQWC8kBNQD+Rjo8I3Jc0ZrcHjo0CUsYXuaFET3rTPnPeyeSlJasCinJCrBs1mCZ7UFi3QUPKCMrLGRoOko1Q4k0QsHbC1f2KubVr4aGPqOWsN47VoSHLw1J9Qd1YqDgHrghoNKa8oDVyOHgZYvd9NwwO998rOVbLeW618PEXeULlynDb2lyKejoLM6oUp3lUocGtqybnn8Eedc+FtM6K57BpXGwS/gejOa0CjIX/+E2UdDQS1vQbDvRZaHL/iHsZ4ZTTN84w3MzHQqFkZtUAAAAABJRU5ErkJggg==',
+    billA_11: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADoAAAApCAYAAABk+TodAAABIUlEQVR42u3awQ3DMAgFUK/VVTJcN8kqXqNHIrdCopGxjeMDn8QS6sWXJwiBqCktOttrIy0S+mFE+c27HtBwxvWQGhwCOIODwq5CQkBXIG8Ddd+YVmZUgsNDXZdwDXulSUF0Xxk572HfqVQLCxZlSqJyOJvlcFZHsHJ8hIEyUmJHOy7fd4+tZdTyHiX64Az6lvKFXuW08q2Bf3ff34Bc3f7LkdTMMVJiYZdxDVULyEXcApSlC4ccBUI+n1YgZMnOIqGwV5EtaBkiwiDdZ7SFnGlIUB12puu6xZ63DYbJdQseykAJPu+SvZLWRkG3GR15dnvzrXyeIWfd8HPu7KsnJDTcitZqRg80CrJ1B3LxDg+1/FED+gtgL3p3b5HR9Jy15wDsk2u1nsJUIQAAAABJRU5ErkJggg==',
+    billA_12: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADoAAAApCAYAAABk+TodAAABUElEQVR42u3ZYQ6CMAwFYK7lVTgcN+EqXIOfysBhqe1WBZK+ZksWEmaUjzdYwa5rrbXW/mn9o39qPRRyGuUODeWJaUiKhUk3H6QFVkO7n5pnkTDQs1jX0/eKFN2negfSZbJ3Qd2laoEuHzv0kNAE441jtRPhEqqBJSjFlk6EayhPR2s1qMslhpZ563Yal8Odq9BS2hD1bUImbFjoPpUriW77Z2yoBbten8o4ub6xHtEy5rB8vJEUCwUsJStt8zj8G4acKL1BcWQeD/WOSEoW/p3RBhv2LmHpZyDBHMkxH/TwhYVHSihtC420AOGhWpLSfvdYC1K6VrUTAFIN2aDSPvdrK106pDtqLemMTN/ltlrSKh/LTYlfl+5LQp7or51Of5iSr7bESElC17il6ohD4UpArczT7srSOCSUH7xUyIeCcmyIv/nPQOEfukvjV//2C8bfCHrPx5gGAAAAAElFTkSuQmCC',
+    toaster: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADcAAAAtCAYAAAAKlvO7AAAEiElEQVR42u2ZvW0jMRCFWYbTCxW6jWtHbbgEpy5DLSi8UOmFLkG+t8AnPD8PuZS0PtwZXmCwspfizsf5JdXOX/hq33DfcN9w/xfc6+vrIl8GTjCn0+m83+/Ph8Ph/PT0dN7tduffL8/LM33W//S3nks0lvH/LJyUl5JS3P9+/vmwiKCqhRAwYyQAa7w+f4b1r4JDIV1SGEWPj22R0353gdFdCyDxMRIWAatqDKBbQrZZa+nFUmBR/nn/DkxQx+NxEYHpLoV//Xh8B8U4XwDmz8X7a3B6IYpLYcBe9g+LwgJxuLSURIujZwiJqJKtANsMGCvtLiYoWRBlgUtrSWQRxjgY3qD/MwbZAnAIpyTASz0ZCEqgrozGpcX0fR8DmO4ecxJ3aQngnwInxVhhYoxkkGDEWCYNB8ItHaiKOz5rTumwOZwmJfB1TzBPCFXy0DiPIeoeVhnFmwsWvjWDlnBMmOleFsyXywIORjnwGrgG5par4HTfBI5OwuFQWtkxXy5gh/OCTGLogbkbVi2dx+YmcB5rI6vxcgcDPmsjwLN9qLv9PS1bS6u5IigupWm3/MpYw+JYjVX39D/biBPPeNItFmxpNfwbl6RQlz2juSRJhMsb69mYcSgyqt5LYy65pjy0yiWxSrqkX+mSDodLeqzNumLWPt91tNZKD5p2S1YPOPrBvBbFra6lS3rXsXZ58U4BTmBZ9/Q+b7xzTPOOP8GIt8rXZc0qkaAsKz8L5lbLbkWKe8jgZSQsrIrrIi1rm7sHW5YqVeOSXiLcJdf2aLzHQbKhzu7G53dXrYAXS6ZLzga+lNHEknRJaltvPl9AB+vVOpIIUICNvOFmuEpZj8WR1TIekV7mdAulpUY7mSVO0y3vPSwibqq5qrjq1T/mAsiheFZlY28eNoXDHXw3kNBZ1EdgWM3HYRVq3iV5/IH/sCCeLe+1GtuUbNNwwyppVPMoiZH+Jb6BdTetxF23eax4d5LHATMFmLTtySDr1gjMWzZXFl2qDHmpaQCZCze6EVa4UspXPaGr3TXPPC7WFovvU4xdmItns4fBjXjr1ZoPW5xON+G9ZPaHvgiVUn6sAExaCK/weubxVoVV89OttE51/tGLJVbWrZXpvtrHkTgovL3y4E2zdyUu2dw3/6LXE48dt2gq6xDAZWZcA+N9OXe113RrZTuWgM1dYCRM6nHpBRm3AWhkNY4JAcszzWEcmU7VM981NF+JW4QVxy05GetZzROPHx3OgI1ckXh9B4evf+ioJ8B8A0mNYx/nfaPXQe/k3QPWMp9vaXr6ZVJpPjABe9KzHpbwFsvLgoOtxVeexqV+WSoqq7eqrqxZKidH2XQz4DxxXAvmcTZa4G6dy32Qu+ostDfF7m7sC2czYg9uzXu6cNVJU08q6B6cJ44sI1edYt0D57WnssoatNc3amJ2HLeCuVvi3niD7wCGcLw4V4VnJIaEpl4hnjgS7NYtlS8ev1fw0zPvG8K5El4asq90RXvbDW9u7wXLn9MSbnTc0KqtyzVSJZg8Et/id24BaW4dRgmIe89qut4AfTgt7cVe3mEAAAAASUVORK5CYII=',
+    maccpu: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADcAAAAtCAYAAAAKlvO7AAABT0lEQVR42u2aDQ6DIAyFuZN34ixegbN4Bc7CFVy6rEnHUGCWH80jaTYWpX48aR3VGNHWdd1HmGndyMm2bbv3vquRz6aAo8C6ANLA0klP40ltDvdx0NUi34AD3KxwqqllRjiOpCGE9+/0GUdYNj4/GXVnhSMgthjMOfeVvm4H91jl/s2ZUG6mNUd9a+2PSWAohzUH5ZDnoByUg3JQDspBOSgH5TJws2zKNlFupDVV7kqtwLpl92ZRqxUcKSf9FCs3W5VHVbncn0Q5S1estD6nuuaOmtyv4AuhGasxPk+OVboDrqrcGZymlcCpbKePKhV3KSGnbgFtSwWS1DE5wOpJ6AkXf0/BSYj4Os/6Q+HO+jFcTqniW5nhaqNgjcXjp/zVFCDpOJqQbHSc4dEr9QiWe/OC4bKJWytJayT5UtWKXvO4WyqogrtbkwHwcXA10fIFldqQkg2mvH4AAAAASUVORK5CYII=',
+    nextcpu: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADcAAAAtCAYAAAAKlvO7AAAA8ElEQVR42u2aQQ6EIAxFuVPPwhXmTnOnuZNuZmGIjKW0fJr5TUh0A3k+UPFbyrdE5EC2ElWXASAtFBAJdgUMhQNOyTVwIGOEIxzhCEc4whGOcITDwLlvo3aDc91lZIB72lWkhqM5mqM5mqM5mqO5fzaH/igbZm6Hz+lh5qzt9ZbjUyQUbsrcLimPu7md8jl3c4M1OpBLnDZlrhdIajrSTDltkroqrY1ea2sKvd4sVtPGxncAT+eQ2FizDns3gN7ddOhPiBVw7bE1E2/fg+Fwv84tcCZztVb31vZ7N47FnPphnek/FBPczo+AKbhMNXJRTptsyA/Cx+uGAAAAAElFTkSuQmCC',
+    sgicpu: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADcAAAAtCAYAAAAKlvO7AAABLklEQVR42u2ZDQ6CMAyFORxn4SxcYWfhcBOQJcscXSdtKfpIXlQ0LZ+v+4EOw3FM0xTv1KB1bMHneb5VaoB/A2ddjmZwRwJTFbn3YxzHeFWu4dZv13MhfhoRYkvu4VoX/2jnOA7BOTgH5+Ac1rmaI+Fw5SfHHOAABzjAAQ5wgAMc4ACHuwLt+zkvD2VVnNtOptdc1o/T1Zzz0CsQdc5bC0vUOe3uz7Isu7gND3HnrFpbXDh1595JZMuPk9jEOYkkXyWW7M15EgXf/Qfla9yd61w+HmsArc8kXAhBReWup5artgWjnGKXuQVcWQVcOKo00+9JwDxwkjRcip/eX4Urr5kNl0//vSC1GLWyPNtAc+HKTX4TjppQekXFO4uvCudBvWWZj7tHrHOc5Ys7W74AvmEMYQ8pEkAAAAAASUVORK5CYII=',
+    suncpu: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADcAAAAtCAYAAAAKlvO7AAABHUlEQVR42u2a7Q2EIAyG2el2YqebhZ1Y4Tx+NOk1lK9wUPRt0ohGiI9vsUV1IYSPJXczLQ0YYzThgBuF2xWKy+C+h5Y64AAHOMABDnCAAxzgAAe4iXBDi92T4LQ1oNr/RLiXf98TjsBoC+Uw5wAHuC64NMdKcN57wN0bzuJL2SlwModYeJ2erqcHLp1bTI67AEfheFuFO1W5Ipzl73McrsV/4KwbwfW4e4Q94rMxGW/PMDmeNj7Pszwk5dpNzi/5lDcNx6MptyitFQPZVPBPOHkBNbhkuX61lEA3YikcjcnbNbhcyEkFc9vlyvWGJSmXAyzBqcpx+WcXxaV9ebxVOa1SKZZfVv5DqSnXPOcs5rkpyu0sXWqlk6Zca115AVZ9cCerTpDmAAAAAElFTkSuQmCC',
+    palmcpu: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADcAAAAtCAYAAAAKlvO7AAACIklEQVR42u2aPVLDMBBGfQuaXIKSNmVKDzdwSZmSlo6Gs9DQcRMaOEjI5/EzG42wpSArsZBndmzkWNqn/ZGQ1DTH6+31/ZBDnl+eeum6h0N73/b3/f6n7GazGUXlTYorN5xPBHRUpZe77e164HwwUt4K1tzudqGWozPi4MyHWcS6qqRYuCItJ5ii4QQmCUwo64ST5eSmxbplhatwVwin5wp37XDdY/s/4DTGVcutGU73ouDsDKU4uJotS8iWRbtlMXC+GUq13Fotp9ircBXOCOuH+phnxUWozP2eRSCJ/s4KpwZoSBUwqMYATgl1CkD1ZofDAudYLsSyUp5OvAhciIulEB/csDGynFsSc9xTuiUxJ/Etpy8KZ2OjX41KaCnmj3RaVjgSiM1oNgb/Ems8MwvBLbPBqRH2zGzmtBluCtRXTmfxztaRFS71pmPIBuSq4EJ3UxGsuAjc18dnL7glS9oxMGzez0FZl5f4LBegeDwcqR8l1BDQnDhgPmgTkJ0rSkGghsH4ZA5JGVbjG4BNNm0CAOOHgjFTGusxHaMDgKYcwYKU2/GMVS6GGV/iioA77zSDmwx0H3Y7x5jgHb3vwtEJdBJnT4ChLgtmd1eTwNm4mDorEnKGxJ4j8SUON4GMQ4rzLuA/8bgLN0OhUGAbV7jtVGb8LUtiMca+ZslLsFjVVcoq7jvyNJfuiUMSiepQe80lL9e6rlu5sWOFjiAzL63rN9WHLtI5dB+mAAAAAElFTkSuQmCC',
+    os2cpu: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADcAAAAtCAYAAAAKlvO7AAABS0lEQVR42u2a0Q2EIAyGXdIVnMUVnMUVnMUVvOOhCWnAtlqwNDX5w3nnIZ+FIi3Tuq6XJU2aR6rwOA4Taga37/unag73VVfsBvf/qqsCzhucise1DHeep1hDwUk87tBwNU/rAg4DAtDwcJwuOiQcfKZeBIa3XG28uRhzrrql63mOC5SPS1dw0S0DrjOcZDXgAg7aisuwXIy5jpYrlQEXcMbh2A7FSlBWHc5SOF21W1pLhKjFLS2msOCh10osMmqdfliW5epd3kXCuXBkGswaXLME5jzPV1K6uaagXm4eo0lmFhqR6y1QrqnHYc2h3D19sYUsTgUlAOqczM89WWJQQRtw0SXXTeXEa1ME29r4DaUFIJ6LkvB13MxqHmnOV+Gi3QxaVoOG4/M3cGLLbdvWTLj+0v2eWC63oItNNmK4r1cEZCPfwI2090vyvx9LJQQ7LhS9zQAAAABJRU5ErkJggg==',
+    bsdcpu: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADcAAAAtCAYAAAAKlvO7AAABM0lEQVR42u2a7Q2EIAyGncld/OdvZ3EFZ2EFXcUVvOslvZAG+bJCITV5o1wEedJquZZhXddLkgbOAwbc912EXoMzxlTV63C1XLEY3PenolK4nuGyv7StwJ3n6VXzcMc8/wTX4zH+1Q0c9LHhsK1uqXCV4O5WN93AQR+F03dO3zl1S4XTIK5wCqdwReC2bXNKLaeWa9lyEpOyLJaTmk5/bDnJhZBHeUvpJSx0XZ+C2Wq4YVmWq/Q5JiveNRxr4XKapgsED+cUjptT02CryOIkbD0FsjWUOKR9UHxWSLaUxFDgAgi1g/W5UKBMEQ3QVDFBnFoq2dp0hfIGoA2E1/S+mMoqztV1TtrNwGU1nDhtF4W7W5RyiI7vel4sXJZbtrDJ5m6uXrja/whil1BZcK3s/Urt9wFz7UvMTZy9fgAAAABJRU5ErkJggg==',
+    wingdows: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABwAAAAYCAYAAADpnJ2CAAABxElEQVR42rWWjbGDIBCEacEW0gIt2IIt2IIt2AIt2IIt2EJq4bGny2wQjeYl49yAgn7s/YBuWZZ41ZxzZnfe2X3jDqzruvh8PjN0miaznwIVitZ7H5umifM8fw9IVwJAKO7Hccxz+PzfQIKoSoEYb9s29n1v/RBCfDwe1r4FplnZNDlKCFUC5DEeY/QbiIoxDlfX3OxUSYamFZulviorVfo0B0CDok1jAOF7gKE/DMMrMMQQ+3ShDUvYrUphmjRUnIFpLhaAFmrpZgBxz2x2Pq6Xq1yYVCaLmgJN8dZXNzOecLd9j0pCWI33Wl+M6RGQ6pwA+RxQ9ZojDCGs2TrmzhXClQXMgOn5LkRH6YuJLyvbVKqL0YfLjtT5LY4VIPzcW6qvfVqljrZspDq4rAbEt07KItgEvIxtSg3Pcm0RWMlMl0og12Vq+4q6W3spwLUYealDv7mXtXgLyHSGW8xtB+p2i0jvlcV+CYgYafH6IhP9QWYyBB9t3oghwAw+43WmTk+Qj2KIDQBgbgS8L118Rd2tpAFIdw1LEJwsou7sWLoNVDfrQasb9ld/McpdSE8AJNWV0/5jIA0JcrSj/ARItZpU7+wPj3aYyj3vuGMAAAAASUVORK5CYII=',
+    apple: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABwAAAAYCAYAAADpnJ2CAAAAfklEQVR42u2WwQ3AIAhFGYzVXMVRXM322lbMh18aTXp4FyK8RBJAem09ila9gOTIl7J9hZ48QQuP4sg7WHj/spkYeTcVWkW8LCo8QzSuHibKFhG2wvELH0ERHvekSZTmCQ3pUFiUxz28txKG92G0ddQCflPmOjGsgqiIvmmiHEZ2xCFAbJlnAAAAAElFTkSuQmCC',
+    next: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABwAAAAYCAYAAADpnJ2CAAAA80lEQVR42r2Wyw2EMAwFXRitbClcKIRSuKQwr4IWFJxn+wXQClkgJ8ow+UspRZ/EsiwqImdk9eUNSBu17BWgB1Fdz2AsZQSi26eDoe/IUka6y0KRXWbpAnWb98Y7KwP0jD3LDnhUPqAI/sQyBMJx+4Ft/ixvAllCILLsx3KGkMxSvAlztcTQ+igwjNalIDsLndZpb9zC9nwCtJYUsIXWN/wB0jIEWmhnp/8GGnNmXxVml7nkncYtxE7AdFlEQAZCTRrakoDQwMyyvhnIEJC1ZCJc+Jmll2ftQiCyuWM4dOLfhQ2d+J5l1p3Z5Ym+REVAFtLGF8ufm1vcqj2TAAAAAElFTkSuQmCC',
+    sgi: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABwAAAAYCAYAAADpnJ2CAAAA+UlEQVR42r3WzQ2DMAwFYA/WVToKlwzSAwfG6AIdpwNQ5WD09OpfNeohEpETPmwUgxyv9/nPIZ3F2+N53u7bNZ/XOF8GKsTAvMbYzyBD+36cY4wrrvMOLJ2MPLCTsUQYxzLQglNQMWtDBfSqk75DC47ADApLGsEMRhDf6wvUzVY5EdYRQV5MooUMz4wwzhln+10wKieXNCprG+SsOG41hux+LqhPr1nN4YG4Rve1QIS8OJYS1yBcBhligDPGrBBOQT47XNaspAyn5xAXWmX1QK+cpU4TNd4MrHwApNpHK2Cln4YfYIY9oNq4y78Y1YO//Ceq0rqWgivGByik59ziTdhQAAAAAElFTkSuQmCC',
+    sun: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABwAAAAYCAYAAADpnJ2CAAAAwklEQVR42r2WywnEMAxEp9G0lzK2gS0iRaQAhxzMGmFbM5LYg0AQ5JfRz8Z1fZpq5/dukbjXoAYcx88i4BCwgyJQZEEqFErNKqCoUvf6aeD416w6D4wdzAZ7ipjUwoNZcD90poypKRSYnUUPNoOCgXXfS6P1ZzGwwTuwTdXq267WWK0tNb3sfGI1Cl7jKOlNdenYoUzjyIO/UsLMqgycKWMyULJLFWjJbcFAS+/DCnXyjZ8BhZ8Y45r7CzD7cgsDo/YARlW6WYqPALoAAAAASUVORK5CYII=',
+    palm: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABwAAAAYCAYAAADpnJ2CAAAA4UlEQVR42u1WwQ3CMAzsdEyEmIU3YzBEB2AAdgAeRY5k6XRy48RHf1iyElmp7bMuly5bYuvjuZ3Ot+a2f70/bb1c7y1mq8VGbeGAJUD3Yu5RnL9BTwtat+iY3PaGDlEj8sjTgtFIvVvbe1MYl0YaIXZUmJiR+Bm5YEQabgjHnhUtk2b0zDTCiDRsTCB5pEya3pmMQCXSMFF612CqoCfFkbLSjIxRJg3Hemojk4ZRywj3xrqnNNHdPJylM9YVbyZHJtQl8a4ojfQ8zWqpPNLR1+Kwgn/SyKSJXvIqutI/za/tC72Yeux3C/spAAAAAElFTkSuQmCC',
+    os2: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABwAAAAYCAYAAADpnJ2CAAAA10lEQVR42sWW4Q2EIAyFO5irMMqt4mqOgkHTu9qUd4+GyI9GBOFrny0gIlJHbNu3+qm3tfbofGE/VIiCLLjZNKCHRBFbeBqoi4zIRs7pT0z8n68qABpPyMKINYa8A4DCqjQnOg8Ea8XR3R6Wy1Cf7bdPEGUMtB5rO+prVo4fzI5BoB/8B0RyPpxxakgvWSKgl8z24fckMIKqnBEMAhlJI9l89ESZ5ZPmkShHYXesfFlYORtQx6gszRR+L2vpwh/d2hCQ3tpe37yXHE+vH8BLrhjLLlGzr4knD9mw3dXrrQ0AAAAASUVORK5CYII=',
+    bsd: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABwAAAAYCAYAAADpnJ2CAAAAuElEQVR42r2W0Q2AIBBDb1AGYjjcwU0wmmBqI0Lx4KMJRsKjvQO1Pee8UqZM3kK4tBQYY2zOcQOiS5SyKfsLY7A7MHeAXYFmdkMZfoJaNa4Cz4VbkSK8t3vtC4RjdtJqHslhATEwpfQA8LMMZHdFDC1SYdVI0SHXcjRKqUt5YezIaUB0O90hxsvupgGX1pBrtxSIkZaIpwP/xOpSQwU+5JC/El8bkoFv96dyrfF7UyJUjsWwQ++/twN7zCRjxNc2JwAAAABJRU5ErkJggg==',
+    linux: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABwAAAAYCAYAAADpnJ2CAAABhklEQVR42rWVsW3DMBBFOUHsSou4cOHKSQbIDBkiUwjwEN7AddJng1REkA0CBxDYyfqiv3iiGPFkmMUHDZvm47/j3RljXKuXbdcPm26tOpnrZ9suO2PRZg+iXl/21+9sCWA9AY6dFgA+bna9AIK74LAqAwTg++vUA7Ae3p6HCxQA2v5wQKR8OE0ZIBz+vq8GfR63Ip+2TEgBIezn46l37XNZ3x+IEAKEFTlkHkNY7b2AvuD/zueRmqZpnXMDUFceCiAOghMAYiDWUB5GEVplwSN8sUMKv4Ww5kKrcAcHdIOVklDsCdB6BprJHd1JUArqG4JseTc4xI3x7GNAChqAVSasGXcMJ14jD+fnNNBkHs8MEC+TQEJlOchLsMeO56TVAwFjCwNUhjIFk22OF1U5lO2LYjfBwYRJKFoc9/GiWFXAGEaxZ8ZASEaDwiXSUCUQYnlId5yJ//1nCl0AZMgAhls/fM1kbIXRpXo09SgX8gBOd+RTSjoM+9wtdWiH3M3NPLY/zVy8ADWYzONN7zTOAAAAAElFTkSuQmCC',
+    redhat: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABwAAAAYCAYAAADpnJ2CAAAAW0lEQVR42mP4P2/ff3pihsFlIQMDAhMyjEi1xFtICh61cNTCUQtHLRy1cDhaiEshtSxEEmfAW5dRw0I0cQaKDSfREQxU8REJPmagamIhIvEwkNRWoTCFDkirDQAwlR8aMcsRZQAAAABJRU5ErkJggg==',
+    hurd: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABwAAAAYCAYAAADpnJ2CAAABUklEQVR42u2WMW7CMBSGfYROCHVBHRDqWAk2lt6gF6BLT5ClOUKlbuwdGJhyAFYmlm5dCh17AsQJ0v5R/+jPKyYOMe2CrF9+zgv+8uznZ1yWZflfyp2BVsniPZ/Md6Xup+vTARWkuklWwWDXFgYNn14LaDTgIZgCB3ezcOD126N3z+Dj5OnmozK+WqaFAAUQSws/5QW671Zx/DQA0RMGYXzxOS7kTOuOkl/PFBwMJGwfEMtpgXae6EDajYCd7WUp35KibxKhDcbZL7FNgZRvD/GhjYB1SaNAZKYFAtYaqBHxGGCMY0Bg/+GljJD20UlDIKOirYmC88fnCtdcqAXyB4hEQYxOgb3b59KGz+ZBo9KGiQlgzzIGAYZ9Q893WtVSlCpCfDAIYxybulsjqHgToCCFwWYGR7ktFLIPBn9UIITsI0RFYPQLWKNVWOjF+29/or4AqM0LSBEXqaAAAAAASUVORK5CYII=',
+    spark_0: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAAk0lEQVR42r2U2wqAMAiGRz1AT9hlT93eJGjhhSDiCZUEIbb57ffQxijYfe0LfHSZCdQ2tYCQunluKxII5573yKULQfwiBEoCXOPBJRgFIIR+hzqm1YvCOFBtEIVi7dA1GO6H05Q83QwNHFKVUVsaG66ODrc54Dwda1R4E0N/BayVBlmCtT1Rv753qRJ46lrq6l36Ac8FLUUJIiVoAAAAAElFTkSuQmCC',
+    spark_1: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAAmklEQVR42q2UYQrAIAiFYzvATrifO/W6yWCNfjwQeWqugiAMP59mljK57mtvZdWq59bSkTwFoToWsTsxx1EbVeGm5gQ1VT/vYUKjexq9O2infsbdMEwqkFBpS8G0Qr1NGIqKDRU4p2A6PQ+SBrJ2YfDp78YeBvZQqdXIEqoVmo0dpQLosgnzq5GjgZH+aiNlQHstm8ap6TIb7AO5KRtd4M4DSQAAAABJRU5ErkJggg==',
+    bucket: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAABHUlEQVR42tWV0Q3CMAxEswVQ5mCYSMzBAmyRX/qDygRMwSf/DBLkSIcO13FKKySodEoE0b1c6tQhf/kJPwHotl3erNZlZM0GwACmw3DJMcaReI2MTQAWppSK6fn2KGN/6t9kwQDUyUYAMYcEwMYCA9CDmADePQNEx+u9CHMZd/vDS16KoM8dxtpQS35nCEAuAAuw45oA0QBs0E1gVYeMvHOY43+skXdTTcApAMHcugMwxMtHQTSriAESl+cQG2P+MYB3zuaQNp8EEEMG1BLoJAAIVN/oJgAQfUc4BV9IN4E+Jjbj6rIS4HbPBlggVBKf/2KABfM+4y6gBdGfcatHVPtBC8BfWTmiWgMKXhfz0qCCWt0tTGmXnv6j6S95noGJv6WG87WMAAAAAElFTkSuQmCC',
+    logo: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAQQAAABBCAYAAAA36tphAAAJjElEQVR42u2dPZbbOAzHXc4RcoWUKXOFHGHalLnGlHsEtzlCymm3dLllrjJr6BkOjJAUPwAQtMB5fHZiW5Zk4ifgLxI4naJFixYtWrRo0aJF29q3f94/vr7+/Pj87e2hf3p5LXb6Xvg8bGf18wA9dx5at5M7p/AYoy6aO+PfM/jejoDwfi5az4HUtgIIBu3T5y9wkpu65x/m9ed/H6eXF5F9lQbAswz+1BU85x3tHUftdgIIhgbUAwWPbi4cy23QdMNgDwIlN3/vc9zjqAHECh7DwwVGyIjh/AQQnFxVa/v2OWeu7H3/rsfTsn+lq1JtnA/v6zHs0udWMwSpfU+dk9XguHT7cf63GQjgWXiBws1gm2GQc3N7Bl/JsEeB0iLOzfwNpIw49busLr4u1x6usAvpCdzDqRk4qQE3egUqhQAjRrWKp5ACWq8Rp87lU7vol8uluuNAb/lMYhtqUJhJ7lYRkRscvF9q/6UMuQQFz1dJSSM+FBDO5zYYQPv9+/0OhV+/fm1dAwi9IuOs0IGLiLn9SIl40sYlKQxKeBu9+97riUga8aEExRZjRiBQKMDjZrTXK+P7+7soEEb0BK8iYsorsIifR8FjdeeBu/q92487DMpAwMEOAMAG/6YeBt63lQTCXyKdQ5GRi4g3iO0OLi2XW+OKbnU/XmJ/JY34cHcYaoCAIECvgAIBQfD92/ftOQACjLEUiliJjBYxLvdgamFgHT+PGm/uroMkEKS8J0kjPtwdBgqEqxXfey5UoF4CnKwv8Pr1+fZjEhBsJ/L671QY0SvY9egJOQOVEhHpPuUGsJVnIC0o1oYh3sIFSSM+lKCY8hAoFLBTz4B7CdsgA1Bgv7nrsC2AATxH72EECCN6gkboUAsDPqi0YaB5V0AbCB6N+HAzFAEI5+vf9+vf+fbHr+oUBlRURI8BYfDl5hnAIwUBPMK/ET5i8frE+Ql0P0rQoQZqMZhKE4q0PA8tkM024kNOWQYjPRX+tteZmEgbBQL3FngYAY+37Q3HyDP1hJZpyZbegab4l/M8pAyEL1nuDRdCUBQMGcBgqRiIr6Hr//r19a+OQEDv4CF8uP0/1xKk3XVLKNSKiNZCoqZ+YCUqanlIklrE6dkbGj2AACID2mGww+tg+L/f//TL5e3+HAwT6c5hgF5DIgQRieGtF0FxGOwZAx2cFoajqR/kPA9virukoLjiGg5xURE9AuoFUBikOn3vdvKZpiBxl2G2yNgiIqYG5zPqBx7j6RAUxYDw9mDgexAodYQCbEfqtqOkntDzw9LvqYUKH5yr6gereAchKDoFAnS4s4Db0gSChchYe0dhz5C0BSkNIGiLidohk6SgeIglzzxkoOFCLwzoZy2A0CUyVuYpaBERawbVDEFxBEQ5yHgcyyEoCgMBYIBXdsn+9uNNFQgjekKLcNkz69FqYGnMJFwJBiEoKgBh1DModXo7U9NllBIZe0TE3D6lEnd6FxR7kpSGoPiEQNCAAWoK2kCQ1BNqcxt4NobehCgaGZxqvhe+Y+R7NAXFw+RQ7AUCNyovQOjVE+g2YF9PnQlSZ7XShKTaHIo5r0BTTEsBKARFh0AoGfyJLG56WAW5IzRaAKFHT6A/Nv2sp8StvfpBqVLTXqp2bSPIhTmzjfiwgiIHAgqKJYNPvVYCAkKGCotWRtIqLHKQrHJV2MuQ3NO1j106iYumfnBYINAEJ61AuC90Yl4FAkH7LkOPnkC1AR5qrOQi1hZz4XUPa7wJjfPQUkQmBMXJQLhc0kCgBl8CAi6NxjsW4HXw7EnWxnKqmIcwUljFKxBqhLCaqk2SgtpeOble4wtBUQEI4NZj7oJeIOAyaYSBVAq1EZExtQiKzilIQWMlIEi4/XtgkLhK8qu3VNwfRVm0jIcsaS55APx1zLeISVFoZ0ulp4luOW0gpzU8g6DoxZ2n26XbkHLzQ1BUBELOEzhlUqjx1++Tm25hA/UYphxTYYLR3t2IFWJHjTwFJZGyd2FY6rOhHywABDRgNHwKh9xrHAYIFgqDWUDIaQO1+RS8u4taKxx7i8XmjCxVcVpLPwggCIcMf4z6vPXUFZ8/pt5PBcbZoQJ4Cagb8FLtp4mZmz3oBz3hw+j2Jd38EBRNQofzg4FT4y7BgL9/VrhQWqXYOr3Zq55gkRpdS2SUcvNDUHQAhRIM8L2J3Iu2MChUYPZeCUrCrbf4jhFj8TjNOATFBiDkrvyp93EweBERs9rCApWlLfUDbS9BUj8IQXESFPB5SmPwAoPtR61csuyxEpSUoUrHvdLTjD3qBwGERijwR/48BYQZV8xTw2zDrszNhWKuzyQo1moVUuXlZxtxCIqDQPAGg95UZ6uUm58hKGqFDR6NOATFzrDBIxC4iNh6BbfK3LyifiANBG39IATFCUCo0Q+8iYgaUJh5BbEGgtT3eb0rEPpBBxC4l+ABCBIw6NYTJi6Css5jIAWEVfSDAEIDEEowsARCT/EUDT3BWmS01g8kQwaPdwUOnTJNGwhWtxv55CKpK7WXcvOtA3gFIEiKgNqCYlj+DhRauomIqBjLexcZrfUDqSKy2vpBCIoTPYVZIYNFqjPvk5asJiRJeySShheC4kTPgAOhJCxqewrUUDXnA1hWlp5xtQ79IIAwFCbsLWBK/Z93EVFDT9DeL2v9QApA0kq+5h2GEBQbdINUWGChJTwYp+H0YW/zE6TXFVjpFbX6AWaJlhYUcyX0erQIi5oVywmJljAYqcD8bFDQTILaAp/W46uJ+XOp1kbESZo8NgWNFi2CguiQXoQHIOzlNjA5D04WQZXcd2kgSKZQqzE8+nrPtlLjgh5Dbp9rgUDfJzkGW4oAaxUKHobDHji0RMSZJ8PDIijtNOk1MNCom9ACg9x5oAbPU8qXDHgPLvxcSP+e/DzkwhrNyuFreCcs76GHjEWz5ydYlF/Tgk6uKlSPsZUK07QWji1Vu5LINs0/VzLqPYM/NBB4bgMvOQhm6Qm1NRk1QDA6x6GmGK3kvrYYcM05HZkBWQuE5UIGy1YqrOLBc7FaBAXH3VPItUYFx23XGNfo+ZfWPiThpX3s1IhHYHBYIKxQgZkLnSeBRVC0CGuNkbYCome7WjUdNRYj9Ran1Z4GvgeEFiM/HBDuugEY27V7PnjuxWwC4m2/eUdhtHQ8rYatCQ+Lis8SV16NDNAax58TBFsN/NAawtFCJPyxael2ie3yjmEC/z6L44TvkvQ6JLeneR56gCABkGjRojltNbcTJcOLaNGiRYsWLVq0fPsfmyUYT97rvT8AAAAASUVORK5CYII='
+  };
+</script>
+
+  <script>
+  // SPDX-License-Identifier: GPL-3.0-or-later
+  // Copyright (C) 2026 Kawade502
+  // Based on XBill 2.1 (Copyright (C) Brian Wellington, Matias Duarte; GPL). See NOTICE.md.
+
+  // Embedded Audio Synthesizer
+  class SoundEngine {
+    constructor() {
+      this.ctx = null;
+      this.enabled = true;
+    }
+
+    init() {
+      if (!this.ctx) {
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        if (AudioContextClass) {
+          try {
+            this.ctx = new AudioContextClass();
+          } catch (e) {
+            this.ctx = null;
+          }
+        }
+      }
+      if (this.ctx && this.ctx.state === 'suspended') {
+        this.ctx.resume();
+      }
+    }
+
+    /**
+     * 単音を鳴らす。
+     * freq から glideTo へ指数的に変化させる／steps ([経過秒, 周波数] の配列) で階段状に変える。
+     */
+    tone({ type, freq, glideTo = null, steps = [], volume, duration, delay = 0 }) {
+      if (!this.enabled) return;
+      this.init();
+      if (!this.ctx) return;
+
+      const t = this.ctx.currentTime + delay;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+
+      osc.type = type;
+      osc.frequency.setValueAtTime(freq, t);
+      if (glideTo !== null) {
+        osc.frequency.exponentialRampToValueAtTime(glideTo, t + duration);
+      }
+      steps.forEach(([after, f]) => osc.frequency.setValueAtTime(f, t + after));
+
+      gain.gain.setValueAtTime(volume, t);
+      gain.gain.exponentialRampToValueAtTime(0.01, t + duration);
+
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+
+      osc.start(t);
+      osc.stop(t + duration);
+    }
+
+    arpeggio(notes, { type, volume, interval, duration }) {
+      notes.forEach((freq, i) => {
+        this.tone({ type, freq, volume, duration, delay: i * interval });
+      });
+    }
+
+    playSlap() {
+      this.tone({ type: 'sawtooth', freq: 390, glideTo: 35, volume: 0.85, duration: 0.13 });
+      this.tone({ type: 'square', freq: 130, glideTo: 25, volume: 0.4, duration: 0.17 });
+    }
+
+    playInfect() {
+      this.tone({
+        type: 'square', freq: 160, steps: [[0.08, 110], [0.16, 65]],
+        volume: 0.4, duration: 0.38
+      });
+    }
+
+    playRestore() {
+      this.arpeggio([523.25, 659.25, 783.99, 1046.5],
+        { type: 'triangle', volume: 0.28, interval: 0.055, duration: 0.14 });
+    }
+
+    playLevelUp() {
+      this.arpeggio([440, 554.37, 659.25, 880, 1108.73],
+        { type: 'sine', volume: 0.3, interval: 0.08, duration: 0.2 });
+    }
+
+    playSparkZap() {
+      this.tone({
+        type: 'sawtooth', freq: 950 + Math.random() * 300, glideTo: 180,
+        volume: 0.25, duration: 0.08
+      });
+    }
+
+    playSparkAlarm() {
+      this.tone({
+        type: 'sawtooth', freq: 800, steps: [[0.05, 400]],
+        volume: 0.12, duration: 0.1
+      });
+    }
+
+    // バケツの水しぶき用（ノイズの代わりに高めの下降音）
+    playSplash() {
+      this.tone({ type: 'triangle', freq: 1400, glideTo: 300, volume: 0.25, duration: 0.18 });
+      this.tone({ type: 'sine', freq: 900, glideTo: 200, volume: 0.15, duration: 0.25, delay: 0.04 });
+    }
+  }
+
+  const sound = new SoundEngine();
+</script>
+
+  <script>
+  // SPDX-License-Identifier: GPL-3.0-or-later
+  // Copyright (C) 2026 Kawade502
+  // Based on XBill 2.1 (Copyright (C) Brian Wellington, Matias Duarte; GPL). See NOTICE.md.
+
+  // ---- 原作 XBill 2.1 の絵（assets.html の data URI）の読み込みと描画 ----
+  // XBill is free software (GPL). Copyright (C) Brian Wellington, Matias Duarte.
+  // 座標は原作の画面（400x400）の単位。描画側で拡大縮小するので、ここでは 1 ドット = 1 単位で描く。
+
+  const CPU_FILES = ['toaster', 'maccpu', 'nextcpu', 'sgicpu', 'suncpu', 'palmcpu', 'os2cpu', 'bsdcpu'];
+  const OS_FILES = ['wingdows', 'apple', 'next', 'sgi', 'sun', 'palm', 'os2', 'bsd', 'linux', 'redhat', 'hurd'];
+  const WALK_CEL = [0, 1, 2, 1];   // 歩く絵は 3 枚。4 コマ目は 2 コマ目を使う（原作と同じ）
+
+  const SPRITES = { billL: [], billR: [], billD: [], billA: [], cpu: [], os: [], spark: [], bucket: null, logo: null };
+  const DIM = {};   // 絵の大きさ。loadSprites() の後に入る
+
+  function loadSprites() {
+    const load = (name) => new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => resolve(img);
+      img.onerror = () => reject(new Error('画像を読み込めません: ' + name));
+      img.src = XBILL_ASSETS[name];
+    });
+    const seq = (prefix, n) => Promise.all(Array.from({ length: n }, (_, i) => load(`${prefix}_${i}`)));
+
+    return Promise.all([
+      seq('billL', 3), seq('billR', 3), seq('billD', 5), seq('billA', 13),
+      Promise.all(CPU_FILES.map(load)), Promise.all(OS_FILES.map(load)),
+      seq('spark', 2), load('bucket'), load('logo')
+    ]).then(([billL, billR, billD, billA, cpu, os, spark, bucket, logo]) => {
+      Object.assign(SPRITES, { billL, billR, billD, billA, cpu, os, spark, bucket, logo });
+      Object.assign(DIM, {
+        billW: billD[0].width, billH: billD[0].height,
+        cpuW: cpu[0].width, cpuH: cpu[0].height,
+        osW: os[0].width, osH: os[0].height,
+        sparkW: spark[0].width, sparkH: spark[0].height,
+        bucketW: bucket.width, bucketH: bucket.height
+      });
+    });
+  }
+
+  function drawOs(ctx, os, x, y) {
+    ctx.drawImage(SPRITES.os[os], Math.round(x), Math.round(y));
+  }
+
+  function drawComputer(ctx, comp) {
+    ctx.drawImage(SPRITES.cpu[comp.type], comp.x, comp.y);
+    if (comp.os !== OS_OFF) drawOs(ctx, comp.os, comp.x + 4, comp.y + 4);
+  }
+
+  function drawCable(ctx, cable) {
+    ctx.strokeStyle = '#000000';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(cable.x1 + 0.5, cable.y1 + 0.5);
+    ctx.lineTo(cable.x2 + 0.5, cable.y2 + 0.5);
+    ctx.stroke();
+    if (cable.active) {
+      ctx.drawImage(SPRITES.spark[cable.index], Math.round(cable.x - DIM.sparkW / 2), Math.round(cable.y - DIM.sparkH / 2));
+    }
+  }
+
+  /** ビルの絵（歩く・OS を入れ替える・やられる）と、持っている OS。原作の Bill_draw を移したもの。 */
+  function drawBill(ctx, b) {
+    if (b.state === BILL_STRAY) {
+      drawOs(ctx, b.cargo, b.x, b.y);
+      return;
+    }
+
+    if (b.state === BILL_AT) {
+      const comp = state.computers[b.target_c];
+      if (b.index > 6 && b.index < 12) drawOs(ctx, OS_WINGDOWS, b.x + b.sx, b.y + b.sy);
+      if (b.cargo >= 0) drawOs(ctx, b.cargo, b.x + b.x_offset, b.y + b.y_offset);
+      ctx.drawImage(SPRITES.billA[b.index], comp.x, comp.y);
+      return;
+    }
+
+    if (b.cargo >= 0) drawOs(ctx, b.cargo, b.x + b.x_offset, b.y + b.y_offset);
+    let cel;
+    if (b.state === BILL_DYING) cel = SPRITES.billD[Math.max(0, b.index)];
+    else cel = (b.cels === 'R' ? SPRITES.billR : SPRITES.billL)[WALK_CEL[b.index]];
+    ctx.drawImage(cel, Math.round(b.x), Math.round(b.y));
+  }
+
+  function drawBucket(ctx, x, y) {
+    ctx.drawImage(SPRITES.bucket, Math.round(x), Math.round(y));
+  }
+
+  /** バケツの水しぶき（原作には無い、手ごたえを出すための小さな演出）。 */
+  function drawSplash(ctx, splash) {
+    const t = 1 - splash.life / splash.maxLife;
+    ctx.save();
+    ctx.globalAlpha = Math.max(0, 1 - t);
+    ctx.strokeStyle = '#3b82f6';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.arc(splash.x, splash.y, 6 + 22 * t, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.restore();
+  }
+</script>
+
+  <script>
+  // SPDX-License-Identifier: GPL-3.0-or-later
+  // Copyright (C) 2026 Kawade502
+  // Based on XBill 2.1 (Copyright (C) Brian Wellington, Matias Duarte; GPL). See NOTICE.md.
+
+  'use strict';
+
+  // ============================================================
+  // 設定値
+  // ============================================================
+  // 原作 XBill 2.1（C 言語）のルールを移植している。座標と大きさは、原作の画面（400x400）の単位。
+  // XBill is free software (GPL). Copyright (C) Brian Wellington, Matias Duarte.
+  const CONFIG = {
+    FIELD: 400,              // 画面の短い辺の長さ（原作は 400x400 の正方形）。長い辺は画面に合わせて伸ばす
+    MAX_ASPECT: 1.6,         // 長い辺は短い辺の何倍まで伸ばすか（それ以上は両脇を空ける）
+    TICK: 0.2,               // 原作の 1 コマ (秒)。歩く・やられる絵のコマ送りと、稼働率の計算に使う
+
+    // 最終レベルをクリアすると全クリア
+    MAX_LEVEL: 10,
+    ALL_CLEAR_BONUS: 1000,
+
+    // 原作の値
+    BILL_OFFSET_X: 20,       // ビルが PC に着く位置（PC の右上からの距離）
+    BILL_OFFSET_Y: 3,
+    BORDER: 40,              // PC は画面の端からこれ以上離して置く
+    MAX_COMPUTERS: 20,
+    SCORE_BILLPOINTS: 5,     // 一度のクリックで倒した数の 2 乗 × これ
+    GRAVITY: 3,
+    OUT_SPEED_RATIO: 1.25,   // 逃げるビルは速い
+
+    // 当たり判定の余裕。原作は絵の大きさぴったりだが、指でも触れるよう少し広げている
+    HIT_PAD_BILL: 6,
+    HIT_PAD_OS: 6,
+    HIT_PAD_PC: 10,
+    HIT_PAD_BUCKET: 10,
+    HIT_PAD_SPARK: 6,
+    TOUCH_DRAG_OFFSET: -28,  // 画面の px。指で隠れないよう、タッチ操作ではドラッグ中の絵を少し上に出す
+
+    MAX_DPR: 3,
+
+    SOURCE_URL: 'https://github.com/Kawade502/xbill-webremake',   // このゲームのソース (GPL)
+
+    RANKING_TIMEOUT_MS: 10000,
+    RANKING_LOCAL_MAX: 10,
+    TITLE_RANKING_ROWS: 5,
+    NAME_MAX: 12
+  };
+
+  // レベルごとの難易度。どの項目も、上のレベルほど確実に厳しくなる。
+  //   bills: そのレベルで倒すビルの総数。逃げ切られたビルは戻ってくるので、全員を倒すとレベル終了
+  //   rate: 1 秒あたりに画面へ出てくるビルの平均数
+  //   group: 1 回に同時に出てくるビルの最大数（1〜group 体。実際の数は乱数）
+  //   speed: ビルの歩く速さ（画面の px/s。実際は 1.0〜1.2 倍でばらつく。原作は 60〜75）
+  //   steal: ビルが PC の前で OS を入れ替える時間（秒。原作は 2.6）
+  //   spark: 火花の進む速さ（画面の px/s。原作は 20）
+  // PC の台数（8+レベル、最大20）とケーブルの本数（レベル、または台数の半分）は原作の式のまま。
+  // 調整するときはここだけ触ればよい（bills・rate・group・speed・spark は増やすと難しく、steal は減らすと難しい）。
+  const LEVELS = [
+    { bills:  24, rate: 0.70, group: 2, speed:  33, steal: 1.80, spark: 20 },
+    { bills:  28, rate: 0.75, group: 2, speed:  39, steal: 1.75, spark: 25 },
+    { bills:  33, rate: 0.81, group: 3, speed:  45, steal: 1.68, spark: 30 },
+    { bills:  38, rate: 0.87, group: 3, speed:  54, steal: 1.60, spark: 35 },
+    { bills:  43, rate: 0.92, group: 3, speed:  64, steal: 1.52, spark: 40 },
+    { bills:  52, rate: 1.19, group: 3, speed:  70, steal: 1.41, spark: 44 },
+    { bills:  62, rate: 1.47, group: 3, speed:  78, steal: 1.31, spark: 49 },
+    { bills:  74, rate: 1.84, group: 4, speed:  86, steal: 1.21, spark: 54 },
+    { bills:  84, rate: 2.18, group: 5, speed:  94, steal: 1.13, spark: 59 },
+    { bills:  97, rate: 2.58, group: 6, speed: 100, steal: 1.04, spark: 64 }
+  ];
+
+  /** 出現イベントの平均間隔 (ms)。1 回に平均 (1+group)/2 体出るので、rate から逆算する。 */
+  function spawnIntervalMs(params) {
+    return ((1 + params.group) / 2) / params.rate * 1000;
+  }
+
+  function levelParams(level) {
+    return LEVELS[clamp(level, 1, LEVELS.length) - 1];
+  }
+
+  const FONT_CSS_URL =
+    'https://fonts.googleapis.com/css2?family=VT323&family=Press+Start+2P&family=Inter:wght@400;600;700&display=swap';
+
+  // Web フォントは後から読み込む（取得できなくても起動を待たせない）
+  (function loadFonts() {
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = FONT_CSS_URL;
+    document.head.appendChild(link);
+  })();
+
+  // ============================================================
+  // ユーティリティ
+  // ============================================================
+  const clamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
+  const dist = (ax, ay, bx, by) => Math.hypot(ax - bx, ay - by);
+
+  /** DOM 要素を作る。文字列の子は textContent 相当で入るので、外部入力を渡しても安全。 */
+  function el(tag, props, ...children) {
+    const node = document.createElement(tag);
+    Object.entries(props || {}).forEach(([key, value]) => {
+      if (value === false || value == null) return;
+      if (key === 'class') node.className = value;
+      else node.setAttribute(key, value === true ? '' : value);
+    });
+    children.flat().forEach((child) => {
+      if (child != null) node.append(child);
+    });
+    return node;
+  }
+
+  function vibrate(pattern) {
+    try {
+      if (navigator.vibrate) navigator.vibrate(pattern);
+    } catch (e) { /* 未対応・ポリシーで拒否されても無視 */ }
+  }
+
+  // ブラウザの設定（プライベートブラウズや、サイトデータの遮断）で localStorage が例外になることがある。
+  // その場合はメモリだけで動かす。
+  const storage = (() => {
+    const memory = {};
+    return {
+      get(key, fallback) {
+        try {
+          const v = window.localStorage.getItem(key);
+          if (v !== null) return v;
+        } catch (e) { /* fall through */ }
+        return Object.prototype.hasOwnProperty.call(memory, key) ? memory[key] : fallback;
+      },
+      set(key, value) {
+        memory[key] = String(value);
+        try {
+          window.localStorage.setItem(key, String(value));
+        } catch (e) { /* メモリのみ */ }
+      }
+    };
+  })();
+
+  // ============================================================
+  // DOM 参照
+  // ============================================================
+  const canvas = document.getElementById('gameCanvas');
+  const ctx = canvas.getContext('2d');
+  const playArea = document.getElementById('playArea');
+
+  const scoreDisplay = document.getElementById('scoreDisplay');
+  const levelDisplay = document.getElementById('levelDisplay');
+  const safeOsDisplay = document.getElementById('safeOsDisplay');
+  const hiScoreDisplay = document.getElementById('hiScoreDisplay');
+  const statusMessage = document.getElementById('statusMessage');
+
+  const modalOverlay = document.getElementById('modalOverlay');
+  const dialogTitle = document.getElementById('dialogTitle');
+  const dialogBody = document.getElementById('dialogBody');
+  const dialogActions = document.getElementById('dialogActions');
+
+  const btnSoundToggle = document.getElementById('btnSoundToggle');
+  const btnHelp = document.getElementById('btnHelp');
+  const btnPause = document.getElementById('btnPause');
+  const btnReset = document.getElementById('btnReset');
+
+  // ============================================================
+  // 原作の定数と、ゲームの状態
+  // ============================================================
+  const OS_WINGDOWS = 0;
+  const OS_OFF = -1;
+  const OS_PC = 6;         // OS の番号が 6 以上なら PC 用の OS（PC 用 OS はどの PC にも入る）
+  const OS_NAMES = ['Wingdows', 'Mac OS', 'NeXT', 'SGI', 'Solaris', 'Palm', 'OS/2', 'BSD', 'Linux', 'Red Hat', 'Hurd'];
+
+  // ビルの状態
+  const BILL_IN = 1;       // PC へ向かっている
+  const BILL_AT = 2;       // PC の前で OS を入れ替えている
+  const BILL_OUT = 3;      // 盗んだ OS を持って逃げている
+  const BILL_DYING = 4;    // やられている
+  const BILL_STRAY = 5;    // 落とした OS（拾ってドラッグできる）
+
+  const WCELS = 4;         // 歩く絵のコマ数
+  const DCELS = 5;         // やられる絵のコマ数
+  const ACELS = 13;        // OS を入れ替える絵のコマ数
+
+  // phase: 'title' | 'playing' | 'paused' | 'levelClear' | 'gameClear' | 'gameOver'
+  const state = {
+    phase: 'title',
+    score: 0,
+    level: 1,
+    hiScore: parseInt(storage.get('xbill_hi_score', '0'), 10) || 0,
+    params: LEVELS[0],
+
+    computers: [],         // { type, os, x, y, busy, stray }
+    cables: [],            // { c1, c2, x1, y1, x2, y2, x, y, active, index, spin }
+    net: { base: 0, off: 0, win: 0 },   // 自分の OS で動いている台数 / 電源が切れた台数 / Wingdows の台数
+
+    bills: [],             // 生きているビル
+    strays: [],            // 落とされた OS
+    hordeOn: 0,            // 画面の中にいるビル
+    hordeOff: 0,           // これから出てくるビル（逃げたビルもここに戻る）
+
+    spawnTimer: 0,
+    nextSpawnMs: 0,
+    efficiency: 0,         // 稼働率の積算（レベル終了ボーナスに使う）
+    iteration: 0,
+    tickTimer: 0,
+
+    drag: null,            // { kind: 'os' | 'bucket', pointerId, x, y, offsetY, bill }
+    splashes: [],
+    billsKilled: 0,
+    lastTime: 0,
+
+    width: 800,            // 遊ぶ領域の大きさ (CSS px)
+    height: 600,
+    scale: 1,              // 原作の 1 単位が何 CSS px か
+    dpr: 1,
+    fieldW: 400,           // ゲームの世界の大きさ（原作の単位）。遊ぶ領域いっぱいに広げる
+    fieldH: 400,
+    offsetX: 0,
+    offsetY: 0
+  };
+
+  hiScoreDisplay.textContent = state.hiScore;
+
+  const rand = (lb, ub) => Math.floor(Math.random() * (ub - lb + 1)) + lb;
+  const intersects = (x1, y1, w1, h1, x2, y2, w2, h2) =>
+    x1 < x2 + w2 && x2 < x1 + w1 && y1 < y2 + h2 && y2 < y1 + h1;
+
+  function updateLevelDisplay() {
+    levelDisplay.textContent = `${state.level}/${CONFIG.MAX_LEVEL}`;
+  }
+
+  function setStatus(text) {
+    statusMessage.textContent = text;
+  }
+
+  function setPhase(phase) {
+    state.phase = phase;
+    btnPause.textContent = phase === 'paused' ? '再開 (▶)' : 'ポーズ (II)';
+    btnPause.disabled = phase !== 'playing' && phase !== 'paused';
+  }
+
+  // ============================================================
+  // 画面の大きさ（短い辺が原作の 400 になるよう拡大し、長い辺は遊ぶ領域いっぱいまで広げる）
+  // ============================================================
+  function resizeCanvas() {
+    const rect = playArea.getBoundingClientRect();
+    if (rect.width < 1 || rect.height < 1) return;
+
+    const dpr = Math.min(window.devicePixelRatio || 1, CONFIG.MAX_DPR);
+    state.width = Math.floor(rect.width);
+    state.height = Math.floor(rect.height);
+    state.dpr = dpr;
+
+    canvas.width = Math.round(state.width * dpr);
+    canvas.height = Math.round(state.height * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+    const short = CONFIG.FIELD;
+    const cap = Math.floor(short * CONFIG.MAX_ASPECT);
+    state.scale = Math.min(state.width, state.height) / short;
+    state.fieldW = Math.min(cap, Math.floor(state.width / state.scale));
+    state.fieldH = Math.min(cap, Math.floor(state.height / state.scale));
+    state.offsetX = Math.floor((state.width - state.fieldW * state.scale) / 2);
+    state.offsetY = Math.floor((state.height - state.fieldH * state.scale) / 2);
+
+    refitField();
+  }
+
+  /** 遊ぶ領域の大きさが変わったとき、はみ出したものを中に戻す（大きく動かさない）。 */
+  function refitField() {
+    if (state.computers.length === 0) return;
+
+    const border = CONFIG.BORDER;
+    state.computers.forEach((c) => {
+      c.x = clamp(c.x, border, Math.max(border, state.fieldW - border - DIM.cpuW));
+      c.y = clamp(c.y, border, Math.max(border, state.fieldH - border - DIM.cpuH));
+    });
+    state.cables.forEach((cable) => {
+      const a = state.computers[cable.c1];
+      const b = state.computers[cable.c2];
+      cable.x1 = a.x + Math.floor(DIM.cpuW / 3);
+      cable.y1 = a.y + Math.floor(DIM.cpuH / 2);
+      cable.x2 = b.x + Math.floor(DIM.cpuW / 3);
+      cable.y2 = b.y + Math.floor(DIM.cpuH / 2);
+    });
+    state.bills.forEach((bill) => {
+      if (bill.state !== BILL_IN) return;
+      const comp = state.computers[bill.target_c];
+      bill.target_x = comp.x + DIM.cpuW - CONFIG.BILL_OFFSET_X;
+      bill.target_y = comp.y + CONFIG.BILL_OFFSET_Y;
+    });
+    state.strays.forEach((bill) => {
+      bill.x = clamp(bill.x, 0, state.fieldW - DIM.osW);
+      bill.y = clamp(bill.y, 0, state.fieldH - DIM.osH);
+    });
+  }
+
+  /** 画面上の位置（CSS px）を、原作の座標に直す。 */
+  function fieldPoint(e) {
+    const rect = canvas.getBoundingClientRect();
+    return {
+      x: (e.clientX - rect.left - state.offsetX) / state.scale,
+      y: (e.clientY - rect.top - state.offsetY) / state.scale
+    };
+  }
+
+  // ============================================================
+  // コンピュータとケーブル（原作の Computer.c / Network.c / Cable.c）
+  // ============================================================
+  function setupComputer() {
+    const border = CONFIG.BORDER;
+    const tw = DIM.cpuW - CONFIG.BILL_OFFSET_X + DIM.billW;   // ビルが立つ分も含めた幅
+
+    for (let tries = 0; tries < 4000; tries++) {
+      const x = rand(border, state.fieldW - border - DIM.cpuW);
+      const y = rand(border, state.fieldH - border - DIM.cpuH);
+      if (state.computers.some((c) => intersects(x, y, tw, DIM.cpuH, c.x, c.y, tw, DIM.cpuH))) continue;
+
+      const type = rand(1, SPRITES.cpu.length - 1);   // 0 番（トースター）は最後の画面だけ
+      return {
+        type,
+        os: type < OS_PC ? type : rand(OS_PC, OS_NAMES.length - 1),
+        x, y, busy: false, stray: null
+      };
+    }
+    return null;
+  }
+
+  function setupCable() {
+    const n = state.computers.length;
+    const c1 = rand(0, n - 1);
+    let c2;
+    do {
+      c2 = rand(0, n - 1);
+    } while (c2 === c1);
+    const a = state.computers[c1];
+    const b = state.computers[c2];
+    return {
+      c1, c2,
+      x1: a.x + Math.floor(DIM.cpuW / 3), y1: a.y + Math.floor(DIM.cpuH / 2),
+      x2: b.x + Math.floor(DIM.cpuW / 3), y2: b.y + Math.floor(DIM.cpuH / 2),
+      x: 0, y: 0, active: false, index: 0, spin: 0
+    };
+  }
+
+  function setupNetwork() {
+    const n = Math.min(8 + state.level, CONFIG.MAX_COMPUTERS);
+    state.computers = [];
+    for (let i = 0; i < n; i++) {
+      const comp = setupComputer();
+      if (!comp) break;
+      state.computers.push(comp);
+    }
+    const units = state.computers.length;
+    state.net = { base: units, off: 0, win: 0 };
+
+    state.cables = [];
+    const ncables = units >= 2 ? Math.min(state.level, Math.floor(units / 2)) : 0;
+    for (let i = 0; i < ncables; i++) state.cables.push(setupCable());
+  }
+
+  /** この OS は、その PC に入るか。同じ種類か、PC 用の OS 同士なら入る。 */
+  function compatible(comp, os) {
+    return comp.type === os || (comp.type >= OS_PC && os >= OS_PC);
+  }
+
+  function computerHit(comp, x, y) {
+    const p = CONFIG.HIT_PAD_PC;
+    return x > comp.x - p && x < comp.x + DIM.cpuW + p && y > comp.y - p && y < comp.y + DIM.cpuH + p;
+  }
+
+  function reverseCable(cable) {
+    [cable.c1, cable.c2] = [cable.c2, cable.c1];
+    [cable.x1, cable.x2] = [cable.x2, cable.x1];
+    [cable.y1, cable.y2] = [cable.y2, cable.y1];
+  }
+
+  /** 片方の PC だけが Wingdows なら、ケーブルを火花が走って、もう片方へ感染させる。 */
+  function updateCable(cable, dt) {
+    const comp1 = state.computers[cable.c1];
+    const comp2 = state.computers[cable.c2];
+    const win1 = comp1.os === OS_WINGDOWS;
+    const win2 = comp2.os === OS_WINGDOWS;
+
+    if (cable.active) {
+      if (win1 === win2) {
+        cable.active = false;
+        return;
+      }
+      if (win2) reverseCable(cable);
+
+      const target = state.computers[cable.c2];
+      const xdist = cable.x2 - cable.x;
+      const ydist = cable.y2 - cable.y;
+      const step = state.params.spark * dt;
+      if (Math.hypot(xdist, ydist) <= step) {
+        cable.x = cable.x2;
+        cable.y = cable.y2;
+        if (!target.busy) {
+          state.net[target.os === OS_OFF ? 'off' : 'base']--;
+          state.net.win++;
+          target.os = OS_WINGDOWS;
+          sound.playInfect();
+        }
+        cable.active = false;
+      } else {
+        // 原作と同じく、x と y の距離の比で進む
+        const total = Math.abs(xdist) + Math.abs(ydist);
+        cable.x += (Math.abs(xdist) * step * Math.sign(xdist)) / total;
+        cable.y += (Math.abs(ydist) * step * Math.sign(ydist)) / total;
+      }
+      cable.spin += dt;
+      cable.index = Math.floor(cable.spin / CONFIG.TICK) % 2;
+    } else if (win1 !== win2) {
+      cable.active = true;
+      if (win2) reverseCable(cable);
+      cable.x = cable.x1;
+      cable.y = cable.y1;
+    }
+  }
+
+  // ============================================================
+  // ビル（原作の Bill.c / Horde.c）
+  // ============================================================
+  /** 画面の外の、ランダムな縁の位置（ここから歩いてくる・ここへ逃げる）。 */
+  function getBorder() {
+    const side = rand(0, 3);
+    let x;
+    let y;
+    if (side % 2 === 0) x = rand(0, state.fieldW - DIM.billW);
+    else y = rand(0, state.fieldH - DIM.billH);
+
+    switch (side) {
+      case 0: y = -DIM.billH - 16; break;
+      case 1: x = state.fieldW + 1; break;
+      case 2: y = state.fieldH + 1; break;
+      default: x = -DIM.billW - 2;
+    }
+    return [x, y];
+  }
+
+  function enterBill() {
+    const [x, y] = getBorder();
+    const ci = rand(0, state.computers.length - 1);
+    const comp = state.computers[ci];
+    state.bills.push({
+      state: BILL_IN,
+      index: 0,
+      cels: 'L',
+      x, y,
+      cargo: OS_WINGDOWS,          // 最初は Wingdows を持っている
+      x_offset: -2,
+      y_offset: -15,
+      sx: 0, sy: 0,
+      target_c: ci,
+      target_x: comp.x + DIM.cpuW - CONFIG.BILL_OFFSET_X,
+      target_y: comp.y + CONFIG.BILL_OFFSET_Y,
+      speed: state.params.speed * (1 + Math.random() * 0.2),
+      clock: 0
+    });
+    state.hordeOn++;
+    state.hordeOff--;
+  }
+
+  function launch(max) {
+    if (max === 0 || state.hordeOff === 0) return;
+    const n = 1 + Math.floor(Math.random() * Math.min(max, state.hordeOff));
+    for (let i = 0; i < n; i++) enterBill();
+  }
+
+  function clearStray(bill) {
+    state.computers.forEach((c) => {
+      if (c.stray === bill) c.stray = null;
+    });
+  }
+
+  function removeBill(bill) {
+    let i = state.bills.indexOf(bill);
+    if (i >= 0) state.bills.splice(i, 1);
+    i = state.strays.indexOf(bill);
+    if (i >= 0) state.strays.splice(i, 1);
+    clearStray(bill);
+  }
+
+  /** 目的地へ向かって進む。動けたかどうかを返す。 */
+  function moveBill(bill, dt, fast) {
+    let xdist = bill.target_x - bill.x;
+    let ydist = bill.target_y - bill.y;
+    const signx = xdist >= 0 ? 1 : -1;
+    const signy = ydist >= 0 ? 1 : -1;
+    xdist = Math.abs(xdist);
+    ydist = Math.abs(ydist);
+    if (xdist === 0 && ydist === 0) return false;
+
+    const step = bill.speed * dt * (fast ? CONFIG.OUT_SPEED_RATIO : 1);
+    if (xdist < step && ydist < step) {
+      bill.x = bill.target_x;
+      bill.y = bill.target_y;
+    } else {
+      const dx = (xdist * step * signx) / (xdist + ydist);
+      const dy = (ydist * step * signy) / (xdist + ydist);
+      bill.x += dx;
+      bill.y += dy;
+      if (dx < 0) bill.cels = 'L';
+      else if (dx > 0) bill.cels = 'R';
+    }
+    return true;
+  }
+
+  /** 歩く絵のコマ送り（原作は 1 コマ 0.2 秒）と、持っている OS の上下の揺れ。 */
+  function walkFrames(bill, dt) {
+    bill.clock += dt;
+    while (bill.clock >= CONFIG.TICK) {
+      bill.clock -= CONFIG.TICK;
+      bill.index = (bill.index + 1) % WCELS;
+      bill.y_offset += 8 * (bill.index % 2) - 4;
+    }
+  }
+
+  function updateIn(bill, dt) {
+    const moved = moveBill(bill, dt, false);
+    const comp = state.computers[bill.target_c];
+
+    if (!moved && comp.os !== OS_WINGDOWS && !comp.busy) {
+      comp.busy = true;
+      bill.cels = 'A';
+      bill.index = 0;
+      bill.state = BILL_AT;
+      bill.clock = 0;
+      return;
+    }
+    if (!moved) {
+      // 着いたが、もう Wingdows か、ほかのビルが作業中。別の PC へ向かう
+      let i;
+      do {
+        i = rand(0, state.computers.length - 1);
+      } while (i === bill.target_c);
+      const next = state.computers[i];
+      bill.target_c = i;
+      bill.target_x = next.x + DIM.cpuW - CONFIG.BILL_OFFSET_X;
+      bill.target_y = next.y + CONFIG.BILL_OFFSET_Y;
+    }
+    walkFrames(bill, dt);
+  }
+
+  /** OS を入れ替える 1 コマ分（原作の update_at をそのまま移したもの）。 */
+  function stepAt(bill) {
+    const comp = state.computers[bill.target_c];
+
+    if (bill.index === 0 && comp.os === OS_OFF) {
+      // 電源が切れた PC に着いた。近くに落ちている OS があれば拾う
+      bill.index = 6;
+      if (comp.stray === null) {
+        bill.cargo = -1;
+      } else {
+        bill.cargo = comp.stray.cargo;
+        removeBill(comp.stray);
+        comp.stray = null;
+      }
+    } else {
+      bill.index++;
+    }
+
+    if (bill.index === 13) {
+      bill.y_offset = -15;
+      bill.x_offset = -2;
+      [bill.target_x, bill.target_y] = getBorder();
+      bill.index = 0;
+      bill.cels = 'L';
+      bill.state = BILL_OUT;
+      bill.clock = 0;
+      comp.busy = false;
+      return;
+    }
+
+    bill.y_offset = DIM.billH - DIM.osH;
+    switch (bill.index) {
+      case 1:
+      case 2:
+        bill.x -= 8;
+        bill.x_offset += 8;
+        break;
+      case 3:
+        bill.x -= 10;
+        bill.x_offset += 10;
+        break;
+      case 4:
+        bill.x += 3;
+        bill.x_offset -= 3;
+        break;
+      case 5:
+        bill.x += 2;
+        bill.x_offset -= 2;
+        break;
+      case 6:
+        if (comp.os !== OS_OFF) {
+          state.net.base--;
+          state.net.off++;
+          bill.cargo = comp.os;
+        } else {
+          bill.x -= 21;
+          bill.x_offset += 21;
+        }
+        comp.os = OS_OFF;
+        bill.y_offset = -15;
+        bill.x += 20;
+        bill.x_offset -= 20;
+        break;
+      case 7:
+        bill.sy = bill.y_offset;
+        bill.sx = -2;
+        break;
+      case 8:
+        bill.sy = -15;
+        bill.sx = -2;
+        break;
+      case 9:
+        bill.sy = -7;
+        bill.sx = -7;
+        bill.x -= 8;
+        bill.x_offset += 8;
+        break;
+      case 10:
+        bill.sy = 0;
+        bill.sx = -7;
+        bill.x -= 15;
+        bill.x_offset += 15;
+        break;
+      case 11:
+        bill.sy = 0;
+        bill.sx = -7;
+        comp.os = OS_WINGDOWS;
+        state.net.off--;
+        state.net.win++;
+        sound.playInfect();
+        break;
+      case 12:
+        bill.x += 11;
+        bill.x_offset -= 11;
+        break;
+      default:
+    }
+  }
+
+  function updateAt(bill, dt) {
+    const frame = state.params.steal / ACELS;   // 13 コマで 1 回の入れ替え
+    bill.clock += dt;
+    while (bill.clock >= frame && bill.state === BILL_AT) {
+      bill.clock -= frame;
+      stepAt(bill);
+    }
+  }
+
+  function updateOut(bill, dt) {
+    if (intersects(bill.x, bill.y, DIM.billW, DIM.billH, 0, 0, state.fieldW, state.fieldH)) {
+      moveBill(bill, dt, true);
+      walkFrames(bill, dt);
+    } else {
+      // 画面の外へ逃げ切った。戻ってきて、また PC を狙う
+      removeBill(bill);
+      state.hordeOn--;
+      state.hordeOff++;
+    }
+  }
+
+  function stepDying(bill) {
+    if (bill.index < DCELS - 1) {
+      bill.y_offset += bill.index * CONFIG.GRAVITY;
+      bill.index++;
+      return;
+    }
+    bill.y += bill.y_offset;
+    if (bill.cargo < 0 || bill.cargo === OS_WINGDOWS) {
+      removeBill(bill);
+    } else {
+      // 盗んだ OS を落とした。拾ってドラッグできる
+      state.bills.splice(state.bills.indexOf(bill), 1);
+      state.strays.push(bill);
+      bill.state = BILL_STRAY;
+    }
+    state.hordeOn--;
+  }
+
+  function updateDying(bill, dt) {
+    bill.clock += dt;
+    while (bill.clock >= CONFIG.TICK && bill.state === BILL_DYING) {
+      bill.clock -= CONFIG.TICK;
+      stepDying(bill);
+    }
+  }
+
+  function updateBill(bill, dt) {
+    switch (bill.state) {
+      case BILL_IN: updateIn(bill, dt); break;
+      case BILL_AT: updateAt(bill, dt); break;
+      case BILL_OUT: updateOut(bill, dt); break;
+      case BILL_DYING: updateDying(bill, dt); break;
+      default:
+    }
+  }
+
+  function setDying(bill) {
+    bill.index = -1;
+    bill.cels = 'D';
+    bill.x_offset = -2;
+    bill.y_offset = -15;
+    bill.state = BILL_DYING;
+    bill.clock = 0;
+  }
+
+  function billHit(bill, x, y) {
+    const p = CONFIG.HIT_PAD_BILL;
+    return x > bill.x - p && x < bill.x + DIM.billW + p && y > bill.y - p && y < bill.y + DIM.billH + p;
+  }
+
+  function strayHit(bill, x, y) {
+    const p = CONFIG.HIT_PAD_OS;
+    return x > bill.x - p && x < bill.x + DIM.osW + p && y > bill.y - p && y < bill.y + DIM.osH + p;
+  }
+
+  /** クリックした場所にいるビルを、全員倒す。倒した数を返す。 */
+  function killAt(x, y) {
+    let counter = 0;
+    state.bills.slice().forEach((bill) => {
+      if (bill.state === BILL_DYING || !billHit(bill, x, y)) return;
+      if (bill.state === BILL_AT) {
+        // 作業の途中で倒した。PC はもう作業中ではなく、落とした OS を後から拾える
+        const comp = state.computers[bill.target_c];
+        comp.busy = false;
+        comp.stray = bill;
+      }
+      setDying(bill);
+      counter++;
+    });
+    return counter;
+  }
+
+  // ============================================================
+  // 更新
+  // ============================================================
+  function updateEffects(dt) {
+    for (let i = state.splashes.length - 1; i >= 0; i--) {
+      state.splashes[i].life -= dt;
+      if (state.splashes[i].life <= 0) state.splashes.splice(i, 1);
+    }
+  }
+
+  function updateGame(dt) {
+    if (state.phase === 'paused') return;
+
+    updateEffects(dt);
+    if (state.phase !== 'playing') return;
+
+    // ビルの出現
+    state.spawnTimer += dt * 1000;
+    if (state.spawnTimer >= state.nextSpawnMs) {
+      state.spawnTimer = 0;
+      state.nextSpawnMs = spawnIntervalMs(state.params) * (0.6 + Math.random() * 0.8);
+      launch(state.params.group);
+    }
+
+    state.cables.forEach((cable) => updateCable(cable, dt));
+    state.bills.slice().forEach((bill) => updateBill(bill, dt));
+
+    // 稼働率の積算（1 コマ = 0.2 秒ごと）
+    state.tickTimer += dt;
+    while (state.tickTimer >= CONFIG.TICK) {
+      state.tickTimer -= CONFIG.TICK;
+      state.iteration++;
+      state.efficiency += (100 * state.net.base - 10 * state.net.win) / state.computers.length;
+    }
+
+    updateStatusHeader();
+
+    // 動いている PC が 1 台以下になったら終わり。全員倒せばレベル終了（両方なら終わりが優先）
+    if (state.net.base + state.net.off <= 1) gameOver();
+    else if (state.hordeOn + state.hordeOff === 0) finishLevel();
+  }
+
+  // ============================================================
+  // 入力（原作の Game_button_press / Game_button_release）
+  // ============================================================
+  function bucketHit(p) {
+    const pad = CONFIG.HIT_PAD_BUCKET;
+    return p.x > -pad && p.x < DIM.bucketW + pad && p.y > -pad && p.y < DIM.bucketH + pad;
+  }
+
+  function onPointerDown(e) {
+    if (state.phase !== 'playing') return;
+
+    const p = fieldPoint(e);
+    if (!state.drag) {
+      if (bucketHit(p)) {
+        startDrag('bucket', e, p, null);
+        return;
+      }
+      const stray = state.strays.find((b) => strayHit(b, p.x, p.y));
+      if (stray) {
+        state.strays.splice(state.strays.indexOf(stray), 1);
+        startDrag('os', e, p, stray);
+        return;
+      }
+    }
+
+    const counter = killAt(p.x, p.y);
+    if (counter > 0) {
+      state.billsKilled += counter;
+      addScore(counter * counter * CONFIG.SCORE_BILLPOINTS);
+      sound.playSlap();
+      vibrate([30, 20, 40]);
+    }
+  }
+
+  function startDrag(kind, e, p, bill) {
+    const offsetY = e.pointerType === 'touch' ? CONFIG.TOUCH_DRAG_OFFSET / state.scale : 0;
+    state.drag = { kind, pointerId: e.pointerId, x: p.x, y: p.y + offsetY, offsetY, bill };
+
+    if (kind === 'os') {
+      sound.playRestore();
+      setStatus(`${OS_NAMES[bill.cargo]}を拾った！同じ種類のPCにドラッグして戻そう！`);
+    } else {
+      setStatus('バケツを持った！火花にかけると、火花が最初からやり直しになる！');
+    }
+
+    try {
+      canvas.setPointerCapture(e.pointerId);
+    } catch (err) { /* 合成イベントなどでは失敗する */ }
+  }
+
+  function onPointerMove(e) {
+    if (!state.drag || e.pointerId !== state.drag.pointerId) return;
+    const p = fieldPoint(e);
+    state.drag.x = p.x;
+    state.drag.y = p.y + state.drag.offsetY;
+  }
+
+  function onPointerUp(e) {
+    if (!state.drag || e.pointerId !== state.drag.pointerId) return;
+    finishDrag(state.phase !== 'playing');
+  }
+
+  function onPointerCancel(e) {
+    if (!state.drag || e.pointerId !== state.drag.pointerId) return;
+    finishDrag(true);
+  }
+
+  /** cancelled のときは、何も起こさず持っていたものを元に戻す。 */
+  function finishDrag(cancelled) {
+    const drag = state.drag;
+    state.drag = null;
+    if (!drag) return;
+
+    if (drag.kind === 'bucket') {
+      if (!cancelled) useBucket(drag.x, drag.y);
+      return;
+    }
+
+    const bill = drag.bill;
+    if (!cancelled) {
+      const comp = state.computers.find((c) =>
+        computerHit(c, drag.x, drag.y) && compatible(c, bill.cargo) &&
+        (c.os === OS_WINGDOWS || c.os === OS_OFF));
+      if (comp) {
+        state.net.base++;
+        state.net[comp.os === OS_WINGDOWS ? 'win' : 'off']--;
+        comp.os = bill.cargo;
+        clearStray(bill);
+        sound.playRestore();
+        setStatus(`${OS_NAMES[bill.cargo]}を戻した！`);
+        updateStatusHeader();
+        return;
+      }
+    }
+    // 戻せなかったら、落ちていた場所に戻る
+    state.strays.push(bill);
+  }
+
+  /** 火花にバケツの水をかける。火花は消えて、感染元の PC からやり直しになる。 */
+  function useBucket(x, y) {
+    state.splashes.push({ x, y, life: 0.4, maxLife: 0.4 });
+    sound.playSplash();
+
+    const pad = CONFIG.HIT_PAD_SPARK;
+    let count = 0;
+    state.cables.forEach((cable) => {
+      if (cable.active && Math.abs(x - cable.x) < DIM.sparkW + pad && Math.abs(y - cable.y) < DIM.sparkH + pad) {
+        cable.active = false;
+        count++;
+      }
+    });
+    setStatus(count > 0 ? '火花に水をかけた！' : 'バケツは空振り…火花にかけよう');
+  }
+
+  // ============================================================
+  // スコア / HUD
+  // ============================================================
+  function addScore(pts) {
+    state.score += pts;
+    scoreDisplay.textContent = state.score;
+    if (state.score > state.hiScore) {
+      state.hiScore = state.score;
+      hiScoreDisplay.textContent = state.hiScore;
+      storage.set('xbill_hi_score', state.hiScore);
+    }
+  }
+
+  /** 原作の下の行と同じ内容（Bill: 画面内/これから、System: 動いている/電源切れ/Wingdows）。 */
+  function statusLine() {
+    const n = state.net;
+    return `Bill:${state.hordeOn}/${state.hordeOff}  System:${n.base}/${n.off}/${n.win}  ` +
+      `Level:${state.level}  Score:${state.score}`;
+  }
+
+  function updateStatusHeader() {
+    safeOsDisplay.textContent = `${state.net.base} / ${state.computers.length}`;
+    safeOsDisplay.classList.toggle('danger', state.net.base + state.net.off <= 2);
+  }
+
+  // ============================================================
+  // ダイアログ
+  // ============================================================
+  let activeDialog = null;   // ヘルプから戻るときに再表示するダイアログ
+  let primaryButton = null;
+  let helpOpen = false;
+
+  function showDialog(spec, options) {
+    const isHelp = !!(options && options.isHelp);
+    if (!isHelp) activeDialog = spec;
+
+    dialogTitle.textContent = spec.title;
+    dialogBody.textContent = '';
+    spec.body.forEach((node) => dialogBody.append(node));
+
+    primaryButton = null;
+    dialogActions.textContent = '';
+    spec.actions.forEach((action) => {
+      const btn = el('button', {
+        type: 'button',
+        class: 'motif-btn ' + (action.primary ? 'btn-primary' : 'btn-secondary')
+      }, action.label);
+      btn.addEventListener('click', action.onClick);
+      if (action.primary) primaryButton = btn;
+      dialogActions.append(btn);
+    });
+
+    modalOverlay.hidden = false;
+    dialogBody.scrollTop = 0;
+    if (primaryButton) primaryButton.focus({ preventScroll: true });
+  }
+
+  function hideDialog() {
+    modalOverlay.hidden = true;
+    activeDialog = null;
+    primaryButton = null;
+    helpOpen = false;
+  }
+
+  function rulesBox(hideOnShort) {
+    return el('div', { class: hideOnShort ? 'rules hide-on-short' : 'rules' },
+      el('p', { class: 'hl' }, '🕹️ ルール (原作 XBill 2.1 準拠):'),
+      el('p', {}, '1. ', el('strong', {}, 'ビルを叩く'),
+        ': クリック/タップで倒す。重なったビルを一度に倒すほど高得点（倒した数の2乗×5点）。'),
+      el('p', {}, '2. ', el('strong', {}, 'OSを取り戻す'),
+        ': ビルはPCのOSをWingdowsに入れ替え、盗んだOSを頭に載せて逃げる。叩くとOSを落とすので、ドラッグして同じ種類のPCに戻す。逃げ切られたビルはまた戻ってくる。'),
+      el('p', {}, '3. ', el('strong', {}, '火花を止める'),
+        ': ケーブルでつながったPCの片方だけがWingdowsだと、そこから相手へ火花が走る。左上のバケツをドラッグして火花にかけると、火花が最初からやり直しになるだけ。' +
+        '火花を止めるには、Wingdowsになっている側のPCに、落ちているOSをドラッグして戻す（両方がWingdowsでなくなれば止まる）。' +
+        '火花でWingdowsになったPCは元のOSが落ちないので、ほかのビルを叩いて落としたOSを使う。'),
+      el('p', {}, '4. 動いているPCが1台以下になるとゲームオーバー。レベルが終わるたびに、稼働率に応じたボーナス。'),
+      el('p', {}, '5. ', el('strong', {}, 'レベル10をクリアで全クリア！'),
+        ' 上のレベルほど、ビルは何体も同時に、多く・速く押し寄せ、OSを抜くのも速くなる。')
+    );
+  }
+
+  function creditLine() {
+    return el('p', { class: 'dialog-msg' },
+      'XBill 2.1  Copyright (C) Brian Wellington, Matias Duarte (GPL)。ルールと絵は原作のものです。',
+      el('br'),
+      'このゲームのソース (GPL-3.0以降): ',
+      el('a', { href: CONFIG.SOURCE_URL, target: '_blank', rel: 'noopener' }, CONFIG.SOURCE_URL));
+  }
+
+  function subtitle(...lines) {
+    const parts = [];
+    lines.forEach((line, i) => {
+      if (i > 0) parts.push(el('br'));
+      parts.push(line);
+    });
+    return el('p', { class: 'dialog-subtitle' }, parts);
+  }
+
+  function showTitleDialog() {
+    setPhase('title');
+
+    const rankingBox = el('div', { class: 'ranking-box' });
+    renderRanking(rankingBox, { status: 'loading' });
+    fetchRanking().then(
+      (res) => renderRanking(rankingBox, {
+        status: 'ok', list: res.list.slice(0, CONFIG.TITLE_RANKING_ROWS), source: res.source
+      }),
+      () => renderRanking(rankingBox, { status: 'error' })
+    );
+
+    const actions = [{
+      label: '🎮 スタート (START)',
+      primary: true,
+      onClick: () => {
+        sound.init();
+        startNewGame();
+      }
+    }];
+    if (document.fullscreenEnabled) {
+      actions.push({ label: '⛶ フルスクリーン切替', onClick: toggleFullscreen });
+    }
+
+    const logo = el('img', { class: 'title-logo', src: XBILL_ASSETS.logo, alt: 'XBill' });
+    showDialog({
+      title: 'WEB REMAKE',
+      body: [
+        logo,
+        subtitle('ビル軍団からオープンソースOSを守れ！', 'Wingdowsの強制インストールを叩き潰して阻止せよ！'),
+        rulesBox(true),
+        rankingBox,
+        creditLine()
+      ],
+      actions
+    });
+  }
+
+  let closeHelp = () => {};
+
+  function openHelp() {
+    if (helpOpen) return;
+    const previous = { phase: state.phase, dialog: activeDialog };
+    if (state.phase === 'playing') setPhase('paused');
+    helpOpen = true;
+
+    const close = () => {
+      helpOpen = false;
+      if (previous.dialog) showDialog(previous.dialog);
+      else hideDialog();
+      setPhase(previous.phase);
+    };
+    closeHelp = close;
+
+    showDialog({
+      title: 'XBill ガイド (原作仕様)',
+      body: [
+        rulesBox(),
+        el('p', { class: 'dialog-msg' }, 'キー操作: P / Esc = ポーズ、M = サウンド切替'),
+        creditLine()
+      ],
+      actions: [{ label: '閉じる', primary: true, onClick: close }]
+    }, { isHelp: true });
+  }
+
+  function levelClear(bonus) {
+    if (state.phase !== 'playing') return;
+
+    const cleared = state.level;
+    setPhase('levelClear');
+    sound.playLevelUp();
+    state.drag = null;
+    state.level++;
+    updateLevelDisplay();
+    setStatus(`LEVEL ${cleared} クリア！`);
+
+    const next = state.level === CONFIG.MAX_LEVEL ? `最終 LEVEL ${state.level}` : `LEVEL ${state.level}`;
+    showDialog({
+      title: `LEVEL ${cleared} CLEAR!`,
+      body: [subtitle(
+        'すべてのビルを撃退しました！',
+        `倒したビル: ${state.billsKilled}体`,
+        el('span', {}, `稼働率ボーナス: `, el('strong', {}, `+${bonus} pts`)),
+        el('span', {}, `スコア: `, el('strong', {}, String(state.score)))
+      )],
+      actions: [{ label: `▶ ${next} に進む`, primary: true, onClick: startLevel }]
+    });
+  }
+
+  /** 最終レベルのクリア。全クリアボーナスを加えて結果画面へ。 */
+  function allClear(bonus) {
+    addScore(CONFIG.ALL_CLEAR_BONUS);
+    setPhase('gameClear');
+    state.drag = null;
+    sound.playLevelUp();
+    setStatus('ALL CLEAR! すべてのレベルをクリアしました！');
+
+    showResultDialog({
+      cleared: true,
+      finalScore: state.score,
+      finalLevel: state.level,
+      lines: [
+        `稼働率ボーナス: +${bonus} pts`,
+        `全クリアボーナス: +${CONFIG.ALL_CLEAR_BONUS} pts`
+      ]
+    });
+  }
+
+  function gameOver() {
+    if (state.phase !== 'playing') return;
+    setPhase('gameOver');
+    state.drag = null;
+
+    // 原作の最後の画面: すべてのコンピュータがトースターになる
+    state.computers.forEach((comp) => {
+      comp.type = 0;
+      comp.os = OS_OFF;
+    });
+    state.cables = [];
+    state.bills = [];
+    state.strays = [];
+    setStatus('ゲームオーバー: 動いているコンピュータが1台以下になりました');
+
+    showResultDialog({ cleared: false, finalScore: state.score, finalLevel: state.level, lines: [] });
+  }
+
+  /** ゲームオーバー・全クリア共通の結果画面（スコア登録とランキング）。 */
+  function showResultDialog({ cleared, finalScore, finalLevel, lines }) {
+    const rankingBox = el('div', { class: 'ranking-box' });
+    const msg = el('p', { class: 'dialog-msg' });
+    const input = el('input', {
+      class: 'name-input',
+      type: 'text',
+      maxlength: CONFIG.NAME_MAX,
+      placeholder: 'なまえ (最大12文字)',
+      autocomplete: 'off',
+      'aria-label': 'ランキングに載せる名前'
+    });
+    input.value = storage.get('xbill_name', '');
+    const submitBtn = el('button', { type: 'button', class: 'motif-btn' }, '🏆 登録');
+    const nameRow = el('div', { class: 'name-row' }, input, submitBtn);
+
+    let submitted = false;
+
+    const setMsg = (text, isError) => {
+      msg.textContent = text;
+      msg.classList.toggle('error', !!isError);
+    };
+
+    const onSubmit = async () => {
+      if (submitted || submitBtn.disabled) return;
+      input.disabled = submitBtn.disabled = true;
+      setMsg('送信中...');
+      try {
+        const res = await postScore(input.value.trim(), finalScore, finalLevel, cleared);
+        submitted = true;
+        storage.set('xbill_name', input.value.trim());
+        rankingPromise = Promise.resolve({ source: res.source, list: res.ranking });
+        applyRankingBest(res.ranking);
+
+        nameRow.hidden = true;
+        setMsg(res.rank > 0 ? `第${res.rank}位にランクイン！` : 'ランク外でした。また挑戦しよう！');
+        renderRanking(rankingBox, {
+          status: 'ok', list: res.ranking, source: res.source, highlightIndex: res.rank - 1
+        });
+      } catch (err) {
+        input.disabled = submitBtn.disabled = false;
+        setMsg('登録できませんでした。通信状況を確認して、もう一度お試しください。', true);
+      }
+    };
+
+    submitBtn.addEventListener('click', onSubmit);
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        onSubmit();
+      }
+    });
+
+    renderRanking(rankingBox, { status: 'loading' });
+    fetchRanking(true).then(
+      (res) => {
+        if (!submitted) renderRanking(rankingBox, { status: 'ok', list: res.list, source: res.source });
+      },
+      () => {
+        if (!submitted) renderRanking(rankingBox, { status: 'error' });
+      }
+    );
+
+    const headline = cleared
+      ? 'おめでとう！全レベルをクリアし、Wingdowsの野望を打ち砕きました！'
+      : '動いているPCが1台以下になってしまいました...';
+    const scoreLine = el('span', {}, `最終スコア: `, el('strong', {}, String(finalScore)),
+      cleared ? '  (ALL CLEAR)' : `  (LEVEL ${finalLevel})`);
+    const body = [subtitle(headline, ...lines, scoreLine)];
+    if (!cleared) {
+      body.push(el('p', { class: 'dialog-msg quote' },
+        'Module xBill has caused a segmentation fault at memory address 097E:F1A0. Core dumped. ' +
+        'We apologize for the inconvenience.'));
+    }
+    if (finalScore > 0) body.push(nameRow);
+    body.push(msg, rankingBox);
+
+    showDialog({
+      title: cleared ? 'ALL CLEAR!' : 'SYSTEM OVERRUN!',
+      body,
+      actions: [{
+        label: cleared ? '🔄 もう一度遊ぶ' : '🔄 もう一度遊ぶ (RETRY)',
+        primary: true,
+        onClick: startNewGame
+      }]
+    });
+  }
+
+  // ============================================================
+  // ランキング（Cloudflare Workers の API。API の URL が無いときは、この端末内だけ）
+  // ============================================================
+  const LOCAL_RANKING_KEY = 'xbill_local_ranking';
+  let rankingPromise = null;
+
+  /** ビルドが注入する、ランキング API（Cloudflare Workers）の URL。空なら、この端末だけのランキングにする。 */
+  function rankingApiUrl() {
+    const url = window.XBILL_CONFIG && window.XBILL_CONFIG.rankingApi;
+    return typeof url === 'string' ? url.replace(/\/+$/, '') : '';
+  }
+
+  /** ランキングの保存先: 'api'（Cloudflare の API）、'local'（この端末だけ）。 */
+  function rankingTransport() {
+    return rankingApiUrl() ? 'api' : 'local';
+  }
+
+  /** ランキング API を fetch で呼ぶ。失敗（通信エラー・タイムアウト・エラー応答）は例外。 */
+  async function callApi(method, path, body) {
+    const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
+    const timer = setTimeout(() => controller && controller.abort(), CONFIG.RANKING_TIMEOUT_MS);
+    try {
+      const res = await fetch(rankingApiUrl() + path, {
+        method,
+        headers: body === undefined ? undefined : { 'Content-Type': 'application/json' },
+        body: body === undefined ? undefined : JSON.stringify(body),
+        signal: controller ? controller.signal : undefined
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
+      return data;
+    } finally {
+      clearTimeout(timer);
+    }
+  }
+
+  function readLocalRanking() {
+    try {
+      const list = JSON.parse(storage.get(LOCAL_RANKING_KEY, '[]'));
+      return Array.isArray(list) ? list : [];
+    } catch (e) {
+      return [];
+    }
+  }
+
+  function postScoreLocal(name, score, level, cleared) {
+    const cleanName = Array.from(name || '').slice(0, CONFIG.NAME_MAX).join('') || 'NO NAME';
+    const entry = { name: cleanName, score, level, cleared: cleared === true, at: Date.now() };
+    const list = readLocalRanking();
+    list.push(entry);
+    list.sort((a, b) => (b.score - a.score) || (a.at - b.at));
+    const top = list.slice(0, CONFIG.RANKING_LOCAL_MAX);
+    storage.set(LOCAL_RANKING_KEY, JSON.stringify(top));
+    return { ranking: top, rank: top.indexOf(entry) + 1 };
+  }
+
+  async function loadRanking() {
+    if (rankingTransport() === 'api') {
+      return { source: 'server', list: (await callApi('GET', '/ranking')).ranking };
+    }
+    return { source: 'local', list: readLocalRanking() };
+  }
+
+  async function postScore(name, score, level, cleared) {
+    if (rankingTransport() === 'api') {
+      const res = await callApi('POST', '/score', { name, score, level, cleared });
+      return { source: 'server', ranking: res.ranking, rank: res.rank };
+    }
+    return Object.assign({ source: 'local' }, postScoreLocal(name, score, level, cleared));
+  }
+
+  /** 起動時とタイトル表示で二重に呼ばないよう、結果を共有する。 */
+  function fetchRanking(force) {
+    if (force || !rankingPromise) {
+      rankingPromise = loadRanking().then(
+        (res) => {
+          applyRankingBest(res.list);
+          return res;
+        },
+        (err) => {
+          rankingPromise = null;
+          throw err;
+        }
+      );
+    }
+    return rankingPromise;
+  }
+
+  /** HUD の HI-SCORE を、ランキングの1位が上回っていればそちらにする。 */
+  function applyRankingBest(list) {
+    if (list.length > 0 && list[0].score > state.hiScore) {
+      state.hiScore = list[0].score;
+      hiScoreDisplay.textContent = state.hiScore;
+    }
+  }
+
+  function rankingTable(list, highlightIndex) {
+    const rows = list.map((entry, i) => el('tr', { class: i === highlightIndex ? 'me' : null },
+      el('td', { class: 'r-rank' }, String(i + 1)),
+      el('td', { class: 'r-name' }, String(entry.name)),
+      el('td', { class: 'r-score' }, String(entry.score)),
+      el('td', { class: 'r-level' }, entry.cleared ? 'CLEAR' : `Lv${entry.level}`)
+    ));
+    return el('table', { class: 'ranking-table' }, el('tbody', {}, rows));
+  }
+
+  /** view: { status: 'loading' | 'error' | 'ok', list?, source?, highlightIndex? } */
+  function renderRanking(box, view) {
+    box.textContent = '';
+    box.append(el('p', { class: 'ranking-title' },
+      view.source === 'local' ? '🏆 ランキング (この端末のみ)' : '🏆 ランキング'));
+
+    if (view.status === 'loading') {
+      box.append(el('p', { class: 'ranking-empty' }, '読み込み中...'));
+    } else if (view.status === 'error') {
+      box.append(el('p', { class: 'ranking-empty' }, 'ランキングを取得できませんでした'));
+    } else if (view.list.length === 0) {
+      box.append(el('p', { class: 'ranking-empty' }, 'まだ記録がありません'));
+    } else {
+      box.append(rankingTable(view.list, view.highlightIndex));
+    }
+  }
+
+  // ============================================================
+  // ゲーム進行
+  // ============================================================
+  function startLevel() {
+    hideDialog();
+
+    state.params = levelParams(state.level);
+    setupNetwork();
+
+    state.bills = [];
+    state.strays = [];
+    state.hordeOn = 0;
+    state.hordeOff = state.params.bills;
+    state.billsKilled = 0;
+    state.spawnTimer = 0;
+    state.nextSpawnMs = 500;          // 原作と同じく、始まってすぐに最初のビルが出てくる
+    state.efficiency = 0;
+    state.iteration = 0;
+    state.tickTimer = 0;
+    state.drag = null;
+    state.splashes = [];
+
+    setPhase('playing');
+    updateLevelDisplay();
+    updateStatusHeader();
+    setStatus(state.level === CONFIG.MAX_LEVEL
+      ? `LEVEL ${state.level} (最終): ビル軍団の総攻撃！PCを守り抜け！`
+      : `LEVEL ${state.level}: ビル軍団の襲来！PCを守れ！`);
+  }
+
+  function startNewGame() {
+    state.score = 0;
+    state.level = 1;
+    scoreDisplay.textContent = '0';
+    startLevel();
+  }
+
+  /** ビルを全員倒した。原作どおり、稼働率 × レベルをボーナスに加える。 */
+  function finishLevel() {
+    const bonus = Math.floor(state.level * state.efficiency / Math.max(1, state.iteration));
+    addScore(bonus);
+    if (state.level >= CONFIG.MAX_LEVEL) allClear(bonus);
+    else levelClear(bonus);
+  }
+
+  function pauseGame() {
+    if (state.phase !== 'playing') return;
+    setPhase('paused');
+    setStatus('一時停止中');
+  }
+
+  function resumeGame() {
+    if (state.phase !== 'paused' || helpOpen) return;
+    setPhase('playing');
+    setStatus('ゲーム再開');
+  }
+
+  function togglePause() {
+    if (state.phase === 'paused') resumeGame();
+    else pauseGame();
+  }
+
+  function toggleSound() {
+    sound.enabled = !sound.enabled;
+    storage.set('xbill_sound', sound.enabled ? 'on' : 'off');
+    syncSoundButton();
+  }
+
+  function syncSoundButton() {
+    btnSoundToggle.textContent = sound.enabled ? '🔊 SOUND: ON' : '🔇 SOUND: OFF';
+  }
+
+  function toggleFullscreen() {
+    try {
+      const request = !document.fullscreenElement
+        ? document.documentElement.requestFullscreen()
+        : document.exitFullscreen();
+      if (request && request.catch) request.catch(() => {});
+    } catch (e) { /* 未対応 */ }
+  }
+
+  // ============================================================
+  // 描画（原作の Game_update の描画順: バケツ → ケーブルと PC → 落ちた OS → ビル → 下の行）
+  // ============================================================
+  function render() {
+    const FW = state.fieldW;
+    const FH = state.fieldH;
+    ctx.clearRect(0, 0, state.width, state.height);
+
+    ctx.save();
+    ctx.translate(state.offsetX, state.offsetY);
+    ctx.scale(state.scale, state.scale);
+    // 倍率が整数なら、ドットの絵をそのまま拡大する。端数のときは、ぎざぎざにならないよう滑らかに拡大縮小する
+    const deviceScale = state.scale * state.dpr;
+    ctx.imageSmoothingEnabled = Math.abs(deviceScale - Math.round(deviceScale)) > 0.02;
+    ctx.imageSmoothingQuality = 'high';
+
+    ctx.beginPath();
+    ctx.rect(0, 0, FW, FH);
+    ctx.clip();
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, FW, FH);
+
+    const drag = state.drag;
+    if (!(drag && drag.kind === 'bucket')) drawBucket(ctx, 0, 0);
+
+    state.cables.forEach((cable) => drawCable(ctx, cable));
+    state.computers.forEach((comp) => drawComputer(ctx, comp));
+
+    // OS をドラッグしている間は、戻せる PC に印を付ける
+    if (drag && drag.kind === 'os') {
+      ctx.strokeStyle = '#16a34a';
+      ctx.lineWidth = 2;
+      state.computers.forEach((comp) => {
+        if (compatible(comp, drag.bill.cargo) && (comp.os === OS_WINGDOWS || comp.os === OS_OFF)) {
+          ctx.strokeRect(comp.x - 2, comp.y - 2, DIM.cpuW + 4, DIM.cpuH + 4);
+        }
+      });
+    }
+
+    for (let i = state.strays.length - 1; i >= 0; i--) drawBill(ctx, state.strays[i]);
+    for (let i = state.bills.length - 1; i >= 0; i--) drawBill(ctx, state.bills[i]);
+    state.splashes.forEach((splash) => drawSplash(ctx, splash));
+
+    if (drag) {
+      if (drag.kind === 'bucket') drawBucket(ctx, drag.x - DIM.bucketW / 2, drag.y - DIM.bucketH / 2);
+      else drawOs(ctx, drag.bill.cargo, drag.x - DIM.osW / 2, drag.y - DIM.osH / 2);
+    }
+
+    if (state.phase !== 'title') {
+      ctx.fillStyle = '#000000';
+      ctx.font = '12px "Courier New", monospace';
+      ctx.textBaseline = 'alphabetic';
+      ctx.fillText(statusLine(), 5, FH - 5);
+    }
+    ctx.restore();
+
+    if (state.phase === 'paused' && modalOverlay.hidden) {
+      ctx.save();
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+      ctx.fillRect(0, 0, state.width, state.height);
+      ctx.fillStyle = '#facc15';
+      ctx.font = '20px "Press Start 2P", monospace';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('PAUSED', state.width / 2, state.height / 2);
+      ctx.restore();
+    }
+  }
+
+  let lastLoopError = '';
+
+  function gameLoop(timestamp) {
+    // 例外が出ても次のフレームを予約し、ゲームが固まらないようにする
+    requestAnimationFrame(gameLoop);
+
+    try {
+      if (!state.lastTime) state.lastTime = timestamp;
+      const dt = Math.min((timestamp - state.lastTime) / 1000, 0.1);
+      state.lastTime = timestamp;
+
+      updateGame(dt);
+      render();
+    } catch (err) {
+      const text = String(err && err.stack || err);
+      if (text !== lastLoopError) {
+        lastLoopError = text;
+        console.error(err);
+      }
+    }
+  }
+
+  // ============================================================
+  // イベント登録 / 起動
+  // ============================================================
+  canvas.addEventListener('pointerdown', (e) => {
+    e.preventDefault();
+    onPointerDown(e);
+  });
+  canvas.addEventListener('pointermove', (e) => {
+    e.preventDefault();
+    onPointerMove(e);
+  });
+  canvas.addEventListener('pointerup', (e) => {
+    e.preventDefault();
+    onPointerUp(e);
+  });
+  canvas.addEventListener('pointercancel', onPointerCancel);
+
+  btnSoundToggle.addEventListener('click', toggleSound);
+  btnHelp.addEventListener('click', openHelp);
+  btnPause.addEventListener('click', togglePause);
+  btnReset.addEventListener('click', startNewGame);
+
+  window.addEventListener('keydown', (e) => {
+    if (e.repeat || e.ctrlKey || e.metaKey || e.altKey) return;
+    const target = e.target;
+    if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA')) return;
+
+    const onControl = target && target.closest && target.closest('button, a');
+    if ((e.key === 'Enter' || e.key === ' ') && !modalOverlay.hidden && !onControl && primaryButton) {
+      e.preventDefault();
+      primaryButton.click();
+      return;
+    }
+
+    if (e.key === 'Escape' && helpOpen) {
+      closeHelp();
+    } else if (e.key === 'p' || e.key === 'P' || e.key === 'Escape') {
+      if (!helpOpen) togglePause();
+    } else if (e.key === 'm' || e.key === 'M') {
+      toggleSound();
+    }
+  });
+
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) pauseGame();
+  });
+
+  if (typeof ResizeObserver !== 'undefined') {
+    new ResizeObserver(resizeCanvas).observe(playArea);
+  } else {
+    window.addEventListener('resize', resizeCanvas);
+  }
+
+  sound.enabled = storage.get('xbill_sound', 'on') !== 'off';
+  syncSoundButton();
+  updateLevelDisplay();
+  setPhase('title');
+  safeOsDisplay.textContent = '- / -';
+  resizeCanvas();
+
+  // 原作の絵を読み込んでから始める
+  loadSprites().then(() => {
+    showTitleDialog();
+    requestAnimationFrame(gameLoop);
+  }).catch((err) => {
+    console.error(err);
+    setStatus('画像を読み込めませんでした。ページを再読み込みしてください。');
+  });
+</script>
+
+</body>
+</html>

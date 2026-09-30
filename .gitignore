@@ -1,0 +1,10 @@
+# macOS
+.DS_Store
+
+# 原作の全ソース（手元で参照するためのもの）。公開するのは third_party/ の必要な部分だけ
+src/xbill-2.1/
+
+# Cloudflare Worker
+node_modules/
+worker/.wrangler/
+worker/.dev.vars

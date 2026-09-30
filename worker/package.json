@@ -1,0 +1,16 @@
+{
+  "name": "xbill-ranking",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "XBill Web Remake のランキング API（Cloudflare Workers + KV）",
+  "license": "GPL-3.0-or-later",
+  "scripts": {
+    "test": "node --test test/*.test.mjs",
+    "dev": "wrangler dev --port 8787",
+    "deploy": "wrangler deploy"
+  },
+  "devDependencies": {
+    "wrangler": "^4.0.0"
+  }
+}

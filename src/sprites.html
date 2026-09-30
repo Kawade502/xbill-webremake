@@ -1,0 +1,101 @@
+<script>
+  // SPDX-License-Identifier: GPL-3.0-or-later
+  // Copyright (C) 2026 Kawade502
+  // Based on XBill 2.1 (Copyright (C) Brian Wellington, Matias Duarte; GPL). See NOTICE.md.
+
+  // ---- 原作 XBill 2.1 の絵（assets.html の data URI）の読み込みと描画 ----
+  // XBill is free software (GPL). Copyright (C) Brian Wellington, Matias Duarte.
+  // 座標は原作の画面（400x400）の単位。描画側で拡大縮小するので、ここでは 1 ドット = 1 単位で描く。
+
+  const CPU_FILES = ['toaster', 'maccpu', 'nextcpu', 'sgicpu', 'suncpu', 'palmcpu', 'os2cpu', 'bsdcpu'];
+  const OS_FILES = ['wingdows', 'apple', 'next', 'sgi', 'sun', 'palm', 'os2', 'bsd', 'linux', 'redhat', 'hurd'];
+  const WALK_CEL = [0, 1, 2, 1];   // 歩く絵は 3 枚。4 コマ目は 2 コマ目を使う（原作と同じ）
+
+  const SPRITES = { billL: [], billR: [], billD: [], billA: [], cpu: [], os: [], spark: [], bucket: null, logo: null };
+  const DIM = {};   // 絵の大きさ。loadSprites() の後に入る
+
+  function loadSprites() {
+    const load = (name) => new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => resolve(img);
+      img.onerror = () => reject(new Error('画像を読み込めません: ' + name));
+      img.src = XBILL_ASSETS[name];
+    });
+    const seq = (prefix, n) => Promise.all(Array.from({ length: n }, (_, i) => load(`${prefix}_${i}`)));
+
+    return Promise.all([
+      seq('billL', 3), seq('billR', 3), seq('billD', 5), seq('billA', 13),
+      Promise.all(CPU_FILES.map(load)), Promise.all(OS_FILES.map(load)),
+      seq('spark', 2), load('bucket'), load('logo')
+    ]).then(([billL, billR, billD, billA, cpu, os, spark, bucket, logo]) => {
+      Object.assign(SPRITES, { billL, billR, billD, billA, cpu, os, spark, bucket, logo });
+      Object.assign(DIM, {
+        billW: billD[0].width, billH: billD[0].height,
+        cpuW: cpu[0].width, cpuH: cpu[0].height,
+        osW: os[0].width, osH: os[0].height,
+        sparkW: spark[0].width, sparkH: spark[0].height,
+        bucketW: bucket.width, bucketH: bucket.height
+      });
+    });
+  }
+
+  function drawOs(ctx, os, x, y) {
+    ctx.drawImage(SPRITES.os[os], Math.round(x), Math.round(y));
+  }
+
+  function drawComputer(ctx, comp) {
+    ctx.drawImage(SPRITES.cpu[comp.type], comp.x, comp.y);
+    if (comp.os !== OS_OFF) drawOs(ctx, comp.os, comp.x + 4, comp.y + 4);
+  }
+
+  function drawCable(ctx, cable) {
+    ctx.strokeStyle = '#000000';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(cable.x1 + 0.5, cable.y1 + 0.5);
+    ctx.lineTo(cable.x2 + 0.5, cable.y2 + 0.5);
+    ctx.stroke();
+    if (cable.active) {
+      ctx.drawImage(SPRITES.spark[cable.index], Math.round(cable.x - DIM.sparkW / 2), Math.round(cable.y - DIM.sparkH / 2));
+    }
+  }
+
+  /** ビルの絵（歩く・OS を入れ替える・やられる）と、持っている OS。原作の Bill_draw を移したもの。 */
+  function drawBill(ctx, b) {
+    if (b.state === BILL_STRAY) {
+      drawOs(ctx, b.cargo, b.x, b.y);
+      return;
+    }
+
+    if (b.state === BILL_AT) {
+      const comp = state.computers[b.target_c];
+      if (b.index > 6 && b.index < 12) drawOs(ctx, OS_WINGDOWS, b.x + b.sx, b.y + b.sy);
+      if (b.cargo >= 0) drawOs(ctx, b.cargo, b.x + b.x_offset, b.y + b.y_offset);
+      ctx.drawImage(SPRITES.billA[b.index], comp.x, comp.y);
+      return;
+    }
+
+    if (b.cargo >= 0) drawOs(ctx, b.cargo, b.x + b.x_offset, b.y + b.y_offset);
+    let cel;
+    if (b.state === BILL_DYING) cel = SPRITES.billD[Math.max(0, b.index)];
+    else cel = (b.cels === 'R' ? SPRITES.billR : SPRITES.billL)[WALK_CEL[b.index]];
+    ctx.drawImage(cel, Math.round(b.x), Math.round(b.y));
+  }
+
+  function drawBucket(ctx, x, y) {
+    ctx.drawImage(SPRITES.bucket, Math.round(x), Math.round(y));
+  }
+
+  /** バケツの水しぶき（原作には無い、手ごたえを出すための小さな演出）。 */
+  function drawSplash(ctx, splash) {
+    const t = 1 - splash.life / splash.maxLife;
+    ctx.save();
+    ctx.globalAlpha = Math.max(0, 1 - t);
+    ctx.strokeStyle = '#3b82f6';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.arc(splash.x, splash.y, 6 + 22 * t, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.restore();
+  }
+</script>

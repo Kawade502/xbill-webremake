@@ -1,0 +1,446 @@
+<style>
+  /*
+   * SPDX-License-Identifier: GPL-3.0-or-later
+   * Copyright (C) 2026 Kawade502
+   * Based on XBill 2.1 (Copyright (C) Brian Wellington, Matias Duarte; GPL). See NOTICE.md.
+   */
+
+  /* ---------- Base ---------- */
+  *, *::before, *::after { box-sizing: border-box; }
+
+  [hidden] { display: none !important; }
+
+  html, body { margin: 0; }
+
+  body {
+    height: 100vh;
+    height: 100dvh;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #1a1e29;
+    color: #e2e8f0;
+    font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+    overflow: hidden;
+  }
+
+  @media (min-width: 640px) {
+    body { padding: 16px; }
+  }
+
+  * {
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+    touch-action: manipulation;
+  }
+
+  /* iOS Safari は user-select:none の input に文字を入力できない */
+  input {
+    user-select: text;
+    -webkit-user-select: text;
+  }
+
+  .font-retro { font-family: 'VT323', monospace; }
+  .font-pixel { font-family: 'Press Start 2P', monospace; }
+
+  /* ---------- Motif window ---------- */
+  .motif-window {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 56rem;
+    height: 100%;
+    background-color: #b2b2b2;
+    border: 4px solid #dfdfdf;
+    border-right-color: #4f4f4f;
+    border-bottom-color: #4f4f4f;
+    box-shadow: 4px 4px 16px rgba(0, 0, 0, 0.7);
+    overflow: hidden;
+  }
+
+  .titlebar {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 4px 8px;
+    background: linear-gradient(90deg, #000080, #1084d0);
+    color: #ffffff;
+    font-size: 12px;
+    font-weight: bold;
+    text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.8);
+  }
+
+  .titlebar-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+  }
+
+  .titlebar-title .font-pixel {
+    font-size: 11px;
+    letter-spacing: 0.05em;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .titlebar-icon {
+    flex-shrink: 0;
+    width: 12px;
+    height: 12px;
+    background: #dc2626;
+    border: 1px solid #ffffff;
+  }
+
+  .titlebar-actions {
+    flex-shrink: 0;
+    display: flex;
+    gap: 4px;
+  }
+
+  .motif-btn {
+    background-color: #c0c0c0;
+    border: 2px solid #ffffff;
+    border-right-color: #404040;
+    border-bottom-color: #404040;
+    color: #000000;
+    font: inherit;
+    font-size: 12px;
+    font-weight: bold;
+    padding: 2px 8px;
+    cursor: pointer;
+    text-shadow: none;
+  }
+
+  .motif-btn:active {
+    border: 2px solid #404040;
+    border-right-color: #ffffff;
+    border-bottom-color: #ffffff;
+  }
+
+  .motif-btn:disabled {
+    color: #6b7280;
+    cursor: default;
+  }
+
+  .motif-btn:focus-visible,
+  .name-input:focus-visible {
+    outline: 2px dotted #000080;
+    outline-offset: 1px;
+  }
+
+  #btnSoundToggle {
+    font-family: 'VT323', monospace;
+    font-size: 14px;
+  }
+
+  /* ---------- HUD ---------- */
+  .hud {
+    flex-shrink: 0;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 2px 16px;
+    padding: 6px 12px;
+    background: #242c38;
+    color: #90cdf4;
+    border-bottom: 2px solid #151a22;
+    font-family: 'VT323', monospace;
+    font-size: 18px;
+  }
+
+  .hud-group { display: flex; gap: 16px; align-items: center; }
+  .hud strong { font-size: 20px; }
+
+  .v-score { color: #fde047; }
+  .v-level { color: #4ade80; }
+  .v-safe  { color: #67e8f9; }
+  .v-safe.danger { color: #ef4444; animation: pulse 1s ease-in-out infinite; }
+  .v-hi    { color: #fdba74; }
+
+  @keyframes pulse {
+    50% { opacity: 0.4; }
+  }
+
+  /* ---------- Play area ---------- */
+  .play-area {
+    position: relative;
+    flex: 1 1 0%;
+    min-height: 0;
+    background: #000000;
+    overflow: hidden;
+  }
+
+  #gameCanvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+    background-color: #152219;
+    cursor: crosshair;
+    touch-action: none;
+  }
+
+  /* ---------- Dialog ---------- */
+  .overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px;
+    background: rgba(0, 0, 0, 0.8);
+  }
+
+  /* 高さは内容に合わせ、足りなければ本文だけスクロールする（ボタンは常に見える） */
+  .motif-dialog {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 28rem;
+    max-height: 100%;
+    padding: 12px 16px;
+    background: #c0c0c0;
+    color: #000000;
+    text-align: center;
+    border: 4px solid #dfdfdf;
+    border-right-color: #4f4f4f;
+    border-bottom-color: #4f4f4f;
+    box-shadow: 4px 4px 16px rgba(0, 0, 0, 0.7);
+  }
+
+  .dialog-title {
+    flex-shrink: 0;
+    margin: 0 0 8px;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 18px;
+    line-height: 1.3;
+    color: #1e3a8a;
+  }
+
+  .dialog-body {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .dialog-actions {
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding-top: 10px;
+  }
+
+  .dialog-subtitle {
+    margin: 0 0 12px;
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1.5;
+    color: #1f2937;
+  }
+
+  .dialog-msg {
+    margin: 6px 0;
+    font-size: 13px;
+    font-weight: 600;
+    color: #1f2937;
+  }
+
+  .dialog-msg.error { color: #b91c1c; }
+  .dialog-subtitle strong { color: #15803d; }
+
+  .title-logo {
+    display: block;
+    width: 100%;
+    max-width: 260px;
+    height: auto;
+    margin: 0 auto 8px;
+    image-rendering: pixelated;
+  }
+
+  .dialog-msg.quote {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 11px;
+    font-weight: 400;
+    font-style: italic;
+    color: #374151;
+  }
+
+  .rules {
+    margin: 0 0 12px;
+    padding: 12px;
+    background: #111827;
+    color: #4ade80;
+    text-align: left;
+    border: 1px solid #4b5563;
+    border-radius: 4px;
+    font-family: 'VT323', monospace;
+    font-size: 16px;
+    line-height: 1.3;
+  }
+
+  .rules p { margin: 0 0 4px; }
+  .rules p:last-child { margin-bottom: 0; }
+  .rules .hl { color: #fde047; font-weight: bold; }
+
+  .btn-primary {
+    padding: 10px 16px;
+    background-color: #1d4ed8;
+    color: #ffffff;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 12px;
+    line-height: 1.4;
+  }
+
+  .btn-primary:hover { background-color: #1e40af; }
+  .btn-secondary { padding: 6px 12px; color: #1f2937; }
+
+  /* ---------- Ranking ---------- */
+  .ranking-box { margin: 0 0 8px; }
+
+  .ranking-title {
+    margin: 0 0 4px;
+    font-size: 12px;
+    font-weight: 700;
+    color: #1f2937;
+  }
+
+  .ranking-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #111827;
+    color: #e5e7eb;
+    font-family: 'VT323', monospace;
+    font-size: 16px;
+  }
+
+  .ranking-table td { padding: 1px 6px; }
+  .ranking-table .r-rank  { width: 2.5em; text-align: right; color: #fde047; }
+  .ranking-table .r-name  { text-align: left; max-width: 9em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .ranking-table .r-score { text-align: right; color: #4ade80; }
+  .ranking-table .r-level { width: 3.5em; text-align: right; color: #90cdf4; }
+  .ranking-table tr.me td { background: #1d4ed8; color: #ffffff; }
+
+  .ranking-empty {
+    margin: 0;
+    padding: 6px;
+    background: #111827;
+    color: #9ca3af;
+    font-family: 'VT323', monospace;
+    font-size: 16px;
+  }
+
+  .name-row {
+    display: flex;
+    gap: 6px;
+    margin: 8px 0;
+  }
+
+  .name-input {
+    flex: 1 1 auto;
+    min-width: 0;
+    padding: 6px 8px;
+    background: #ffffff;
+    color: #000000;
+    border: 2px solid #404040;
+    border-right-color: #ffffff;
+    border-bottom-color: #ffffff;
+    font-size: 16px; /* 16px 未満だと iOS が入力時にズームする */
+  }
+
+  .name-row .motif-btn { flex-shrink: 0; padding: 6px 10px; }
+
+  /* ---------- Bottom bar ---------- */
+  .bottom-bar {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 6px 12px;
+    background: #dcdcdc;
+    color: #1f2937;
+    border-top: 2px solid #ffffff;
+    font-size: 12px;
+  }
+
+  .status {
+    flex: 1 1 auto;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .status-dot {
+    flex-shrink: 0;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #22c55e;
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  #statusMessage {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 11px;
+    color: #374151;
+  }
+
+  .bottom-actions {
+    flex-shrink: 0;
+    display: flex;
+    gap: 6px;
+  }
+
+  .bottom-actions .motif-btn { padding: 6px 10px; white-space: nowrap; }
+
+  @media (min-width: 640px) {
+    .bottom-bar { font-size: 12px; }
+    #statusMessage { font-size: 12px; }
+    .dialog-title { font-size: 24px; }
+    .motif-dialog { padding: 16px 24px; }
+  }
+
+  /* 横向きスマホなど、高さが足りない画面ではダイアログを詰める（ルールは「?」で見られる） */
+  @media (max-height: 480px) {
+    .hud { padding: 2px 12px; font-size: 16px; }
+    .hud strong { font-size: 18px; }
+    .bottom-bar { padding: 3px 12px; }
+    .bottom-actions .motif-btn { padding: 3px 10px; }
+
+    .motif-dialog { padding: 8px 12px; }
+    .dialog-title { margin-bottom: 4px; font-size: 14px; }
+    .dialog-subtitle { margin-bottom: 6px; font-size: 12px; line-height: 1.4; }
+    .dialog-actions { flex-direction: row; gap: 6px; padding-top: 6px; }
+    .dialog-actions .motif-btn { flex: 1 1 0; }
+    .btn-primary { padding: 8px 10px; font-size: 11px; }
+    .hide-on-short { display: none; }
+  }
+
+  /* スマホ（縦向き）では、余白と上下の帯を詰めて、遊ぶ領域を広げる */
+  @media (max-width: 480px) {
+    body { padding: 0; }
+    .motif-window { border-width: 2px; }
+    .titlebar { padding: 2px 6px; }
+    .hud { padding: 2px 8px; gap: 0 10px; font-size: 14px; }
+    .hud strong { font-size: 15px; }
+    .hud-group { gap: 8px; }
+    .bottom-bar { padding: 3px 8px; }
+    .bottom-actions .motif-btn { padding: 5px 9px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .status-dot, .v-safe.danger { animation: none; }
+  }
+</style>
