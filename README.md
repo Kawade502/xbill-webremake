@@ -21,8 +21,8 @@
 
 ## 特徴
 
-- 原作 XBill 2.1 の C ソースをもとに、PC とケーブルの配置、ビルの動き、OS の入れ替え、火花とバケツ、得点、終了条件を移植しています。
-- 絵は原作のものをそのまま使っています。
+- オリジナル XBill 2.1 の C ソースをもとに、PC とケーブルの配置、ビルの動き、OS の入れ替え、火花とバケツ、得点、終了条件を移植しています。
+- 絵はオリジナルのものをそのまま使っています。
 - ランキング（名前とスコア）を Cloudflare Workers + KV に保存します。
 
 ## 仕組みとファイル構成
@@ -33,16 +33,16 @@
 src/                    ゲームの部品（ビルドで 1 枚の HTML にまとめる）
   index.html              画面の骨組み。<!-- @include 名前 --> で下の部品を読み込む
   styles.html             CSS
-  assets.html             原作の絵（自動生成）
+  assets.html             オリジナルの絵（自動生成）
   sprites.html            絵の読み込みと描画
   sound.html              効果音
   game.html               ゲーム本体（ルール、操作、画面、ランキングの画面）
 docs/                   GitHub Pages で公開する完成品（ビルドの出力。手で編集しない）
 worker/                 ランキング API（Cloudflare Workers + KV）とそのテスト
 tools/build_pages.py    src/ から docs/index.html を作る
-tools/make_assets.py    原作の絵（XPM）から src/assets.html を作る
+tools/make_assets.py    オリジナルの絵（XPM）から src/assets.html を作る
 tools/make_ogp.py       SNS 共有用の画像（docs/ogp.png）とファビコンを作る
-third_party/xbill-2.1/  原作の絵の元データ、README、ライセンス表記
+third_party/xbill-2.1/  オリジナルの絵の元データ、README、ライセンス表記
 pages.config.json       公開 URL と、ランキング API の URL
 ```
 
@@ -88,10 +88,10 @@ Worker の KV（キー `ranking`）に、上位 20 件を JSON で保存しま�
 ## 難易度の調整
 
 `src/game.html` の `LEVELS`（レベルごとの、ビルの数・出現の勢い・速さなど）だけを変えれば調整できます。
-PC の台数とケーブルの本数は、原作の式のままです。
+PC の台数とケーブルの本数は、オリジナルの式のままです。
 
 ## ライセンスとクレジット
 
 - ライセンス: **GPL-3.0 以降**（[`LICENSE`](LICENSE)）
-- 原作: XBill 2.1 — Copyright (C) Brian Wellington, Matias Duarte（<http://www.xbill.org/>）
+- オリジナル: XBill 2.1 — Copyright (C) Brian Wellington, Matias Duarte（<http://www.xbill.org/>）
 - 詳しくは [`NOTICE.md`](NOTICE.md) を見てください。
