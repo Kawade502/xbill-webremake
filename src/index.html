@@ -21,8 +21,8 @@
         <span class="font-pixel">XBill 1994 Parody - Web Edition</span>
       </div>
       <div class="titlebar-actions">
-        <button type="button" id="btnSoundToggle" class="motif-btn" aria-label="サウンドの切り替え">🔊 SOUND: ON</button>
-        <button type="button" id="btnHelp" class="motif-btn" aria-label="遊び方">?</button>
+        <button type="button" id="btnSoundToggle" class="motif-btn" data-i18n-aria="aria.sound">🔊 SOUND: ON</button>
+        <button type="button" id="btnHelp" class="motif-btn" data-i18n-aria="aria.help">?</button>
       </div>
     </div>
 
@@ -56,11 +56,11 @@
     <div class="bottom-bar">
       <div class="status">
         <span class="status-dot"></span>
-        <span id="statusMessage" aria-live="polite">SYSTEM READY: ビルの侵入を監視中...</span>
+        <span id="statusMessage" aria-live="polite" data-i18n="status.ready">SYSTEM READY</span>
       </div>
       <div class="bottom-actions">
-        <button type="button" id="btnPause" class="motif-btn">ポーズ (II)</button>
-        <button type="button" id="btnReset" class="motif-btn">リセット</button>
+        <button type="button" id="btnPause" class="motif-btn" data-i18n="btn.pause">Pause (II)</button>
+        <button type="button" id="btnReset" class="motif-btn" data-i18n="btn.reset">Reset</button>
       </div>
     </div>
   </div>
@@ -68,6 +68,7 @@
   <!-- @include assets -->
   <!-- @include sound -->
   <!-- @include sprites -->
+  <!-- @include i18n -->
   <!-- @include game -->
 </body>
 </html>

@@ -40,9 +40,21 @@ def read(path):
         return f.read()
 
 
+def i18n_json():
+    """src/i18n/*.json を 1 つの JSON にまとめる（ja を先頭に）。</script> を壊さないよう < をエスケープする。"""
+    d = {}
+    for name in sorted(os.listdir(os.path.join(SRC, 'i18n'))):
+        if name.endswith('.json'):
+            d[name[:-5]] = json.loads(read(os.path.join(SRC, 'i18n', name)))
+    return json.dumps(d, ensure_ascii=False, separators=(',', ':')).replace('<', '\\u003c')
+
+
 def expand_includes(text):
     def repl(m):
-        return read(os.path.join(SRC, m.group(1) + '.html'))
+        body = read(os.path.join(SRC, m.group(1) + '.html'))
+        if m.group(1) == 'i18n':
+            body = re.sub(r'/\*@dicts\*/.*?/\*@end\*/', lambda _m: i18n_json(), body, count=1, flags=re.S)
+        return body
     return re.sub(r"<!-- @include ([A-Za-z0-9_]+) -->", repl, text)
 
 

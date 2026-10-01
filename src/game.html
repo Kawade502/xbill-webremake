@@ -5,6 +5,8 @@
 
   'use strict';
 
+  const { t } = window.XBILL_LANG;
+
   // ============================================================
   // 設定値
   // ============================================================
@@ -231,7 +233,7 @@
 
   function setPhase(phase) {
     state.phase = phase;
-    btnPause.textContent = phase === 'paused' ? '再開 (▶)' : 'ポーズ (II)';
+    btnPause.textContent = phase === 'paused' ? t('btn.resume') : t('btn.pause');
     btnPause.disabled = phase !== 'playing' && phase !== 'paused';
   }
 
@@ -813,9 +815,9 @@
 
     if (kind === 'os') {
       sound.playRestore();
-      setStatus(`${OS_NAMES[bill.cargo]}を拾った！同じ種類のPCにドラッグして戻そう！`);
+      setStatus(t('status.pickedOs', { os: OS_NAMES[bill.cargo] }));
     } else {
-      setStatus('バケツを持った！火花にかけると、火花が最初からやり直しになる！');
+      setStatus(t('status.pickedBucket'));
     }
 
     try {
@@ -862,7 +864,7 @@
         comp.os = bill.cargo;
         clearStray(bill);
         sound.playRestore();
-        setStatus(`${OS_NAMES[bill.cargo]}を戻した！`);
+        setStatus(t('status.restored', { os: OS_NAMES[bill.cargo] }));
         updateStatusHeader();
         return;
       }
@@ -884,7 +886,7 @@
         count++;
       }
     });
-    setStatus(count > 0 ? '火花に水をかけた！' : 'バケツは空振り…火花にかけよう');
+    setStatus(count > 0 ? t('status.bucketHit') : t('status.bucketMiss'));
   }
 
   // ============================================================
@@ -953,27 +955,31 @@
 
   function rulesBox(hideOnShort) {
     return el('div', { class: hideOnShort ? 'rules hide-on-short' : 'rules' },
-      el('p', { class: 'hl' }, '🕹️ ルール (オリジナル XBill 2.1 準拠):'),
-      el('p', {}, '1. ', el('strong', {}, 'ビルを叩く'),
-        ': クリック/タップで倒す。重なったビルを一度に倒すほど高得点（倒した数の2乗×5点）。'),
-      el('p', {}, '2. ', el('strong', {}, 'OSを取り戻す'),
-        ': ビルはPCのOSをWingdowsに入れ替え、盗んだOSを頭に載せて逃げる。叩くとOSを落とすので、ドラッグして同じ種類のPCに戻す。逃げ切られたビルはまた戻ってくる。'),
-      el('p', {}, '3. ', el('strong', {}, '火花を止める'),
-        ': ケーブルでつながったPCの片方だけがWingdowsだと、そこから相手へ火花が走る。左上のバケツをドラッグして火花にかけると、火花が最初からやり直しになるだけ。' +
-        '火花を止めるには、Wingdowsになっている側のPCに、落ちているOSをドラッグして戻す（両方がWingdowsでなくなれば止まる）。' +
-        '火花でWingdowsになったPCは元のOSが落ちないので、ほかのビルを叩いて落としたOSを使う。'),
-      el('p', {}, '4. 動いているPCが1台以下になるとゲームオーバー。レベルが終わるたびに、稼働率に応じたボーナス。'),
-      el('p', {}, '5. ', el('strong', {}, 'レベル10をクリアで全クリア！'),
-        ' 上のレベルほど、ビルは何体も同時に、多く・速く押し寄せ、OSを抜くのも速くなる。')
+      el('p', { class: 'hl' }, t('rules.title')),
+      el('p', {}, '1. ', el('strong', {}, t('rules.1.head')), t('rules.1.body')),
+      el('p', {}, '2. ', el('strong', {}, t('rules.2.head')), t('rules.2.body')),
+      el('p', {}, '3. ', el('strong', {}, t('rules.3.head')), t('rules.3.body')),
+      el('p', {}, '4. ' + t('rules.4')),
+      el('p', {}, '5. ', el('strong', {}, t('rules.5.head')), t('rules.5.body'))
     );
   }
 
   function creditLine() {
     return el('p', { class: 'dialog-msg' },
-      'XBill 2.1  Copyright (C) Brian Wellington, Matias Duarte (GPL)。ルールと絵はオリジナルのものです。',
+      t('credit.line'),
       el('br'),
-      'このゲームのソース (GPL-3.0以降): ',
+      t('credit.source'),
       el('a', { href: CONFIG.SOURCE_URL, target: '_blank', rel: 'noopener' }, CONFIG.SOURCE_URL));
+  }
+
+  /** 言語の選択。変えるとページを読み込み直す（タイトル画面でだけ出す）。 */
+  function langPicker() {
+    const L = window.XBILL_LANG;
+    const select = el('select', { class: 'lang-select', 'aria-label': t('lang.label') },
+      L.supported.map((code) => el('option', { value: code }, L.names[code])));
+    select.value = L.lang;
+    select.addEventListener('change', () => L.setLang(select.value));
+    return el('p', { class: 'dialog-msg lang-row' }, '🌐 ', select);
   }
 
   function subtitle(...lines) {
@@ -998,7 +1004,7 @@
     );
 
     const actions = [{
-      label: '🎮 スタート (START)',
+      label: t('title.start'),
       primary: true,
       onClick: () => {
         sound.init();
@@ -1006,7 +1012,7 @@
       }
     }];
     if (document.fullscreenEnabled) {
-      actions.push({ label: '⛶ フルスクリーン切替', onClick: toggleFullscreen });
+      actions.push({ label: t('title.fullscreen'), onClick: toggleFullscreen });
     }
 
     const logo = el('img', { class: 'title-logo', src: XBILL_ASSETS.logo, alt: 'XBill' });
@@ -1014,9 +1020,10 @@
       title: 'WEB REMAKE',
       body: [
         logo,
-        subtitle('ビル軍団からオープンソースOSを守れ！', 'Wingdowsの強制インストールを叩き潰して阻止せよ！'),
+        subtitle(t('title.sub1'), t('title.sub2')),
         rulesBox(true),
         rankingBox,
+        langPicker(),
         creditLine()
       ],
       actions
@@ -1040,13 +1047,13 @@
     closeHelp = close;
 
     showDialog({
-      title: 'XBill ガイド (オリジナル仕様)',
+      title: t('help.title'),
       body: [
         rulesBox(),
-        el('p', { class: 'dialog-msg' }, 'キー操作: P / Esc = ポーズ、M = サウンド切替'),
+        el('p', { class: 'dialog-msg' }, t('help.keys')),
         creditLine()
       ],
-      actions: [{ label: '閉じる', primary: true, onClick: close }]
+      actions: [{ label: t('help.close'), primary: true, onClick: close }]
     }, { isHelp: true });
   }
 
@@ -1059,18 +1066,18 @@
     state.drag = null;
     state.level++;
     updateLevelDisplay();
-    setStatus(`LEVEL ${cleared} クリア！`);
+    setStatus(t('status.levelCleared', { n: cleared }));
 
-    const next = state.level === CONFIG.MAX_LEVEL ? `最終 LEVEL ${state.level}` : `LEVEL ${state.level}`;
+    const next = state.level === CONFIG.MAX_LEVEL ? t('level.final', { n: state.level }) : t('level.n', { n: state.level });
     showDialog({
       title: `LEVEL ${cleared} CLEAR!`,
       body: [subtitle(
-        'すべてのビルを撃退しました！',
-        `倒したビル: ${state.billsKilled}体`,
-        el('span', {}, `稼働率ボーナス: `, el('strong', {}, `+${bonus} pts`)),
-        el('span', {}, `スコア: `, el('strong', {}, String(state.score)))
+        t('clear.headline'),
+        t('clear.killed', { n: state.billsKilled }),
+        el('span', {}, t('label.bonus'), el('strong', {}, `+${bonus} pts`)),
+        el('span', {}, t('label.score'), el('strong', {}, String(state.score)))
       )],
-      actions: [{ label: `▶ ${next} に進む`, primary: true, onClick: startLevel }]
+      actions: [{ label: t('clear.goto', { next }), primary: true, onClick: startLevel }]
     });
   }
 
@@ -1080,15 +1087,15 @@
     setPhase('gameClear');
     state.drag = null;
     sound.playLevelUp();
-    setStatus('ALL CLEAR! すべてのレベルをクリアしました！');
+    setStatus(t('status.allClear'));
 
     showResultDialog({
       cleared: true,
       finalScore: state.score,
       finalLevel: state.level,
       lines: [
-        `稼働率ボーナス: +${bonus} pts`,
-        `全クリアボーナス: +${CONFIG.ALL_CLEAR_BONUS} pts`
+        t('result.bonus', { n: bonus }),
+        t('result.allClearBonus', { n: CONFIG.ALL_CLEAR_BONUS })
       ]
     });
   }
@@ -1106,7 +1113,7 @@
     state.cables = [];
     state.bills = [];
     state.strays = [];
-    setStatus('ゲームオーバー: 動いているコンピュータが1台以下になりました');
+    setStatus(t('status.gameOver'));
 
     showResultDialog({ cleared: false, finalScore: state.score, finalLevel: state.level, lines: [] });
   }
@@ -1119,12 +1126,12 @@
       class: 'name-input',
       type: 'text',
       maxlength: CONFIG.NAME_MAX,
-      placeholder: 'なまえ (最大12文字)',
+      placeholder: t('name.placeholder'),
       autocomplete: 'off',
-      'aria-label': 'ランキングに載せる名前'
+      'aria-label': t('name.aria')
     });
     input.value = storage.get('xbill_name', '');
-    const submitBtn = el('button', { type: 'button', class: 'motif-btn' }, '🏆 登録');
+    const submitBtn = el('button', { type: 'button', class: 'motif-btn' }, t('name.submit'));
     const nameRow = el('div', { class: 'name-row' }, input, submitBtn);
 
     let submitted = false;
@@ -1137,7 +1144,7 @@
     const onSubmit = async () => {
       if (submitted || submitBtn.disabled) return;
       input.disabled = submitBtn.disabled = true;
-      setMsg('送信中...');
+      setMsg(t('name.sending'));
       try {
         const res = await postScore(input.value.trim(), finalScore, finalLevel, cleared);
         submitted = true;
@@ -1146,13 +1153,13 @@
         applyRankingBest(res.ranking);
 
         nameRow.hidden = true;
-        setMsg(res.rank > 0 ? `第${res.rank}位にランクイン！` : 'ランク外でした。また挑戦しよう！');
+        setMsg(res.rank > 0 ? t('name.rank', { rank: res.rank }) : t('name.outOfRank'));
         renderRanking(rankingBox, {
           status: 'ok', list: res.ranking, source: res.source, highlightIndex: res.rank - 1
         });
       } catch (err) {
         input.disabled = submitBtn.disabled = false;
-        setMsg('登録できませんでした。通信状況を確認して、もう一度お試しください。', true);
+        setMsg(t('name.error'), true);
       }
     };
 
@@ -1175,9 +1182,9 @@
     );
 
     const headline = cleared
-      ? 'おめでとう！全レベルをクリアし、Wingdowsの野望を打ち砕きました！'
-      : '動いているPCが1台以下になってしまいました...';
-    const scoreLine = el('span', {}, `最終スコア: `, el('strong', {}, String(finalScore)),
+      ? t('result.clearedHeadline')
+      : t('result.overHeadline');
+    const scoreLine = el('span', {}, t('label.finalScore'), el('strong', {}, String(finalScore)),
       cleared ? '  (ALL CLEAR)' : `  (LEVEL ${finalLevel})`);
     const body = [subtitle(headline, ...lines, scoreLine)];
     if (!cleared) {
@@ -1192,7 +1199,7 @@
       title: cleared ? 'ALL CLEAR!' : 'SYSTEM OVERRUN!',
       body,
       actions: [{
-        label: cleared ? '🔄 もう一度遊ぶ' : '🔄 もう一度遊ぶ (RETRY)',
+        label: cleared ? t('result.retry') : t('result.retry') + ' (RETRY)',
         primary: true,
         onClick: startNewGame
       }]
@@ -1309,14 +1316,14 @@
   function renderRanking(box, view) {
     box.textContent = '';
     box.append(el('p', { class: 'ranking-title' },
-      view.source === 'local' ? '🏆 ランキング (この端末のみ)' : '🏆 ランキング'));
+      view.source === 'local' ? t('ranking.titleLocal') : t('ranking.title')));
 
     if (view.status === 'loading') {
-      box.append(el('p', { class: 'ranking-empty' }, '読み込み中...'));
+      box.append(el('p', { class: 'ranking-empty' }, t('ranking.loading')));
     } else if (view.status === 'error') {
-      box.append(el('p', { class: 'ranking-empty' }, 'ランキングを取得できませんでした'));
+      box.append(el('p', { class: 'ranking-empty' }, t('ranking.error')));
     } else if (view.list.length === 0) {
-      box.append(el('p', { class: 'ranking-empty' }, 'まだ記録がありません'));
+      box.append(el('p', { class: 'ranking-empty' }, t('ranking.empty')));
     } else {
       box.append(rankingTable(view.list, view.highlightIndex));
     }
@@ -1348,8 +1355,8 @@
     updateLevelDisplay();
     updateStatusHeader();
     setStatus(state.level === CONFIG.MAX_LEVEL
-      ? `LEVEL ${state.level} (最終): ビル軍団の総攻撃！PCを守り抜け！`
-      : `LEVEL ${state.level}: ビル軍団の襲来！PCを守れ！`);
+      ? t('status.levelStartFinal', { n: state.level })
+      : t('status.levelStart', { n: state.level }));
   }
 
   function startNewGame() {
@@ -1370,13 +1377,13 @@
   function pauseGame() {
     if (state.phase !== 'playing') return;
     setPhase('paused');
-    setStatus('一時停止中');
+    setStatus(t('status.paused'));
   }
 
   function resumeGame() {
     if (state.phase !== 'paused' || helpOpen) return;
     setPhase('playing');
-    setStatus('ゲーム再開');
+    setStatus(t('status.resumed'));
   }
 
   function togglePause() {
@@ -1560,6 +1567,6 @@
     requestAnimationFrame(gameLoop);
   }).catch((err) => {
     console.error(err);
-    setStatus('画像を読み込めませんでした。ページを再読み込みしてください。');
+    setStatus(t('status.imageError'));
   });
 </script>

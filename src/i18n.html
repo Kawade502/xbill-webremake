@@ -1,0 +1,79 @@
+<script>
+  // SPDX-License-Identifier: GPL-3.0-or-later
+  // Copyright (C) 2026 Kawade502
+  // 多言語対応。辞書は src/i18n/*.json（ビルドで下の XBILL_I18N に埋め込む）。ja が基準。
+  // 翻訳は AI による下書き。誤りがあれば src/i18n/<言語>.json を直して PR / Issue でお知らせください。
+  window.XBILL_I18N = /*@dicts*/{}/*@end*/;
+
+  (function () {
+    'use strict';
+    const DICTS = window.XBILL_I18N;
+    const SUPPORTED = ['ja', 'en', 'zh-CN', 'zh-TW', 'ko', 'es', 'fr', 'de', 'pt'];
+    const NATIVE_NAMES = {
+      'ja': '日本語', 'en': 'English', 'zh-CN': '简体中文', 'zh-TW': '繁體中文', 'ko': '한국어',
+      'es': 'Español', 'fr': 'Français', 'de': 'Deutsch', 'pt': 'Português'
+    };
+    const LANG_KEY = 'xbill_lang';
+
+    function readSaved() {
+      try { return window.localStorage.getItem(LANG_KEY); } catch (e) { return null; }
+    }
+
+    /** ブラウザの言語（例: zh-Hant-TW, pt-BR, en-US）を、対応言語のどれかに丸める。合わなければ null。 */
+    function matchLang(tag) {
+      if (!tag) return null;
+      const lower = String(tag).toLowerCase();
+      if (lower.startsWith('zh')) {
+        return /hant|-tw|-hk|-mo/.test(lower) ? 'zh-TW' : 'zh-CN';
+      }
+      const base = lower.split('-')[0];
+      return SUPPORTED.find((l) => l.toLowerCase() === base) || null;
+    }
+
+    function detectLang() {
+      let fromUrl = null;
+      try { fromUrl = new URLSearchParams(window.location.search).get('lang'); } catch (e) { /* 無視 */ }
+      const candidates = [fromUrl, readSaved()];
+      for (const c of candidates) {
+        const m = SUPPORTED.find((l) => l.toLowerCase() === String(c || '').toLowerCase());
+        if (m) return m;
+      }
+      const prefs = (navigator.languages && navigator.languages.length) ? navigator.languages : [navigator.language];
+      for (const p of prefs) {
+        const m = matchLang(p);
+        if (m) return m;
+      }
+      return 'en';
+    }
+
+    const lang = detectLang();
+    const dict = DICTS[lang] || DICTS.en;
+
+    /** 辞書を引く。{name} の部分は params で置き換える。無い鍵は ja → 鍵そのもの、の順で代用。 */
+    function t(key, params) {
+      let s = Object.prototype.hasOwnProperty.call(dict, key) ? dict[key]
+        : (DICTS.ja && DICTS.ja[key] !== undefined ? DICTS.ja[key] : key);
+      if (params) s = s.replace(/\{(\w+)\}/g, (m, k) => (params[k] !== undefined ? String(params[k]) : m));
+      return s;
+    }
+
+    function setLang(next) {
+      if (!SUPPORTED.includes(next)) return;
+      try { window.localStorage.setItem(LANG_KEY, next); } catch (e) { /* 保存できなくても、URL で切り替える */ }
+      const url = new URL(window.location.href);
+      url.searchParams.set('lang', next);
+      window.location.href = url.toString();
+    }
+
+    /** 静的な HTML の data-i18n（テキスト）と data-i18n-aria（aria-label）を埋める。 */
+    function applyStatic() {
+      document.documentElement.lang = lang;
+      document.title = t('page.title');
+      document.querySelectorAll('[data-i18n]').forEach((n) => { n.textContent = t(n.getAttribute('data-i18n')); });
+      document.querySelectorAll('[data-i18n-aria]').forEach((n) => { n.setAttribute('aria-label', t(n.getAttribute('data-i18n-aria'))); });
+    }
+
+    window.XBILL_LANG = { lang, supported: SUPPORTED, names: NATIVE_NAMES, t, setLang, applyStatic };
+    applyStatic();
+  })();
+</script>

@@ -443,4 +443,14 @@
   @media (prefers-reduced-motion: reduce) {
     .status-dot, .v-safe.danger { animation: none; }
   }
+
+  /* 多言語: 中国語・韓国語は、その言語向けのフォントを先に探す */
+  :lang(zh-CN) body, :lang(zh-CN) .motif-btn { font-family: 'Inter', system-ui, 'PingFang SC', 'Microsoft YaHei', 'Noto Sans CJK SC', sans-serif; }
+  :lang(zh-TW) body, :lang(zh-TW) .motif-btn { font-family: 'Inter', system-ui, 'PingFang TC', 'Microsoft JhengHei', 'Noto Sans CJK TC', sans-serif; }
+  :lang(ko) body, :lang(ko) .motif-btn { font-family: 'Inter', system-ui, 'Apple SD Gothic Neo', 'Malgun Gothic', 'Noto Sans CJK KR', sans-serif; }
+  .lang-select {
+    font: inherit;
+    padding: 4px 8px;
+    max-width: 100%;
+  }
 </style>

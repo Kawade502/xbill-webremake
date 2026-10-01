@@ -475,6 +475,16 @@
   @media (prefers-reduced-motion: reduce) {
     .status-dot, .v-safe.danger { animation: none; }
   }
+
+  /* 多言語: 中国語・韓国語は、その言語向けのフォントを先に探す */
+  :lang(zh-CN) body, :lang(zh-CN) .motif-btn { font-family: 'Inter', system-ui, 'PingFang SC', 'Microsoft YaHei', 'Noto Sans CJK SC', sans-serif; }
+  :lang(zh-TW) body, :lang(zh-TW) .motif-btn { font-family: 'Inter', system-ui, 'PingFang TC', 'Microsoft JhengHei', 'Noto Sans CJK TC', sans-serif; }
+  :lang(ko) body, :lang(ko) .motif-btn { font-family: 'Inter', system-ui, 'Apple SD Gothic Neo', 'Malgun Gothic', 'Noto Sans CJK KR', sans-serif; }
+  .lang-select {
+    font: inherit;
+    padding: 4px 8px;
+    max-width: 100%;
+  }
 </style>
 
 </head>
@@ -487,8 +497,8 @@
         <span class="font-pixel">XBill 1994 Parody - Web Edition</span>
       </div>
       <div class="titlebar-actions">
-        <button type="button" id="btnSoundToggle" class="motif-btn" aria-label="サウンドの切り替え">🔊 SOUND: ON</button>
-        <button type="button" id="btnHelp" class="motif-btn" aria-label="遊び方">?</button>
+        <button type="button" id="btnSoundToggle" class="motif-btn" data-i18n-aria="aria.sound">🔊 SOUND: ON</button>
+        <button type="button" id="btnHelp" class="motif-btn" data-i18n-aria="aria.help">?</button>
       </div>
     </div>
 
@@ -522,11 +532,11 @@
     <div class="bottom-bar">
       <div class="status">
         <span class="status-dot"></span>
-        <span id="statusMessage" aria-live="polite">SYSTEM READY: ビルの侵入を監視中...</span>
+        <span id="statusMessage" aria-live="polite" data-i18n="status.ready">SYSTEM READY</span>
       </div>
       <div class="bottom-actions">
-        <button type="button" id="btnPause" class="motif-btn">ポーズ (II)</button>
-        <button type="button" id="btnReset" class="motif-btn">リセット</button>
+        <button type="button" id="btnPause" class="motif-btn" data-i18n="btn.pause">Pause (II)</button>
+        <button type="button" id="btnReset" class="motif-btn" data-i18n="btn.reset">Reset</button>
       </div>
     </div>
   </div>
@@ -801,9 +811,91 @@
   <script>
   // SPDX-License-Identifier: GPL-3.0-or-later
   // Copyright (C) 2026 Kawade502
+  // 多言語対応。辞書は src/i18n/*.json（ビルドで下の XBILL_I18N に埋め込む）。ja が基準。
+  // 翻訳は AI による下書き。誤りがあれば src/i18n/<言語>.json を直して PR / Issue でお知らせください。
+  window.XBILL_I18N = {"de":{"btn.pause":"Pause (II)","btn.resume":"Weiter (▶)","btn.reset":"Zurücksetzen","aria.sound":"Ton ein- oder ausschalten","aria.help":"Spielanleitung","page.title":"XBill Web Remake - Schlag die Bills, rette deine Betriebssysteme","lang.label":"Sprache","status.ready":"SYSTEM READY: Überwache den Einfall der Bills...","status.pickedOs":"{os} aufgenommen! Zieh es auf einen PC desselben Typs, um es wiederherzustellen!","status.pickedBucket":"Eimer genommen! Schütte ihn auf einen Funken, dann beginnt dieser von vorn!","status.restored":"{os} wiederhergestellt!","status.bucketHit":"Funke begossen!","status.bucketMiss":"Daneben ... ziel auf einen Funken","status.paused":"Pausiert","status.resumed":"Spiel läuft weiter","status.levelStart":"LEVEL {n}: Die Bills kommen! Schütze die PCs!","status.levelStartFinal":"LEVEL {n} (FINALE): Großangriff der Bills! Halte die PCs!","status.levelCleared":"LEVEL {n} geschafft!","status.allClear":"ALL CLEAR! Du hast alle Level geschafft!","status.gameOver":"Game Over: Nur noch höchstens 1 Computer läuft","status.imageError":"Die Bilder konnten nicht geladen werden. Bitte lade die Seite neu.","rules.title":"🕹️ Regeln (nach dem Original-XBill 2.1):","rules.1.head":"Bills schlagen","rules.1.body":": Klicke oder tippe, um sie auszuschalten. Je mehr sich überlappende Bills du auf einmal erwischst, desto mehr Punkte (Anzahl zum Quadrat × 5 Punkte).","rules.2.head":"Betriebssystem zurückholen","rules.2.body":": Ein Bill ersetzt das Betriebssystem eines PCs durch Wingdows und rennt mit dem gestohlenen System auf dem Kopf davon. Schlägst du ihn, lässt er es fallen – zieh es auf einen PC desselben Typs. Bills, die entkommen, kommen später wieder.","rules.3.head":"Funken stoppen","rules.3.body":": Läuft nur einer von zwei per Kabel verbundenen PCs unter Wingdows, läuft ein Funke über das Kabel zum anderen. Ziehst du den Eimer oben links auf einen Funken, beginnt er nur von vorn. Um ihn endgültig zu stoppen, ziehe ein heruntergefallenes Betriebssystem auf den PC mit Wingdows (er stoppt, sobald kein Ende mehr Wingdows hat). Ein PC, der durch einen Funken zu Wingdows wurde, lässt sein altes System nicht fallen – nimm eines, das ein anderer Bill verloren hat.","rules.4":"Das Spiel endet, wenn nur noch höchstens 1 PC läuft. Nach jedem Level gibt es einen Bonus entsprechend der Laufzeit.","rules.5.head":"Schaffe Level 10 und gewinne!","rules.5.body":" Auf höheren Leveln kommen mehr Bills gleichzeitig, schneller, und sie stehlen Systeme schneller.","credit.line":"XBill 2.1  Copyright (C) Brian Wellington, Matias Duarte (GPL). Regeln und Grafiken stammen aus dem Originalspiel.","credit.source":"Quellcode dieses Spiels (GPL-3.0 oder neuer): ","title.start":"🎮 START","title.fullscreen":"⛶ Vollbild umschalten","title.sub1":"Beschütze freie Betriebssysteme vor der Bill-Horde!","title.sub2":"Verhindere die Zwangsinstallation von Wingdows!","help.title":"XBill-Anleitung (Originalregeln)","help.keys":"Tasten: P / Esc = Pause, M = Ton","help.close":"Schließen","level.n":"LEVEL {n}","level.final":"FINAL-LEVEL {n}","clear.headline":"Alle Bills abgewehrt!","clear.killed":"Besiegte Bills: {n}","clear.goto":"▶ Weiter zu {next}","label.bonus":"Laufzeit-Bonus: ","label.score":"Punkte: ","label.finalScore":"Endstand: ","result.bonus":"Laufzeit-Bonus: +{n} pts","result.allClearBonus":"All-Clear-Bonus: +{n} pts","result.clearedHeadline":"Glückwunsch! Du hast alle Level geschafft und Wingdows' Pläne zunichtegemacht!","result.overHeadline":"Es läuft nur noch höchstens 1 PC ...","result.retry":"🔄 Nochmal spielen","name.placeholder":"Name (max. 12 Zeichen)","name.aria":"Name für die Bestenliste","name.submit":"🏆 Eintragen","name.sending":"Wird gesendet ...","name.rank":"Platz {rank} in der Bestenliste!","name.outOfRank":"Diesmal nicht in der Bestenliste. Versuch es nochmal!","name.error":"Eintragen fehlgeschlagen. Prüfe deine Verbindung und versuche es erneut.","ranking.title":"🏆 Bestenliste","ranking.titleLocal":"🏆 Bestenliste (nur dieses Gerät)","ranking.loading":"Wird geladen ...","ranking.error":"Bestenliste konnte nicht geladen werden","ranking.empty":"Noch keine Einträge"},"en":{"btn.pause":"Pause (II)","btn.resume":"Resume (▶)","btn.reset":"Reset","aria.sound":"Toggle sound","aria.help":"How to play","page.title":"XBill Web Remake - Whack the Bills, protect your OS","lang.label":"Language","status.ready":"SYSTEM READY: watching for Bills...","status.pickedOs":"Picked up {os}! Drag it to a PC of the same type to restore it!","status.pickedBucket":"Got the bucket! Splash a spark to restart it from the beginning!","status.restored":"{os} restored!","status.bucketHit":"Splashed the spark!","status.bucketMiss":"Missed... splash the bucket on a spark","status.paused":"Paused","status.resumed":"Resumed","status.levelStart":"LEVEL {n}: The Bills are coming! Protect the PCs!","status.levelStartFinal":"LEVEL {n} (FINAL): The Bills attack in force! Hold them off!","status.levelCleared":"LEVEL {n} cleared!","status.allClear":"ALL CLEAR! You beat every level!","status.gameOver":"Game over: only 1 or fewer computers are still running","status.imageError":"Could not load the images. Please reload the page.","rules.title":"🕹️ Rules (based on the original XBill 2.1):","rules.1.head":"Whack the Bills","rules.1.body":": Click or tap to take them out. Hit several overlapping Bills at once for a bigger score (number defeated squared × 5 points).","rules.2.head":"Get the OS back","rules.2.body":": A Bill replaces a PC's OS with Wingdows and runs off with the stolen OS on his head. Whack him and he drops it — drag it back to a PC of the same type. Bills that escape come back later.","rules.3.head":"Stop the sparks","rules.3.body":": If only one of two cable-connected PCs is Wingdows, a spark runs along the cable to the other. Dragging the bucket from the top-left onto a spark only restarts it from the beginning. To stop it for good, drag a dropped OS back onto the PC that is running Wingdows (it stops once neither end is Wingdows). A PC that Wingdows took over through a spark does not drop its old OS, so use an OS dropped by another Bill.","rules.4":"The game ends when 1 or fewer PCs are still running. After each level you get a bonus based on uptime.","rules.5.head":"Clear level 10 to win!","rules.5.body":" On higher levels, more Bills come at once, faster, and steal OSes faster.","credit.line":"XBill 2.1  Copyright (C) Brian Wellington, Matias Duarte (GPL). The rules and graphics are from the original game.","credit.source":"Source code of this game (GPL-3.0 or later): ","title.start":"🎮 START","title.fullscreen":"⛶ Toggle fullscreen","title.sub1":"Protect open-source operating systems from the Bill horde!","title.sub2":"Stop the forced installation of Wingdows!","help.title":"XBill Guide (original rules)","help.keys":"Keys: P / Esc = pause, M = toggle sound","help.close":"Close","level.n":"LEVEL {n}","level.final":"FINAL LEVEL {n}","clear.headline":"You drove off every Bill!","clear.killed":"Bills defeated: {n}","clear.goto":"▶ Go to {next}","label.bonus":"Uptime bonus: ","label.score":"Score: ","label.finalScore":"Final score: ","result.bonus":"Uptime bonus: +{n} pts","result.allClearBonus":"All-clear bonus: +{n} pts","result.clearedHeadline":"Congratulations! You cleared every level and crushed Wingdows' ambitions!","result.overHeadline":"Only 1 or fewer PCs are still running...","result.retry":"🔄 Play again","name.placeholder":"Name (max 12 chars)","name.aria":"Name for the ranking","name.submit":"🏆 Submit","name.sending":"Sending...","name.rank":"You ranked #{rank}!","name.outOfRank":"Didn't make the ranking this time. Try again!","name.error":"Could not submit. Check your connection and try again.","ranking.title":"🏆 Ranking","ranking.titleLocal":"🏆 Ranking (this device only)","ranking.loading":"Loading...","ranking.error":"Could not load the ranking","ranking.empty":"No records yet"},"es":{"btn.pause":"Pausa (II)","btn.resume":"Continuar (▶)","btn.reset":"Reiniciar","aria.sound":"Activar o desactivar el sonido","aria.help":"Cómo jugar","page.title":"XBill Web Remake - Golpea a los Bills y protege tus sistemas operativos","lang.label":"Idioma","status.ready":"SYSTEM READY: vigilando la invasión de los Bills...","status.pickedOs":"¡Has recogido {os}! Arrástralo a un PC del mismo tipo para restaurarlo.","status.pickedBucket":"¡Tienes el cubo! Échalo sobre una chispa para que vuelva a empezar desde el principio.","status.restored":"¡{os} restaurado!","status.bucketHit":"¡Agua sobre la chispa!","status.bucketMiss":"Fallaste... échalo sobre una chispa","status.paused":"En pausa","status.resumed":"Juego reanudado","status.levelStart":"LEVEL {n}: ¡Llegan los Bills! ¡Protege los PC!","status.levelStartFinal":"LEVEL {n} (FINAL): ¡Ataque total de los Bills! ¡Defiende los PC!","status.levelCleared":"¡LEVEL {n} superado!","status.allClear":"¡ALL CLEAR! ¡Has superado todos los niveles!","status.gameOver":"Fin del juego: queda 1 ordenador o ninguno en funcionamiento","status.imageError":"No se pudieron cargar las imágenes. Recarga la página.","rules.title":"🕹️ Reglas (basadas en el XBill 2.1 original):","rules.1.head":"Golpea a los Bills","rules.1.body":": Haz clic o toca para derribarlos. Cuantos más Bills superpuestos derribes de una vez, más puntos (cantidad derribada al cuadrado × 5 puntos).","rules.2.head":"Recupera el sistema operativo","rules.2.body":": Un Bill cambia el sistema operativo del PC por Wingdows y huye con el sistema robado sobre la cabeza. Si lo golpeas, lo suelta: arrástralo a un PC del mismo tipo. Los Bills que escapan vuelven más tarde.","rules.3.head":"Detén las chispas","rules.3.body":": Si solo uno de dos PC conectados por cable tiene Wingdows, una chispa viaja por el cable hacia el otro. Arrastrar el cubo de arriba a la izquierda sobre una chispa solo la reinicia desde el principio. Para detenerla del todo, arrastra un sistema operativo caído al PC que tiene Wingdows (se detiene cuando ningún extremo tiene Wingdows). Un PC que se convirtió en Wingdows por una chispa no suelta su sistema anterior, así que usa uno soltado por otro Bill.","rules.4":"La partida termina cuando queda 1 PC o ninguno en funcionamiento. Al terminar cada nivel recibes una bonificación según el tiempo de funcionamiento.","rules.5.head":"¡Supera el nivel 10 para ganar!","rules.5.body":" En los niveles altos llegan más Bills a la vez, más rápido, y roban los sistemas con más rapidez.","credit.line":"XBill 2.1  Copyright (C) Brian Wellington, Matias Duarte (GPL). Las reglas y los gráficos son del juego original.","credit.source":"Código fuente de este juego (GPL-3.0 o posterior): ","title.start":"🎮 EMPEZAR (START)","title.fullscreen":"⛶ Pantalla completa","title.sub1":"¡Protege los sistemas operativos libres de la horda de Bills!","title.sub2":"¡Impide la instalación forzosa de Wingdows!","help.title":"Guía de XBill (reglas originales)","help.keys":"Teclas: P / Esc = pausa, M = sonido","help.close":"Cerrar","level.n":"LEVEL {n}","level.final":"LEVEL {n} (FINAL)","clear.headline":"¡Has derrotado a todos los Bills!","clear.killed":"Bills derrotados: {n}","clear.goto":"▶ Ir a {next}","label.bonus":"Bonificación de funcionamiento: ","label.score":"Puntos: ","label.finalScore":"Puntuación final: ","result.bonus":"Bonificación de funcionamiento: +{n} pts","result.allClearBonus":"Bonificación por completarlo todo: +{n} pts","result.clearedHeadline":"¡Enhorabuena! ¡Has superado todos los niveles y aplastado los planes de Wingdows!","result.overHeadline":"Queda 1 PC o ninguno en funcionamiento...","result.retry":"🔄 Jugar otra vez","name.placeholder":"Nombre (máx. 12 caracteres)","name.aria":"Nombre para la clasificación","name.submit":"🏆 Enviar","name.sending":"Enviando...","name.rank":"¡Has entrado en el puesto {rank}!","name.outOfRank":"Esta vez no has entrado en la clasificación. ¡Inténtalo de nuevo!","name.error":"No se pudo enviar. Comprueba tu conexión e inténtalo de nuevo.","ranking.title":"🏆 Clasificación","ranking.titleLocal":"🏆 Clasificación (solo este dispositivo)","ranking.loading":"Cargando...","ranking.error":"No se pudo cargar la clasificación","ranking.empty":"Aún no hay registros"},"fr":{"btn.pause":"Pause (II)","btn.resume":"Reprendre (▶)","btn.reset":"Réinitialiser","aria.sound":"Activer ou couper le son","aria.help":"Comment jouer","page.title":"XBill Web Remake - Frappez les Bills, protégez vos systèmes","lang.label":"Langue","status.ready":"SYSTEM READY : surveillance de l'invasion des Bills...","status.pickedOs":"{os} ramassé ! Faites-le glisser sur un PC du même type pour le restaurer !","status.pickedBucket":"Vous avez le seau ! Versez-le sur une étincelle pour qu'elle reparte de zéro !","status.restored":"{os} restauré !","status.bucketHit":"Étincelle arrosée !","status.bucketMiss":"Raté... visez une étincelle","status.paused":"En pause","status.resumed":"Partie reprise","status.levelStart":"LEVEL {n} : les Bills arrivent ! Protégez les PC !","status.levelStartFinal":"LEVEL {n} (FINAL) : assaut général des Bills ! Tenez bon !","status.levelCleared":"LEVEL {n} terminé !","status.allClear":"ALL CLEAR ! Vous avez terminé tous les niveaux !","status.gameOver":"Partie terminée : il ne reste qu'un ordinateur (ou aucun) en marche","status.imageError":"Impossible de charger les images. Rechargez la page.","rules.title":"🕹️ Règles (d'après le XBill 2.1 original) :","rules.1.head":"Frappez les Bills","rules.1.body":": Cliquez ou touchez pour les mettre K.O. Plus vous en éliminez d'un coup, plus le score est élevé (nombre éliminé au carré × 5 points).","rules.2.head":"Récupérez le système","rules.2.body":": Un Bill remplace le système du PC par Wingdows et s'enfuit avec le système volé sur la tête. Frappez-le : il le lâche. Faites-le glisser sur un PC du même type. Les Bills qui s'échappent reviennent plus tard.","rules.3.head":"Arrêtez les étincelles","rules.3.body":": Si un seul de deux PC reliés par un câble tourne sous Wingdows, une étincelle court le long du câble vers l'autre. Faire glisser le seau en haut à gauche sur une étincelle ne fait que la relancer depuis le début. Pour l'arrêter pour de bon, faites glisser un système tombé sur le PC sous Wingdows (elle s'arrête quand aucune extrémité n'est sous Wingdows). Un PC passé sous Wingdows à cause d'une étincelle ne lâche pas son ancien système : utilisez celui qu'un autre Bill a laissé tomber.","rules.4":"La partie se termine quand il ne reste qu'un PC (ou aucun) en marche. À la fin de chaque niveau, vous recevez un bonus selon le taux de disponibilité.","rules.5.head":"Terminez le niveau 10 pour tout finir !","rules.5.body":" Plus le niveau est élevé, plus les Bills arrivent nombreux, vite, et volent les systèmes rapidement.","credit.line":"XBill 2.1  Copyright (C) Brian Wellington, Matias Duarte (GPL). Les règles et les graphismes viennent du jeu original.","credit.source":"Code source de ce jeu (GPL-3.0 ou ultérieure) : ","title.start":"🎮 JOUER (START)","title.fullscreen":"⛶ Plein écran","title.sub1":"Protégez les systèmes libres de la horde de Bills !","title.sub2":"Empêchez l'installation forcée de Wingdows !","help.title":"Guide de XBill (règles originales)","help.keys":"Touches : P / Échap = pause, M = son","help.close":"Fermer","level.n":"LEVEL {n}","level.final":"LEVEL {n} (FINAL)","clear.headline":"Tous les Bills ont été repoussés !","clear.killed":"Bills éliminés : {n}","clear.goto":"▶ Passer à {next}","label.bonus":"Bonus de disponibilité : ","label.score":"Score : ","label.finalScore":"Score final : ","result.bonus":"Bonus de disponibilité : +{n} pts","result.allClearBonus":"Bonus de victoire totale : +{n} pts","result.clearedHeadline":"Bravo ! Vous avez terminé tous les niveaux et brisé les ambitions de Wingdows !","result.overHeadline":"Il ne reste qu'un PC (ou aucun) en marche...","result.retry":"🔄 Rejouer","name.placeholder":"Nom (12 caractères max.)","name.aria":"Nom pour le classement","name.submit":"🏆 Envoyer","name.sending":"Envoi...","name.rank":"Vous entrez au classement à la place n° {rank} !","name.outOfRank":"Pas de classement cette fois. Réessayez !","name.error":"Envoi impossible. Vérifiez votre connexion et réessayez.","ranking.title":"🏆 Classement","ranking.titleLocal":"🏆 Classement (cet appareil uniquement)","ranking.loading":"Chargement...","ranking.error":"Impossible de charger le classement","ranking.empty":"Aucun score pour le moment"},"ja":{"btn.pause":"ポーズ (II)","btn.resume":"再開 (▶)","btn.reset":"リセット","aria.sound":"サウンドの切り替え","aria.help":"遊び方","page.title":"XBill Web Remake - ビルを叩いて、OSを守れ","lang.label":"言語","status.ready":"SYSTEM READY: ビルの侵入を監視中...","status.pickedOs":"{os}を拾った！同じ種類のPCにドラッグして戻そう！","status.pickedBucket":"バケツを持った！火花にかけると、火花が最初からやり直しになる！","status.restored":"{os}を戻した！","status.bucketHit":"火花に水をかけた！","status.bucketMiss":"バケツは空振り…火花にかけよう","status.paused":"一時停止中","status.resumed":"ゲーム再開","status.levelStart":"LEVEL {n}: ビル軍団の襲来！PCを守れ！","status.levelStartFinal":"LEVEL {n} (最終): ビル軍団の総攻撃！PCを守り抜け！","status.levelCleared":"LEVEL {n} クリア！","status.allClear":"ALL CLEAR! すべてのレベルをクリアしました！","status.gameOver":"ゲームオーバー: 動いているコンピュータが1台以下になりました","status.imageError":"画像を読み込めませんでした。ページを再読み込みしてください。","rules.title":"🕹️ ルール (オリジナル XBill 2.1 準拠):","rules.1.head":"ビルを叩く","rules.1.body":": クリック/タップで倒す。重なったビルを一度に倒すほど高得点（倒した数の2乗×5点）。","rules.2.head":"OSを取り戻す","rules.2.body":": ビルはPCのOSをWingdowsに入れ替え、盗んだOSを頭に載せて逃げる。叩くとOSを落とすので、ドラッグして同じ種類のPCに戻す。逃げ切られたビルはまた戻ってくる。","rules.3.head":"火花を止める","rules.3.body":": ケーブルでつながったPCの片方だけがWingdowsだと、そこから相手へ火花が走る。左上のバケツをドラッグして火花にかけると、火花が最初からやり直しになるだけ。火花を止めるには、Wingdowsになっている側のPCに、落ちているOSをドラッグして戻す（両方がWingdowsでなくなれば止まる）。火花でWingdowsになったPCは元のOSが落ちないので、ほかのビルを叩いて落としたOSを使う。","rules.4":"動いているPCが1台以下になるとゲームオーバー。レベルが終わるたびに、稼働率に応じたボーナス。","rules.5.head":"レベル10をクリアで全クリア！","rules.5.body":" 上のレベルほど、ビルは何体も同時に、多く・速く押し寄せ、OSを抜くのも速くなる。","credit.line":"XBill 2.1  Copyright (C) Brian Wellington, Matias Duarte (GPL)。ルールと絵はオリジナルのものです。","credit.source":"このゲームのソース (GPL-3.0以降): ","title.start":"🎮 スタート (START)","title.fullscreen":"⛶ フルスクリーン切替","title.sub1":"ビル軍団からオープンソースOSを守れ！","title.sub2":"Wingdowsの強制インストールを叩き潰して阻止せよ！","help.title":"XBill ガイド (オリジナル仕様)","help.keys":"キー操作: P / Esc = ポーズ、M = サウンド切替","help.close":"閉じる","level.n":"LEVEL {n}","level.final":"最終 LEVEL {n}","clear.headline":"すべてのビルを撃退しました！","clear.killed":"倒したビル: {n}体","clear.goto":"▶ {next} に進む","label.bonus":"稼働率ボーナス: ","label.score":"スコア: ","label.finalScore":"最終スコア: ","result.bonus":"稼働率ボーナス: +{n} pts","result.allClearBonus":"全クリアボーナス: +{n} pts","result.clearedHeadline":"おめでとう！全レベルをクリアし、Wingdowsの野望を打ち砕きました！","result.overHeadline":"動いているPCが1台以下になってしまいました...","result.retry":"🔄 もう一度遊ぶ","name.placeholder":"なまえ (最大12文字)","name.aria":"ランキングに載せる名前","name.submit":"🏆 登録","name.sending":"送信中...","name.rank":"第{rank}位にランクイン！","name.outOfRank":"ランク外でした。また挑戦しよう！","name.error":"登録できませんでした。通信状況を確認して、もう一度お試しください。","ranking.title":"🏆 ランキング","ranking.titleLocal":"🏆 ランキング (この端末のみ)","ranking.loading":"読み込み中...","ranking.error":"ランキングを取得できませんでした","ranking.empty":"まだ記録がありません"},"ko":{"btn.pause":"일시정지 (II)","btn.resume":"계속 (▶)","btn.reset":"리셋","aria.sound":"소리 켜기/끄기","aria.help":"게임 방법","page.title":"XBill Web Remake - 빌을 때려서 OS를 지켜라","lang.label":"언어","status.ready":"SYSTEM READY: 빌의 침입을 감시 중...","status.pickedOs":"{os}을(를) 주웠다! 같은 종류의 PC로 끌어다 복구하자!","status.pickedBucket":"양동이를 들었다! 불꽃에 물을 끼얹으면 불꽃이 처음부터 다시 시작된다!","status.restored":"{os} 복구 완료!","status.bucketHit":"불꽃에 물을 끼얹었다!","status.bucketMiss":"빗나갔다… 불꽃을 노리자","status.paused":"일시정지 중","status.resumed":"게임 재개","status.levelStart":"LEVEL {n}: 빌 군단의 습격! PC를 지켜라!","status.levelStartFinal":"LEVEL {n} (최종): 빌 군단의 총공격! PC를 끝까지 지켜라!","status.levelCleared":"LEVEL {n} 클리어!","status.allClear":"ALL CLEAR! 모든 레벨을 클리어했습니다!","status.gameOver":"게임 오버: 작동 중인 컴퓨터가 1대 이하가 되었습니다","status.imageError":"이미지를 불러올 수 없습니다. 페이지를 새로고침하세요.","rules.title":"🕹️ 규칙 (오리지널 XBill 2.1 기준):","rules.1.head":"빌을 때리기","rules.1.body":": 클릭/탭으로 쓰러뜨린다. 겹친 빌을 한꺼번에 쓰러뜨릴수록 고득점 (쓰러뜨린 수의 제곱×5점).","rules.2.head":"OS 되찾기","rules.2.body":": 빌은 PC의 OS를 Wingdows로 바꾸고, 훔친 OS를 머리에 얹고 도망친다. 때리면 OS를 떨어뜨리니, 같은 종류의 PC로 끌어다 놓자. 도망친 빌은 다시 돌아온다.","rules.3.head":"불꽃 막기","rules.3.body":": 케이블로 연결된 PC 중 한쪽만 Wingdows이면, 그쪽에서 상대로 불꽃이 달려간다. 왼쪽 위의 양동이를 끌어다 불꽃에 끼얹어도 불꽃이 처음부터 다시 시작될 뿐이다. 완전히 멈추려면 Wingdows가 된 쪽 PC에 떨어진 OS를 끌어다 놓자 (양쪽 모두 Wingdows가 아니게 되면 멈춘다). 불꽃 때문에 Wingdows가 된 PC는 원래 OS를 떨어뜨리지 않으므로, 다른 빌을 때려서 떨어뜨린 OS를 쓰자.","rules.4":"작동 중인 PC가 1대 이하가 되면 게임 오버. 레벨이 끝날 때마다 가동률에 따른 보너스를 받는다.","rules.5.head":"레벨 10을 클리어하면 올 클리어!","rules.5.body":" 높은 레벨일수록 빌이 여러 명씩, 더 많이, 더 빠르게 몰려오고 OS를 빼앗는 속도도 빨라진다.","credit.line":"XBill 2.1  Copyright (C) Brian Wellington, Matias Duarte (GPL). 규칙과 그림은 오리지널 게임의 것입니다.","credit.source":"이 게임의 소스 (GPL-3.0 이상): ","title.start":"🎮 시작 (START)","title.fullscreen":"⛶ 전체 화면 전환","title.sub1":"오픈소스 OS를 빌 군단으로부터 지켜라!","title.sub2":"Wingdows의 강제 설치를 박살내서 막아라!","help.title":"XBill 가이드 (오리지널 규칙)","help.keys":"키 조작: P / Esc = 일시정지, M = 소리 전환","help.close":"닫기","level.n":"LEVEL {n}","level.final":"최종 LEVEL {n}","clear.headline":"모든 빌을 물리쳤습니다!","clear.killed":"쓰러뜨린 빌: {n}명","clear.goto":"▶ {next}(으)로 진행","label.bonus":"가동률 보너스: ","label.score":"점수: ","label.finalScore":"최종 점수: ","result.bonus":"가동률 보너스: +{n} pts","result.allClearBonus":"올 클리어 보너스: +{n} pts","result.clearedHeadline":"축하합니다! 모든 레벨을 클리어하고 Wingdows의 야망을 분쇄했습니다!","result.overHeadline":"작동 중인 PC가 1대 이하가 되고 말았습니다...","result.retry":"🔄 다시 하기","name.placeholder":"이름 (최대 12자)","name.aria":"랭킹에 올릴 이름","name.submit":"🏆 등록","name.sending":"전송 중...","name.rank":"{rank}위에 랭크인!","name.outOfRank":"이번에는 랭킹에 들지 못했습니다. 다시 도전하자!","name.error":"등록하지 못했습니다. 통신 상태를 확인하고 다시 시도하세요.","ranking.title":"🏆 랭킹","ranking.titleLocal":"🏆 랭킹 (이 기기에서만)","ranking.loading":"불러오는 중...","ranking.error":"랭킹을 가져오지 못했습니다","ranking.empty":"아직 기록이 없습니다"},"pt":{"btn.pause":"Pausar (II)","btn.resume":"Continuar (▶)","btn.reset":"Reiniciar","aria.sound":"Ativar ou desativar o som","aria.help":"Como jogar","page.title":"XBill Web Remake - Acerte os Bills e proteja seus sistemas operacionais","lang.label":"Idioma","status.ready":"SYSTEM READY: vigiando a invasão dos Bills...","status.pickedOs":"Você pegou o {os}! Arraste-o até um PC do mesmo tipo para restaurá-lo!","status.pickedBucket":"Você pegou o balde! Jogue-o sobre uma faísca para ela recomeçar do início!","status.restored":"{os} restaurado!","status.bucketHit":"Faísca molhada!","status.bucketMiss":"Errou... jogue o balde sobre uma faísca","status.paused":"Pausado","status.resumed":"Jogo retomado","status.levelStart":"LEVEL {n}: os Bills estão chegando! Proteja os PCs!","status.levelStartFinal":"LEVEL {n} (FINAL): ataque total dos Bills! Proteja os PCs!","status.levelCleared":"LEVEL {n} concluído!","status.allClear":"ALL CLEAR! Você concluiu todos os níveis!","status.gameOver":"Fim de jogo: restam apenas 1 computador ou nenhum funcionando","status.imageError":"Não foi possível carregar as imagens. Recarregue a página.","rules.title":"🕹️ Regras (baseadas no XBill 2.1 original):","rules.1.head":"Acerte os Bills","rules.1.body":": Clique ou toque para derrubá-los. Quanto mais Bills sobrepostos você derrubar de uma vez, mais pontos (quantidade derrubada ao quadrado × 5 pontos).","rules.2.head":"Recupere o sistema operacional","rules.2.body":": Um Bill troca o sistema do PC por Wingdows e foge com o sistema roubado na cabeça. Se você o acertar, ele derruba o sistema: arraste-o até um PC do mesmo tipo. Os Bills que escapam voltam depois.","rules.3.head":"Pare as faíscas","rules.3.body":": Se apenas um de dois PCs ligados por cabo estiver com Wingdows, uma faísca corre pelo cabo até o outro. Arrastar o balde do canto superior esquerdo até uma faísca só a faz recomeçar do início. Para pará-la de vez, arraste um sistema caído até o PC que está com Wingdows (ela para quando nenhuma ponta tiver Wingdows). Um PC que virou Wingdows por causa de uma faísca não derruba o sistema antigo, então use um derrubado por outro Bill.","rules.4":"O jogo termina quando restam apenas 1 PC ou nenhum funcionando. Ao fim de cada nível, você ganha um bônus conforme o tempo de funcionamento.","rules.5.head":"Conclua o nível 10 para vencer!","rules.5.body":" Nos níveis mais altos, mais Bills chegam ao mesmo tempo, mais rápido, e roubam os sistemas com mais rapidez.","credit.line":"XBill 2.1  Copyright (C) Brian Wellington, Matias Duarte (GPL). As regras e os gráficos são do jogo original.","credit.source":"Código-fonte deste jogo (GPL-3.0 ou posterior): ","title.start":"🎮 COMEÇAR (START)","title.fullscreen":"⛶ Alternar tela cheia","title.sub1":"Proteja os sistemas operacionais livres da horda de Bills!","title.sub2":"Impeça a instalação forçada do Wingdows!","help.title":"Guia do XBill (regras originais)","help.keys":"Teclas: P / Esc = pausa, M = som","help.close":"Fechar","level.n":"LEVEL {n}","level.final":"LEVEL {n} (FINAL)","clear.headline":"Você derrotou todos os Bills!","clear.killed":"Bills derrotados: {n}","clear.goto":"▶ Ir para {next}","label.bonus":"Bônus de funcionamento: ","label.score":"Pontos: ","label.finalScore":"Pontuação final: ","result.bonus":"Bônus de funcionamento: +{n} pts","result.allClearBonus":"Bônus de conclusão total: +{n} pts","result.clearedHeadline":"Parabéns! Você concluiu todos os níveis e destruiu os planos do Wingdows!","result.overHeadline":"Restam apenas 1 PC ou nenhum funcionando...","result.retry":"🔄 Jogar de novo","name.placeholder":"Nome (máx. 12 caracteres)","name.aria":"Nome para o ranking","name.submit":"🏆 Enviar","name.sending":"Enviando...","name.rank":"Você entrou no ranking na posição {rank}!","name.outOfRank":"Desta vez você não entrou no ranking. Tente de novo!","name.error":"Não foi possível enviar. Verifique sua conexão e tente novamente.","ranking.title":"🏆 Ranking","ranking.titleLocal":"🏆 Ranking (somente neste dispositivo)","ranking.loading":"Carregando...","ranking.error":"Não foi possível carregar o ranking","ranking.empty":"Ainda não há registros"},"zh-CN":{"btn.pause":"暂停 (II)","btn.resume":"继续 (▶)","btn.reset":"重置","aria.sound":"切换声音","aria.help":"玩法说明","page.title":"XBill Web Remake - 打倒比尔，守护操作系统","lang.label":"语言","status.ready":"SYSTEM READY: 正在监视比尔的入侵...","status.pickedOs":"捡到了{os}！把它拖到同类型的电脑上恢复吧！","status.pickedBucket":"拿到水桶了！泼在火花上，火花会从头再来！","status.restored":"已恢复{os}！","status.bucketHit":"泼中了火花！","status.bucketMiss":"泼空了……请对准火花","status.paused":"已暂停","status.resumed":"已继续","status.levelStart":"LEVEL {n}：比尔军团来袭！保护好电脑！","status.levelStartFinal":"LEVEL {n}（最终关）：比尔军团总攻击！守住电脑！","status.levelCleared":"LEVEL {n} 通关！","status.allClear":"ALL CLEAR！你通过了所有关卡！","status.gameOver":"游戏结束：仍在运行的电脑只剩 1 台以下","status.imageError":"无法加载图片。请刷新页面。","rules.title":"🕹️ 规则（基于原版 XBill 2.1）：","rules.1.head":"拍打比尔","rules.1.body":"：点击或轻触即可打倒。一次打倒的重叠比尔越多，得分越高（打倒数的平方×5分）。","rules.2.head":"夺回操作系统","rules.2.body":"：比尔会把电脑的操作系统换成 Wingdows，并把偷来的操作系统顶在头上逃跑。打倒他后系统会掉落，把它拖回同类型的电脑上。逃掉的比尔之后还会回来。","rules.3.head":"阻止火花","rules.3.body":"：用网线相连的两台电脑中，只要有一台是 Wingdows，火花就会沿网线传向另一台。把左上角的水桶拖到火花上，火花只会从头再来。要彻底阻止，请把掉落的操作系统拖回正在运行 Wingdows 的那台电脑（两端都不是 Wingdows 时火花就会停止）。被火花变成 Wingdows 的电脑不会掉落原来的系统，所以请使用打倒其他比尔后掉落的系统。","rules.4":"仍在运行的电脑只剩 1 台以下时游戏结束。每通过一关，会按运行率获得奖励。","rules.5.head":"通过第 10 关即为全部通关！","rules.5.body":" 关卡越高，比尔同时来得越多、越快，抽走系统的速度也越快。","credit.line":"XBill 2.1  Copyright (C) Brian Wellington, Matias Duarte (GPL)。规则和图像来自原版游戏。","credit.source":"本游戏的源代码（GPL-3.0 或更高版本）：","title.start":"🎮 开始 (START)","title.fullscreen":"⛶ 切换全屏","title.sub1":"保护开源操作系统，对抗比尔军团！","title.sub2":"粉碎 Wingdows 的强制安装！","help.title":"XBill 指南（原版规则）","help.keys":"按键：P / Esc = 暂停，M = 切换声音","help.close":"关闭","level.n":"LEVEL {n}","level.final":"最终 LEVEL {n}","clear.headline":"已击退所有比尔！","clear.killed":"打倒的比尔：{n} 个","clear.goto":"▶ 前往 {next}","label.bonus":"运行率奖励：","label.score":"得分：","label.finalScore":"最终得分：","result.bonus":"运行率奖励：+{n} pts","result.allClearBonus":"全部通关奖励：+{n} pts","result.clearedHeadline":"恭喜！你通过了所有关卡，粉碎了 Wingdows 的野心！","result.overHeadline":"仍在运行的电脑只剩 1 台以下了……","result.retry":"🔄 再玩一次","name.placeholder":"名字（最多 12 个字符）","name.aria":"排行榜上显示的名字","name.submit":"🏆 登记","name.sending":"发送中...","name.rank":"排名第 {rank}！","name.outOfRank":"这次没进入排行榜。再挑战一次吧！","name.error":"无法登记。请检查网络后重试。","ranking.title":"🏆 排行榜","ranking.titleLocal":"🏆 排行榜（仅限本设备）","ranking.loading":"加载中...","ranking.error":"无法获取排行榜","ranking.empty":"还没有记录"},"zh-TW":{"btn.pause":"暫停 (II)","btn.resume":"繼續 (▶)","btn.reset":"重置","aria.sound":"切換聲音","aria.help":"玩法說明","page.title":"XBill Web Remake - 打倒比爾，守護作業系統","lang.label":"語言","status.ready":"SYSTEM READY: 正在監視比爾的入侵...","status.pickedOs":"撿到了{os}！把它拖到同類型的電腦上復原吧！","status.pickedBucket":"拿到水桶了！潑在火花上，火花會從頭再來！","status.restored":"已復原{os}！","status.bucketHit":"潑中了火花！","status.bucketMiss":"潑空了……請對準火花","status.paused":"已暫停","status.resumed":"已繼續","status.levelStart":"LEVEL {n}：比爾軍團來襲！保護好電腦！","status.levelStartFinal":"LEVEL {n}（最終關）：比爾軍團總攻擊！守住電腦！","status.levelCleared":"LEVEL {n} 過關！","status.allClear":"ALL CLEAR！你通過了所有關卡！","status.gameOver":"遊戲結束：仍在運作的電腦只剩 1 台以下","status.imageError":"無法載入圖片。請重新整理頁面。","rules.title":"🕹️ 規則（依據原版 XBill 2.1）：","rules.1.head":"拍打比爾","rules.1.body":"：點擊或輕觸即可打倒。一次打倒的重疊比爾越多，得分越高（打倒數的平方×5分）。","rules.2.head":"奪回作業系統","rules.2.body":"：比爾會把電腦的作業系統換成 Wingdows，並把偷來的作業系統頂在頭上逃跑。打倒他後系統會掉落，把它拖回同類型的電腦上。逃掉的比爾之後還會回來。","rules.3.head":"阻止火花","rules.3.body":"：用網路線相連的兩台電腦中，只要有一台是 Wingdows，火花就會沿著網路線傳向另一台。把左上角的水桶拖到火花上，火花只會從頭再來。要徹底阻止，請把掉落的作業系統拖回正在執行 Wingdows 的那台電腦（兩端都不是 Wingdows 時火花就會停止）。被火花變成 Wingdows 的電腦不會掉落原本的系統，所以請使用打倒其他比爾後掉落的系統。","rules.4":"仍在運作的電腦只剩 1 台以下時遊戲結束。每過一關，會依運作率獲得獎勵。","rules.5.head":"通過第 10 關即為全部通關！","rules.5.body":" 關卡越高，比爾同時來得越多、越快，抽走系統的速度也越快。","credit.line":"XBill 2.1  Copyright (C) Brian Wellington, Matias Duarte (GPL)。規則與圖像來自原版遊戲。","credit.source":"本遊戲的原始碼（GPL-3.0 或更新版本）：","title.start":"🎮 開始 (START)","title.fullscreen":"⛶ 切換全螢幕","title.sub1":"保護開源作業系統，對抗比爾軍團！","title.sub2":"粉碎 Wingdows 的強制安裝！","help.title":"XBill 指南（原版規則）","help.keys":"按鍵：P / Esc = 暫停，M = 切換聲音","help.close":"關閉","level.n":"LEVEL {n}","level.final":"最終 LEVEL {n}","clear.headline":"已擊退所有比爾！","clear.killed":"打倒的比爾：{n} 個","clear.goto":"▶ 前往 {next}","label.bonus":"運作率獎勵：","label.score":"得分：","label.finalScore":"最終得分：","result.bonus":"運作率獎勵：+{n} pts","result.allClearBonus":"全部通關獎勵：+{n} pts","result.clearedHeadline":"恭喜！你通過了所有關卡，粉碎了 Wingdows 的野心！","result.overHeadline":"仍在運作的電腦只剩 1 台以下了……","result.retry":"🔄 再玩一次","name.placeholder":"名字（最多 12 個字元）","name.aria":"排行榜上顯示的名字","name.submit":"🏆 登錄","name.sending":"傳送中...","name.rank":"排名第 {rank}！","name.outOfRank":"這次沒進入排行榜。再挑戰一次吧！","name.error":"無法登錄。請檢查網路後重試。","ranking.title":"🏆 排行榜","ranking.titleLocal":"🏆 排行榜（僅限本裝置）","ranking.loading":"載入中...","ranking.error":"無法取得排行榜","ranking.empty":"尚無紀錄"}};
+
+  (function () {
+    'use strict';
+    const DICTS = window.XBILL_I18N;
+    const SUPPORTED = ['ja', 'en', 'zh-CN', 'zh-TW', 'ko', 'es', 'fr', 'de', 'pt'];
+    const NATIVE_NAMES = {
+      'ja': '日本語', 'en': 'English', 'zh-CN': '简体中文', 'zh-TW': '繁體中文', 'ko': '한국어',
+      'es': 'Español', 'fr': 'Français', 'de': 'Deutsch', 'pt': 'Português'
+    };
+    const LANG_KEY = 'xbill_lang';
+
+    function readSaved() {
+      try { return window.localStorage.getItem(LANG_KEY); } catch (e) { return null; }
+    }
+
+    /** ブラウザの言語（例: zh-Hant-TW, pt-BR, en-US）を、対応言語のどれかに丸める。合わなければ null。 */
+    function matchLang(tag) {
+      if (!tag) return null;
+      const lower = String(tag).toLowerCase();
+      if (lower.startsWith('zh')) {
+        return /hant|-tw|-hk|-mo/.test(lower) ? 'zh-TW' : 'zh-CN';
+      }
+      const base = lower.split('-')[0];
+      return SUPPORTED.find((l) => l.toLowerCase() === base) || null;
+    }
+
+    function detectLang() {
+      let fromUrl = null;
+      try { fromUrl = new URLSearchParams(window.location.search).get('lang'); } catch (e) { /* 無視 */ }
+      const candidates = [fromUrl, readSaved()];
+      for (const c of candidates) {
+        const m = SUPPORTED.find((l) => l.toLowerCase() === String(c || '').toLowerCase());
+        if (m) return m;
+      }
+      const prefs = (navigator.languages && navigator.languages.length) ? navigator.languages : [navigator.language];
+      for (const p of prefs) {
+        const m = matchLang(p);
+        if (m) return m;
+      }
+      return 'en';
+    }
+
+    const lang = detectLang();
+    const dict = DICTS[lang] || DICTS.en;
+
+    /** 辞書を引く。{name} の部分は params で置き換える。無い鍵は ja → 鍵そのもの、の順で代用。 */
+    function t(key, params) {
+      let s = Object.prototype.hasOwnProperty.call(dict, key) ? dict[key]
+        : (DICTS.ja && DICTS.ja[key] !== undefined ? DICTS.ja[key] : key);
+      if (params) s = s.replace(/\{(\w+)\}/g, (m, k) => (params[k] !== undefined ? String(params[k]) : m));
+      return s;
+    }
+
+    function setLang(next) {
+      if (!SUPPORTED.includes(next)) return;
+      try { window.localStorage.setItem(LANG_KEY, next); } catch (e) { /* 保存できなくても、URL で切り替える */ }
+      const url = new URL(window.location.href);
+      url.searchParams.set('lang', next);
+      window.location.href = url.toString();
+    }
+
+    /** 静的な HTML の data-i18n（テキスト）と data-i18n-aria（aria-label）を埋める。 */
+    function applyStatic() {
+      document.documentElement.lang = lang;
+      document.title = t('page.title');
+      document.querySelectorAll('[data-i18n]').forEach((n) => { n.textContent = t(n.getAttribute('data-i18n')); });
+      document.querySelectorAll('[data-i18n-aria]').forEach((n) => { n.setAttribute('aria-label', t(n.getAttribute('data-i18n-aria'))); });
+    }
+
+    window.XBILL_LANG = { lang, supported: SUPPORTED, names: NATIVE_NAMES, t, setLang, applyStatic };
+    applyStatic();
+  })();
+</script>
+
+  <script>
+  // SPDX-License-Identifier: GPL-3.0-or-later
+  // Copyright (C) 2026 Kawade502
   // Based on XBill 2.1 (Copyright (C) Brian Wellington, Matias Duarte; GPL). See NOTICE.md.
 
   'use strict';
+
+  const { t } = window.XBILL_LANG;
 
   // ============================================================
   // 設定値
@@ -1031,7 +1123,7 @@
 
   function setPhase(phase) {
     state.phase = phase;
-    btnPause.textContent = phase === 'paused' ? '再開 (▶)' : 'ポーズ (II)';
+    btnPause.textContent = phase === 'paused' ? t('btn.resume') : t('btn.pause');
     btnPause.disabled = phase !== 'playing' && phase !== 'paused';
   }
 
@@ -1613,9 +1705,9 @@
 
     if (kind === 'os') {
       sound.playRestore();
-      setStatus(`${OS_NAMES[bill.cargo]}を拾った！同じ種類のPCにドラッグして戻そう！`);
+      setStatus(t('status.pickedOs', { os: OS_NAMES[bill.cargo] }));
     } else {
-      setStatus('バケツを持った！火花にかけると、火花が最初からやり直しになる！');
+      setStatus(t('status.pickedBucket'));
     }
 
     try {
@@ -1662,7 +1754,7 @@
         comp.os = bill.cargo;
         clearStray(bill);
         sound.playRestore();
-        setStatus(`${OS_NAMES[bill.cargo]}を戻した！`);
+        setStatus(t('status.restored', { os: OS_NAMES[bill.cargo] }));
         updateStatusHeader();
         return;
       }
@@ -1684,7 +1776,7 @@
         count++;
       }
     });
-    setStatus(count > 0 ? '火花に水をかけた！' : 'バケツは空振り…火花にかけよう');
+    setStatus(count > 0 ? t('status.bucketHit') : t('status.bucketMiss'));
   }
 
   // ============================================================
@@ -1753,27 +1845,31 @@
 
   function rulesBox(hideOnShort) {
     return el('div', { class: hideOnShort ? 'rules hide-on-short' : 'rules' },
-      el('p', { class: 'hl' }, '🕹️ ルール (オリジナル XBill 2.1 準拠):'),
-      el('p', {}, '1. ', el('strong', {}, 'ビルを叩く'),
-        ': クリック/タップで倒す。重なったビルを一度に倒すほど高得点（倒した数の2乗×5点）。'),
-      el('p', {}, '2. ', el('strong', {}, 'OSを取り戻す'),
-        ': ビルはPCのOSをWingdowsに入れ替え、盗んだOSを頭に載せて逃げる。叩くとOSを落とすので、ドラッグして同じ種類のPCに戻す。逃げ切られたビルはまた戻ってくる。'),
-      el('p', {}, '3. ', el('strong', {}, '火花を止める'),
-        ': ケーブルでつながったPCの片方だけがWingdowsだと、そこから相手へ火花が走る。左上のバケツをドラッグして火花にかけると、火花が最初からやり直しになるだけ。' +
-        '火花を止めるには、Wingdowsになっている側のPCに、落ちているOSをドラッグして戻す（両方がWingdowsでなくなれば止まる）。' +
-        '火花でWingdowsになったPCは元のOSが落ちないので、ほかのビルを叩いて落としたOSを使う。'),
-      el('p', {}, '4. 動いているPCが1台以下になるとゲームオーバー。レベルが終わるたびに、稼働率に応じたボーナス。'),
-      el('p', {}, '5. ', el('strong', {}, 'レベル10をクリアで全クリア！'),
-        ' 上のレベルほど、ビルは何体も同時に、多く・速く押し寄せ、OSを抜くのも速くなる。')
+      el('p', { class: 'hl' }, t('rules.title')),
+      el('p', {}, '1. ', el('strong', {}, t('rules.1.head')), t('rules.1.body')),
+      el('p', {}, '2. ', el('strong', {}, t('rules.2.head')), t('rules.2.body')),
+      el('p', {}, '3. ', el('strong', {}, t('rules.3.head')), t('rules.3.body')),
+      el('p', {}, '4. ' + t('rules.4')),
+      el('p', {}, '5. ', el('strong', {}, t('rules.5.head')), t('rules.5.body'))
     );
   }
 
   function creditLine() {
     return el('p', { class: 'dialog-msg' },
-      'XBill 2.1  Copyright (C) Brian Wellington, Matias Duarte (GPL)。ルールと絵はオリジナルのものです。',
+      t('credit.line'),
       el('br'),
-      'このゲームのソース (GPL-3.0以降): ',
+      t('credit.source'),
       el('a', { href: CONFIG.SOURCE_URL, target: '_blank', rel: 'noopener' }, CONFIG.SOURCE_URL));
+  }
+
+  /** 言語の選択。変えるとページを読み込み直す（タイトル画面でだけ出す）。 */
+  function langPicker() {
+    const L = window.XBILL_LANG;
+    const select = el('select', { class: 'lang-select', 'aria-label': t('lang.label') },
+      L.supported.map((code) => el('option', { value: code }, L.names[code])));
+    select.value = L.lang;
+    select.addEventListener('change', () => L.setLang(select.value));
+    return el('p', { class: 'dialog-msg lang-row' }, '🌐 ', select);
   }
 
   function subtitle(...lines) {
@@ -1798,7 +1894,7 @@
     );
 
     const actions = [{
-      label: '🎮 スタート (START)',
+      label: t('title.start'),
       primary: true,
       onClick: () => {
         sound.init();
@@ -1806,7 +1902,7 @@
       }
     }];
     if (document.fullscreenEnabled) {
-      actions.push({ label: '⛶ フルスクリーン切替', onClick: toggleFullscreen });
+      actions.push({ label: t('title.fullscreen'), onClick: toggleFullscreen });
     }
 
     const logo = el('img', { class: 'title-logo', src: XBILL_ASSETS.logo, alt: 'XBill' });
@@ -1814,9 +1910,10 @@
       title: 'WEB REMAKE',
       body: [
         logo,
-        subtitle('ビル軍団からオープンソースOSを守れ！', 'Wingdowsの強制インストールを叩き潰して阻止せよ！'),
+        subtitle(t('title.sub1'), t('title.sub2')),
         rulesBox(true),
         rankingBox,
+        langPicker(),
         creditLine()
       ],
       actions
@@ -1840,13 +1937,13 @@
     closeHelp = close;
 
     showDialog({
-      title: 'XBill ガイド (オリジナル仕様)',
+      title: t('help.title'),
       body: [
         rulesBox(),
-        el('p', { class: 'dialog-msg' }, 'キー操作: P / Esc = ポーズ、M = サウンド切替'),
+        el('p', { class: 'dialog-msg' }, t('help.keys')),
         creditLine()
       ],
-      actions: [{ label: '閉じる', primary: true, onClick: close }]
+      actions: [{ label: t('help.close'), primary: true, onClick: close }]
     }, { isHelp: true });
   }
 
@@ -1859,18 +1956,18 @@
     state.drag = null;
     state.level++;
     updateLevelDisplay();
-    setStatus(`LEVEL ${cleared} クリア！`);
+    setStatus(t('status.levelCleared', { n: cleared }));
 
-    const next = state.level === CONFIG.MAX_LEVEL ? `最終 LEVEL ${state.level}` : `LEVEL ${state.level}`;
+    const next = state.level === CONFIG.MAX_LEVEL ? t('level.final', { n: state.level }) : t('level.n', { n: state.level });
     showDialog({
       title: `LEVEL ${cleared} CLEAR!`,
       body: [subtitle(
-        'すべてのビルを撃退しました！',
-        `倒したビル: ${state.billsKilled}体`,
-        el('span', {}, `稼働率ボーナス: `, el('strong', {}, `+${bonus} pts`)),
-        el('span', {}, `スコア: `, el('strong', {}, String(state.score)))
+        t('clear.headline'),
+        t('clear.killed', { n: state.billsKilled }),
+        el('span', {}, t('label.bonus'), el('strong', {}, `+${bonus} pts`)),
+        el('span', {}, t('label.score'), el('strong', {}, String(state.score)))
       )],
-      actions: [{ label: `▶ ${next} に進む`, primary: true, onClick: startLevel }]
+      actions: [{ label: t('clear.goto', { next }), primary: true, onClick: startLevel }]
     });
   }
 
@@ -1880,15 +1977,15 @@
     setPhase('gameClear');
     state.drag = null;
     sound.playLevelUp();
-    setStatus('ALL CLEAR! すべてのレベルをクリアしました！');
+    setStatus(t('status.allClear'));
 
     showResultDialog({
       cleared: true,
       finalScore: state.score,
       finalLevel: state.level,
       lines: [
-        `稼働率ボーナス: +${bonus} pts`,
-        `全クリアボーナス: +${CONFIG.ALL_CLEAR_BONUS} pts`
+        t('result.bonus', { n: bonus }),
+        t('result.allClearBonus', { n: CONFIG.ALL_CLEAR_BONUS })
       ]
     });
   }
@@ -1906,7 +2003,7 @@
     state.cables = [];
     state.bills = [];
     state.strays = [];
-    setStatus('ゲームオーバー: 動いているコンピュータが1台以下になりました');
+    setStatus(t('status.gameOver'));
 
     showResultDialog({ cleared: false, finalScore: state.score, finalLevel: state.level, lines: [] });
   }
@@ -1919,12 +2016,12 @@
       class: 'name-input',
       type: 'text',
       maxlength: CONFIG.NAME_MAX,
-      placeholder: 'なまえ (最大12文字)',
+      placeholder: t('name.placeholder'),
       autocomplete: 'off',
-      'aria-label': 'ランキングに載せる名前'
+      'aria-label': t('name.aria')
     });
     input.value = storage.get('xbill_name', '');
-    const submitBtn = el('button', { type: 'button', class: 'motif-btn' }, '🏆 登録');
+    const submitBtn = el('button', { type: 'button', class: 'motif-btn' }, t('name.submit'));
     const nameRow = el('div', { class: 'name-row' }, input, submitBtn);
 
     let submitted = false;
@@ -1937,7 +2034,7 @@
     const onSubmit = async () => {
       if (submitted || submitBtn.disabled) return;
       input.disabled = submitBtn.disabled = true;
-      setMsg('送信中...');
+      setMsg(t('name.sending'));
       try {
         const res = await postScore(input.value.trim(), finalScore, finalLevel, cleared);
         submitted = true;
@@ -1946,13 +2043,13 @@
         applyRankingBest(res.ranking);
 
         nameRow.hidden = true;
-        setMsg(res.rank > 0 ? `第${res.rank}位にランクイン！` : 'ランク外でした。また挑戦しよう！');
+        setMsg(res.rank > 0 ? t('name.rank', { rank: res.rank }) : t('name.outOfRank'));
         renderRanking(rankingBox, {
           status: 'ok', list: res.ranking, source: res.source, highlightIndex: res.rank - 1
         });
       } catch (err) {
         input.disabled = submitBtn.disabled = false;
-        setMsg('登録できませんでした。通信状況を確認して、もう一度お試しください。', true);
+        setMsg(t('name.error'), true);
       }
     };
 
@@ -1975,9 +2072,9 @@
     );
 
     const headline = cleared
-      ? 'おめでとう！全レベルをクリアし、Wingdowsの野望を打ち砕きました！'
-      : '動いているPCが1台以下になってしまいました...';
-    const scoreLine = el('span', {}, `最終スコア: `, el('strong', {}, String(finalScore)),
+      ? t('result.clearedHeadline')
+      : t('result.overHeadline');
+    const scoreLine = el('span', {}, t('label.finalScore'), el('strong', {}, String(finalScore)),
       cleared ? '  (ALL CLEAR)' : `  (LEVEL ${finalLevel})`);
     const body = [subtitle(headline, ...lines, scoreLine)];
     if (!cleared) {
@@ -1992,7 +2089,7 @@
       title: cleared ? 'ALL CLEAR!' : 'SYSTEM OVERRUN!',
       body,
       actions: [{
-        label: cleared ? '🔄 もう一度遊ぶ' : '🔄 もう一度遊ぶ (RETRY)',
+        label: cleared ? t('result.retry') : t('result.retry') + ' (RETRY)',
         primary: true,
         onClick: startNewGame
       }]
@@ -2109,14 +2206,14 @@
   function renderRanking(box, view) {
     box.textContent = '';
     box.append(el('p', { class: 'ranking-title' },
-      view.source === 'local' ? '🏆 ランキング (この端末のみ)' : '🏆 ランキング'));
+      view.source === 'local' ? t('ranking.titleLocal') : t('ranking.title')));
 
     if (view.status === 'loading') {
-      box.append(el('p', { class: 'ranking-empty' }, '読み込み中...'));
+      box.append(el('p', { class: 'ranking-empty' }, t('ranking.loading')));
     } else if (view.status === 'error') {
-      box.append(el('p', { class: 'ranking-empty' }, 'ランキングを取得できませんでした'));
+      box.append(el('p', { class: 'ranking-empty' }, t('ranking.error')));
     } else if (view.list.length === 0) {
-      box.append(el('p', { class: 'ranking-empty' }, 'まだ記録がありません'));
+      box.append(el('p', { class: 'ranking-empty' }, t('ranking.empty')));
     } else {
       box.append(rankingTable(view.list, view.highlightIndex));
     }
@@ -2148,8 +2245,8 @@
     updateLevelDisplay();
     updateStatusHeader();
     setStatus(state.level === CONFIG.MAX_LEVEL
-      ? `LEVEL ${state.level} (最終): ビル軍団の総攻撃！PCを守り抜け！`
-      : `LEVEL ${state.level}: ビル軍団の襲来！PCを守れ！`);
+      ? t('status.levelStartFinal', { n: state.level })
+      : t('status.levelStart', { n: state.level }));
   }
 
   function startNewGame() {
@@ -2170,13 +2267,13 @@
   function pauseGame() {
     if (state.phase !== 'playing') return;
     setPhase('paused');
-    setStatus('一時停止中');
+    setStatus(t('status.paused'));
   }
 
   function resumeGame() {
     if (state.phase !== 'paused' || helpOpen) return;
     setPhase('playing');
-    setStatus('ゲーム再開');
+    setStatus(t('status.resumed'));
   }
 
   function togglePause() {
@@ -2360,7 +2457,7 @@
     requestAnimationFrame(gameLoop);
   }).catch((err) => {
     console.error(err);
-    setStatus('画像を読み込めませんでした。ページを再読み込みしてください。');
+    setStatus(t('status.imageError'));
   });
 </script>
 
