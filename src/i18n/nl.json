@@ -69,5 +69,8 @@
   "cert.body": "Heeft alle {n} levels van XBill Web Remake gehaald en de plannen van Wingdows verpletterd.",
   "cert.score": "Eindscore",
   "cert.date": "Datum",
-  "cert.anonymous": "Speler"
+  "cert.anonymous": "Speler",
+  "story.button": "📖 Het verhaal",
+  "story.p1": "Opnieuw ligt het lot van de wereld in jouw handen! Een kwaadaardige computerhacker, alleen bekend onder de naam „Bill”, heeft het ultieme computervirus gemaakt. Een virus zo krachtig dat het een gewone computer in een broodrooster kan veranderen. (oooh!) „Bill” heeft zichzelf gekloond tot miljarden micro-Bills. Hun enige doel is het snode virus te verspreiden, slim vermomd als een populair besturingssysteem.",
+  "story.p2": "Als systeembeheerder en ongediertebestrijder is het jouw taak te voorkomen dat Bill zijn doel bereikt."
 }

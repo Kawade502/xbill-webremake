@@ -69,5 +69,8 @@
   "cert.body": "XBill Web Remake’in tüm {n} seviyesini tamamladı ve Wingdows’un hayallerini yıktı.",
   "cert.score": "Toplam puan",
   "cert.date": "Tarih",
-  "cert.anonymous": "Oyuncu"
+  "cert.anonymous": "Oyuncu",
+  "story.button": "📖 Hikâye",
+  "story.p1": "Bir kez daha dünyanın kaderi senin ellerinde! Yalnızca «Bill» takma adıyla bilinen kötü bir bilgisayar korsanı, nihai bilgisayar virüsünü yarattı. Sıradan bir bilgisayarı ekmek kızartma makinesine çevirebilecek kadar güçlü bir virüs. (oooh!) «Bill» kendini milyarlarca mikro-Bill olarak klonladı. Tek amaçları, popüler bir işletim sistemi kılığına ustaca sokulmuş bu kötü virüsü ulaştırmak.",
+  "story.p2": "Sistem yöneticisi/haşere yok edici olarak senin görevin, Bill'in amacına ulaşmasını engellemek."
 }

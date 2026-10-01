@@ -1011,6 +1011,7 @@
         startNewGame();
       }
     }];
+    actions.push({ label: t('story.button'), onClick: () => openHelp('story') });
     if (document.fullscreenEnabled) {
       actions.push({ label: t('title.fullscreen'), onClick: toggleFullscreen });
     }
@@ -1032,7 +1033,7 @@
 
   let closeHelp = () => {};
 
-  function openHelp() {
+  function openHelp(kind) {
     if (helpOpen) return;
     const previous = { phase: state.phase, dialog: activeDialog };
     if (state.phase === 'playing') setPhase('paused');
@@ -1046,7 +1047,15 @@
     };
     closeHelp = close;
 
-    showDialog({
+    const spec = kind === 'story' ? {
+      title: 'THE STORY',
+      body: [
+        el('img', { class: 'title-logo', src: XBILL_ASSETS.logo, alt: 'XBill' }),
+        el('div', { class: 'rules story' }, el('p', {}, t('story.p1')), el('p', {}, t('story.p2'))),
+        creditLine()
+      ],
+      actions: [{ label: t('help.close'), primary: true, onClick: close }]
+    } : {
       title: t('help.title'),
       body: [
         rulesBox(),
@@ -1054,7 +1063,8 @@
         creditLine()
       ],
       actions: [{ label: t('help.close'), primary: true, onClick: close }]
-    }, { isHelp: true });
+    };
+    showDialog(spec, { isHelp: true });
   }
 
   function levelClear(bonus) {
@@ -1647,7 +1657,7 @@
   canvas.addEventListener('pointercancel', onPointerCancel);
 
   btnSoundToggle.addEventListener('click', toggleSound);
-  btnHelp.addEventListener('click', openHelp);
+  btnHelp.addEventListener('click', () => openHelp());
   btnPause.addEventListener('click', togglePause);
   btnReset.addEventListener('click', startNewGame);
 

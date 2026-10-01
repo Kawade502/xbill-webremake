@@ -69,5 +69,8 @@
   "cert.body": "Cleared all {n} levels of XBill Web Remake and crushed the ambitions of Wingdows.",
   "cert.score": "Final score",
   "cert.date": "Date",
-  "cert.anonymous": "Player"
+  "cert.anonymous": "Player",
+  "story.button": "📖 Story",
+  "story.p1": "Yet again, the fate of the world rests in your hands! An evil computer hacker, known only by his handle 'Bill', has created the ultimate computer virus. A virus so powerful that it has the power to transmute an ordinary computer into a toaster oven. (oooh!) 'Bill' has cloned himself into a billion-jillion micro-Bills. Their sole purpose is to deliver the nefarious virus, which has been cleverly disguised as a popular operating system.",
+  "story.p2": "As System Administrator/Exterminator, your job is to keep Bill from succeeding at his task."
 }

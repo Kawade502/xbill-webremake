@@ -69,5 +69,8 @@
   "cert.body": "Menyelesaikan semua {n} level XBill Web Remake dan menggagalkan ambisi Wingdows.",
   "cert.score": "Skor akhir",
   "cert.date": "Tanggal",
-  "cert.anonymous": "Pemain"
+  "cert.anonymous": "Pemain",
+  "story.button": "📖 Cerita",
+  "story.p1": "Sekali lagi, nasib dunia ada di tanganmu! Seorang peretas komputer jahat yang hanya dikenal dengan nama «Bill» telah menciptakan virus komputer pamungkas. Virus yang begitu kuat sampai bisa mengubah komputer biasa menjadi oven pemanggang roti. (ooh!) «Bill» telah mengklon dirinya menjadi miliaran micro-Bill. Satu-satunya tujuan mereka adalah menyebarkan virus jahat itu, yang disamarkan dengan cerdik sebagai sistem operasi populer.",
+  "story.p2": "Sebagai administrator sistem sekaligus pembasmi, tugasmu adalah mencegah Bill berhasil menjalankan rencananya."
 }

@@ -69,5 +69,8 @@
   "cert.body": "Superó los {n} niveles de XBill Web Remake y aplastó las ambiciones de Wingdows.",
   "cert.score": "Puntuación final",
   "cert.date": "Fecha",
-  "cert.anonymous": "Jugador"
+  "cert.anonymous": "Jugador",
+  "story.button": "📖 Historia",
+  "story.p1": "¡Una vez más, el destino del mundo está en tus manos! Un malvado hacker informático, conocido solo por su alias «Bill», ha creado el virus informático definitivo. Un virus tan potente que puede transformar un ordenador normal en un horno tostador. (¡oooh!) «Bill» se ha clonado en miles de millones de micro-Bills. Su único propósito es propagar el perverso virus, hábilmente disfrazado de un sistema operativo popular.",
+  "story.p2": "Como administrador de sistemas y exterminador, tu misión es impedir que Bill logre su objetivo."
 }
