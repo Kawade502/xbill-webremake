@@ -63,5 +63,12 @@
   "ranking.titleLocal": "🏆 Sıralama (yalnızca bu cihaz)",
   "ranking.loading": "Yükleniyor...",
   "ranking.error": "Sıralama yüklenemedi",
-  "ranking.empty": "Henüz kayıt yok"
+  "ranking.empty": "Henüz kayıt yok",
+  "cert.button": "📜 Sertifikayı indir",
+  "cert.heading": "Tamamlama Sertifikası",
+  "cert.awardedTo": "Verildiği kişi",
+  "cert.body": "XBill Web Remake’in tüm {n} seviyesini tamamladı ve Wingdows’un hayallerini yıktı.",
+  "cert.score": "Toplam puan",
+  "cert.date": "Tarih",
+  "cert.anonymous": "Oyuncu"
 }

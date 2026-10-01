@@ -63,5 +63,12 @@
   "ranking.titleLocal": "🏆 Таблица рекордов (только это устройство)",
   "ranking.loading": "Загрузка...",
   "ranking.error": "Не удалось загрузить таблицу рекордов",
-  "ranking.empty": "Пока нет записей"
+  "ranking.empty": "Пока нет записей",
+  "cert.button": "📜 Скачать сертификат",
+  "cert.heading": "Сертификат о прохождении",
+  "cert.awardedTo": "Награждается",
+  "cert.body": "Прошёл все {n} уровней XBill Web Remake и разрушил планы Wingdows.",
+  "cert.score": "Итоговый счёт",
+  "cert.date": "Дата",
+  "cert.anonymous": "Игрок"
 }

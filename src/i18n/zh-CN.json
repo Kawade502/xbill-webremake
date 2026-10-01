@@ -63,5 +63,12 @@
   "ranking.titleLocal": "🏆 排行榜（仅限本设备）",
   "ranking.loading": "加载中...",
   "ranking.error": "无法获取排行榜",
-  "ranking.empty": "还没有记录"
+  "ranking.empty": "还没有记录",
+  "cert.button": "📜 下载证书",
+  "cert.heading": "通关证书",
+  "cert.awardedTo": "授予",
+  "cert.body": "通过了 XBill Web Remake 的全部 {n} 个关卡，粉碎了 Wingdows 的野心。",
+  "cert.score": "最终得分",
+  "cert.date": "日期",
+  "cert.anonymous": "玩家"
 }

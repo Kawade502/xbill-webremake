@@ -1118,6 +1118,129 @@
     showResultDialog({ cleared: false, finalScore: state.score, finalLevel: state.level, lines: [] });
   }
 
+  // ============================================================
+  // 全クリア証明書（ブラウザの中で PNG を作ってダウンロードする。サーバーには何も送らない）
+  // ============================================================
+  /** 文字を幅 maxWidth で折り返す。日本語・中国語は文字ごと、それ以外は単語ごと。 */
+  function wrapText(c, text, maxWidth) {
+    const cjk = /^(ja|zh|ko)/.test(window.XBILL_LANG.lang);
+    const units = cjk ? Array.from(text) : text.split(' ');
+    const lines = [];
+    let line = '';
+    units.forEach((u) => {
+      const trial = line ? (cjk ? line + u : line + ' ' + u) : u;
+      if (line && c.measureText(trial).width > maxWidth) {
+        lines.push(line);
+        line = u;
+      } else {
+        line = trial;
+      }
+    });
+    if (line) lines.push(line);
+    return lines;
+  }
+
+  function drawCertificate(name, score) {
+    const W = 1200, H = 800;
+    const cv = document.createElement('canvas');
+    cv.width = W;
+    cv.height = H;
+    const c = cv.getContext('2d');
+    const sans = "system-ui, -apple-system, 'Segoe UI', 'Hiragino Sans', 'Noto Sans CJK JP', 'Noto Sans', sans-serif";
+
+    // 台紙と二重の枠
+    c.fillStyle = '#fffdf5';
+    c.fillRect(0, 0, W, H);
+    c.strokeStyle = '#1a3a8a';
+    c.lineWidth = 10;
+    c.strokeRect(30, 30, W - 60, H - 60);
+    c.strokeStyle = '#d4a017';
+    c.lineWidth = 3;
+    c.strokeRect(50, 50, W - 100, H - 100);
+
+    c.textAlign = 'center';
+    c.textBaseline = 'alphabetic';
+
+    // ロゴ（ドットの絵なので、ぼかさずに 2 倍にする）
+    c.imageSmoothingEnabled = false;
+    const logo = SPRITES.logo;
+    const lw = logo.width * 2, lh = logo.height * 2;
+    c.drawImage(logo, (W - lw) / 2, 78, lw, lh);
+
+    c.fillStyle = '#1a3a8a';
+    c.font = `bold 44px ${sans}`;
+    c.fillText(t('cert.heading'), W / 2, 78 + lh + 56);
+
+    c.fillStyle = '#666666';
+    c.font = `24px ${sans}`;
+    c.fillText(t('cert.awardedTo'), W / 2, 78 + lh + 106);
+
+    // 名前（長いときは縮める）
+    let size = 64;
+    c.fillStyle = '#111111';
+    do {
+      c.font = `bold ${size}px ${sans}`;
+      size -= 4;
+    } while (c.measureText(name).width > W - 240 && size > 24);
+    const nameY = 78 + lh + 186;
+    c.fillText(name, W / 2, nameY);
+    c.strokeStyle = '#d4a017';
+    c.lineWidth = 2;
+    c.beginPath();
+    c.moveTo(220, nameY + 16);
+    c.lineTo(W - 220, nameY + 16);
+    c.stroke();
+
+    c.fillStyle = '#333333';
+    c.font = `28px ${sans}`;
+    const lines = wrapText(c, t('cert.body', { n: CONFIG.MAX_LEVEL }), W - 260);
+    lines.forEach((line, i) => c.fillText(line, W / 2, nameY + 70 + i * 40));
+
+    const infoY = nameY + 70 + lines.length * 40 + 50;
+    c.font = `bold 34px ${sans}`;
+    c.fillStyle = '#1a3a8a';
+    c.fillText(`${t('cert.score')}: ${score}`, W / 2, infoY);
+    c.font = `26px ${sans}`;
+    c.fillStyle = '#555555';
+    let dateText;
+    try {
+      dateText = new Date().toLocaleDateString(window.XBILL_LANG.lang, { year: 'numeric', month: 'long', day: 'numeric' });
+    } catch (e) {
+      dateText = new Date().toISOString().slice(0, 10);
+    }
+    c.fillText(`${t('cert.date')}: ${dateText}`, W / 2, infoY + 42);
+
+    // 下の飾り: OS のアイコンを 3 倍で並べる
+    c.imageSmoothingEnabled = false;
+    const icons = ['linux', 'bsd', 'hurd', 'redhat', 'sun', 'next'].map((n) => SPRITES.os[OS_FILES.indexOf(n)]);
+    const iw = DIM.osW * 3, ih = DIM.osH * 3, gap = 24;
+    let x = (W - (icons.length * iw + (icons.length - 1) * gap)) / 2;
+    icons.forEach((img) => {
+      c.drawImage(img, Math.round(x), H - 96 - ih, iw, ih);
+      x += iw + gap;
+    });
+
+    c.font = `16px ${sans}`;
+    c.fillStyle = '#888888';
+    c.fillText('XBill Web Remake  -  ' + CONFIG.SOURCE_URL, W / 2, H - 66);
+    return cv;
+  }
+
+  function downloadCertificate(name, score) {
+    const cv = drawCertificate(name, score);
+    cv.toBlob((blob) => {
+      if (!blob) return;
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'xbill-certificate.png';
+      document.body.append(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 10000);
+    }, 'image/png');
+  }
+
   /** ゲームオーバー・全クリア共通の結果画面（スコア登録とランキング）。 */
   function showResultDialog({ cleared, finalScore, finalLevel, lines }) {
     const rankingBox = el('div', { class: 'ranking-box' });
@@ -1202,7 +1325,11 @@
         label: cleared ? t('result.retry') : t('result.retry') + ' (RETRY)',
         primary: true,
         onClick: startNewGame
-      }]
+      }].concat(cleared ? [{
+        label: t('cert.button'),
+        onClick: () => downloadCertificate(
+          input.value.trim() || storage.get('xbill_name', '') || t('cert.anonymous'), finalScore)
+      }] : [])
     });
   }
 

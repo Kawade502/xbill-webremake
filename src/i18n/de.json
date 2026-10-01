@@ -63,5 +63,12 @@
   "ranking.titleLocal": "🏆 Bestenliste (nur dieses Gerät)",
   "ranking.loading": "Wird geladen ...",
   "ranking.error": "Bestenliste konnte nicht geladen werden",
-  "ranking.empty": "Noch keine Einträge"
+  "ranking.empty": "Noch keine Einträge",
+  "cert.button": "📜 Urkunde herunterladen",
+  "cert.heading": "Urkunde für den vollständigen Abschluss",
+  "cert.awardedTo": "Verliehen an",
+  "cert.body": "Hat alle {n} Level von XBill Web Remake geschafft und die Pläne von Wingdows zunichtegemacht.",
+  "cert.score": "Endstand",
+  "cert.date": "Datum",
+  "cert.anonymous": "Spieler"
 }

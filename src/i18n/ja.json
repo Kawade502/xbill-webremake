@@ -63,5 +63,12 @@
   "ranking.titleLocal": "🏆 ランキング (この端末のみ)",
   "ranking.loading": "読み込み中...",
   "ranking.error": "ランキングを取得できませんでした",
-  "ranking.empty": "まだ記録がありません"
+  "ranking.empty": "まだ記録がありません",
+  "cert.button": "📜 証明書をダウンロード",
+  "cert.heading": "全クリア証明書",
+  "cert.awardedTo": "授与",
+  "cert.body": "XBill Web Remake の全{n}レベルをクリアし、Wingdows の野望を打ち砕きました。",
+  "cert.score": "最終スコア",
+  "cert.date": "日付",
+  "cert.anonymous": "名無しさん"
 }

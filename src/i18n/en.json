@@ -63,5 +63,12 @@
   "ranking.titleLocal": "🏆 Ranking (this device only)",
   "ranking.loading": "Loading...",
   "ranking.error": "Could not load the ranking",
-  "ranking.empty": "No records yet"
+  "ranking.empty": "No records yet",
+  "cert.button": "📜 Download certificate",
+  "cert.heading": "Certificate of Completion",
+  "cert.awardedTo": "Awarded to",
+  "cert.body": "Cleared all {n} levels of XBill Web Remake and crushed the ambitions of Wingdows.",
+  "cert.score": "Final score",
+  "cert.date": "Date",
+  "cert.anonymous": "Player"
 }

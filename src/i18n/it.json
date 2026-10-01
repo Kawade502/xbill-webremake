@@ -63,5 +63,12 @@
   "ranking.titleLocal": "🏆 Classifica (solo questo dispositivo)",
   "ranking.loading": "Caricamento...",
   "ranking.error": "Impossibile caricare la classifica",
-  "ranking.empty": "Ancora nessun punteggio"
+  "ranking.empty": "Ancora nessun punteggio",
+  "cert.button": "📜 Scarica il certificato",
+  "cert.heading": "Certificato di completamento",
+  "cert.awardedTo": "Conferito a",
+  "cert.body": "Ha completato tutti i {n} livelli di XBill Web Remake e mandato in frantumi le ambizioni di Wingdows.",
+  "cert.score": "Punteggio finale",
+  "cert.date": "Data",
+  "cert.anonymous": "Giocatore"
 }

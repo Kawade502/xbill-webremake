@@ -63,5 +63,12 @@
   "ranking.titleLocal": "🏆 Ranglijst (alleen dit apparaat)",
   "ranking.loading": "Laden...",
   "ranking.error": "De ranglijst kon niet worden geladen",
-  "ranking.empty": "Nog geen scores"
+  "ranking.empty": "Nog geen scores",
+  "cert.button": "📜 Certificaat downloaden",
+  "cert.heading": "Certificaat van voltooiing",
+  "cert.awardedTo": "Toegekend aan",
+  "cert.body": "Heeft alle {n} levels van XBill Web Remake gehaald en de plannen van Wingdows verpletterd.",
+  "cert.score": "Eindscore",
+  "cert.date": "Datum",
+  "cert.anonymous": "Speler"
 }

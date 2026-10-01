@@ -63,5 +63,12 @@
   "ranking.titleLocal": "🏆 रैंकिंग (केवल इस डिवाइस पर)",
   "ranking.loading": "लोड हो रहा है...",
   "ranking.error": "रैंकिंग लोड नहीं हो सकी",
-  "ranking.empty": "अभी कोई रिकॉर्ड नहीं"
+  "ranking.empty": "अभी कोई रिकॉर्ड नहीं",
+  "cert.button": "📜 प्रमाणपत्र डाउनलोड करें",
+  "cert.heading": "पूर्ण-विजय प्रमाणपत्र",
+  "cert.awardedTo": "प्रदान किया गया",
+  "cert.body": "XBill Web Remake के सभी {n} लेवल पूरे किए और Wingdows के इरादे चकनाचूर कर दिए।",
+  "cert.score": "अंतिम अंक",
+  "cert.date": "तारीख़",
+  "cert.anonymous": "खिलाड़ी"
 }
