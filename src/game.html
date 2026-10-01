@@ -1183,8 +1183,8 @@
     c.strokeStyle = '#d4a017';
     c.lineWidth = 2;
     c.beginPath();
-    c.moveTo(220, nameY + 16);
-    c.lineTo(W - 220, nameY + 16);
+    c.moveTo(220, nameY + 30);
+    c.lineTo(W - 220, nameY + 30);
     c.stroke();
 
     c.fillStyle = '#333333';
@@ -1195,9 +1195,9 @@
       lines = wrapText(c, t('cert.body', { n: CONFIG.MAX_LEVEL }), W - 260);
       if (lines.length <= 2) break;
     }
-    lines.forEach((line, i) => c.fillText(line, W / 2, nameY + 70 + i * 40));
+    lines.forEach((line, i) => c.fillText(line, W / 2, nameY + 86 + i * 40));
 
-    const infoY = nameY + 70 + lines.length * 40 + 50;
+    const infoY = nameY + 86 + lines.length * 40 + 46;
     c.font = `bold 34px ${sans}`;
     c.fillStyle = '#1a3a8a';
     c.fillText(`${t('cert.score')}: ${score}`, W / 2, infoY);
