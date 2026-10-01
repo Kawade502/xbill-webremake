@@ -66,7 +66,6 @@
   "ranking.empty": "Aucun score pour le moment",
   "cert.button": "📜 Télécharger le certificat",
   "cert.heading": "Certificat de réussite",
-  "cert.awardedTo": "Décerné à",
   "cert.body": "A terminé les {n} niveaux de XBill Web Remake et brisé les ambitions de Wingdows.",
   "cert.score": "Score final",
   "cert.date": "Date",

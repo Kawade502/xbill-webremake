@@ -66,7 +66,6 @@
   "ranking.empty": "还没有记录",
   "cert.button": "📜 下载证书",
   "cert.heading": "通关证书",
-  "cert.awardedTo": "授予",
   "cert.body": "通过了 XBill Web Remake 的全部 {n} 个关卡，粉碎了 Wingdows 的野心。",
   "cert.score": "最终得分",
   "cert.date": "日期",

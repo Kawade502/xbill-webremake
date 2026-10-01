@@ -66,7 +66,6 @@
   "ranking.empty": "まだ記録がありません",
   "cert.button": "📜 証明書をダウンロード",
   "cert.heading": "全クリア証明書",
-  "cert.awardedTo": "授与",
   "cert.body": "XBill Web Remake の全{n}レベルをクリアし、Wingdows の野望を打ち砕きました。",
   "cert.score": "最終スコア",
   "cert.date": "日付",

@@ -1171,10 +1171,6 @@
     c.font = `bold 44px ${sans}`;
     c.fillText(t('cert.heading'), W / 2, 78 + lh + 56);
 
-    c.fillStyle = '#666666';
-    c.font = `24px ${sans}`;
-    c.fillText(t('cert.awardedTo'), W / 2, 78 + lh + 106);
-
     // 名前（長いときは縮める）
     let size = 64;
     c.fillStyle = '#111111';
@@ -1182,7 +1178,7 @@
       c.font = `bold ${size}px ${sans}`;
       size -= 4;
     } while (c.measureText(name).width > W - 240 && size > 24);
-    const nameY = 78 + lh + 186;
+    const nameY = 78 + lh + 150;
     c.fillText(name, W / 2, nameY);
     c.strokeStyle = '#d4a017';
     c.lineWidth = 2;
@@ -1192,8 +1188,13 @@
     c.stroke();
 
     c.fillStyle = '#333333';
-    c.font = `28px ${sans}`;
-    const lines = wrapText(c, t('cert.body', { n: CONFIG.MAX_LEVEL }), W - 260);
+    // 本文は 2 行に収まるまで文字を小さくする（下の日付・アイコンと重ならないように）
+    let lines;
+    for (let fs = 28; fs >= 20; fs -= 2) {
+      c.font = `${fs}px ${sans}`;
+      lines = wrapText(c, t('cert.body', { n: CONFIG.MAX_LEVEL }), W - 260);
+      if (lines.length <= 2) break;
+    }
     lines.forEach((line, i) => c.fillText(line, W / 2, nameY + 70 + i * 40));
 
     const infoY = nameY + 70 + lines.length * 40 + 50;
