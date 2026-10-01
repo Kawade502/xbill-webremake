@@ -1047,24 +1047,33 @@
     };
     closeHelp = close;
 
-    const spec = kind === 'story' ? {
+    // ヘルプとストーリーは行き来できる。ストーリーをヘルプから開いたときは、閉じるとヘルプに戻る。
+    const storySpec = (backToHelp) => ({
       title: 'THE STORY',
       body: [
         el('img', { class: 'title-logo', src: XBILL_ASSETS.logo, alt: 'XBill' }),
         el('div', { class: 'rules story' }, el('p', {}, t('story.p1')), el('p', {}, t('story.p2'))),
         creditLine()
       ],
-      actions: [{ label: t('help.close'), primary: true, onClick: close }]
-    } : {
+      actions: [{
+        label: t('help.close'),
+        primary: true,
+        onClick: backToHelp ? () => showDialog(helpSpec(), { isHelp: true }) : close
+      }]
+    });
+    const helpSpec = () => ({
       title: t('help.title'),
       body: [
         rulesBox(),
         el('p', { class: 'dialog-msg' }, t('help.keys')),
         creditLine()
       ],
-      actions: [{ label: t('help.close'), primary: true, onClick: close }]
-    };
-    showDialog(spec, { isHelp: true });
+      actions: [
+        { label: t('help.close'), primary: true, onClick: close },
+        { label: t('story.button'), onClick: () => showDialog(storySpec(true), { isHelp: true }) }
+      ]
+    });
+    showDialog(kind === 'story' ? storySpec(false) : helpSpec(), { isHelp: true });
   }
 
   function levelClear(bonus) {
