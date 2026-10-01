@@ -29,7 +29,7 @@
   "rules.3.body": ": If only one of two cable-connected PCs is Wingdows, a spark runs along the cable to the other. Dragging the bucket from the top-left onto a spark only restarts it from the beginning. To stop it for good, drag a dropped OS back onto the PC that is running Wingdows (it stops once neither end is Wingdows). A PC that Wingdows took over through a spark does not drop its old OS, so use an OS dropped by another Bill.",
   "rules.4": "The game ends when 1 or fewer PCs are still running. After each level you get a bonus based on uptime.",
   "rules.5.head": "Clear level 10 to win!",
-  "rules.5.body": " On higher levels, more Bills come at once, faster, and steal OSes faster.",
+  "rules.5.body": " On higher levels, more Bills come at once, faster, and steal OSes faster. Clear every level and you can download a certificate (image) with your name on it.",
   "credit.line": "XBill 2.1  Copyright (C) Brian Wellington, Matias Duarte (GPL). The rules and graphics are from the original game.",
   "credit.source": "Source code of this game (GPL-3.0 or later): ",
   "title.start": "🎮 START",

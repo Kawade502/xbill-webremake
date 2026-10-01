@@ -29,7 +29,7 @@
   "rules.3.body": ": Se apenas um de dois PCs ligados por cabo estiver com Wingdows, uma faísca corre pelo cabo até o outro. Arrastar o balde do canto superior esquerdo até uma faísca só a faz recomeçar do início. Para pará-la de vez, arraste um sistema caído até o PC que está com Wingdows (ela para quando nenhuma ponta tiver Wingdows). Um PC que virou Wingdows por causa de uma faísca não derruba o sistema antigo, então use um derrubado por outro Bill.",
   "rules.4": "O jogo termina quando restam apenas 1 PC ou nenhum funcionando. Ao fim de cada nível, você ganha um bônus conforme o tempo de funcionamento.",
   "rules.5.head": "Conclua o nível 10 para vencer!",
-  "rules.5.body": " Nos níveis mais altos, mais Bills chegam ao mesmo tempo, mais rápido, e roubam os sistemas com mais rapidez.",
+  "rules.5.body": " Nos níveis mais altos, mais Bills chegam ao mesmo tempo, mais rápido, e roubam os sistemas com mais rapidez. Ao concluir todos os níveis, você pode baixar um certificado (imagem) com o seu nome.",
   "credit.line": "XBill 2.1  Copyright (C) Brian Wellington, Matias Duarte (GPL). As regras e os gráficos são do jogo original.",
   "credit.source": "Código-fonte deste jogo (GPL-3.0 ou posterior): ",
   "title.start": "🎮 COMEÇAR (START)",

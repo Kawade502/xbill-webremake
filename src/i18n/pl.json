@@ -29,7 +29,7 @@
   "rules.3.body": ": jeśli tylko jeden z dwóch komputerów połączonych kablem ma Wingdows, po kablu pobiegnie iskra do drugiego. Przeciągnięcie wiadra z lewego górnego rogu na iskrę tylko uruchomi ją od początku. Aby zatrzymać ją na dobre, przeciągnij upuszczony system na komputer z Wingdows (iskra gaśnie, gdy żaden koniec nie ma Wingdows). Komputer, który zmienił się w Wingdows przez iskrę, nie upuszcza starego systemu — użyj systemu upuszczonego przez innego Billa.",
   "rules.4": "Gra kończy się, gdy działa najwyżej 1 komputer. Po każdym poziomie dostajesz premię zależną od czasu działania.",
   "rules.5.head": "Ukończ poziom 10, by wygrać!",
-  "rules.5.body": " Na wyższych poziomach przychodzi więcej Billów naraz, szybciej, a systemy kradną szybciej.",
+  "rules.5.body": " Na wyższych poziomach przychodzi więcej Billów naraz, szybciej, a systemy kradną szybciej. Po ukończeniu wszystkich poziomów możesz pobrać certyfikat (obraz) ze swoim imieniem.",
   "credit.line": "XBill 2.1  Copyright (C) Brian Wellington, Matias Duarte (GPL). Zasady i grafika pochodzą z oryginalnej gry.",
   "credit.source": "Kod źródłowy tej gry (GPL-3.0 lub nowsza): ",
   "title.start": "🎮 START",

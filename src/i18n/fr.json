@@ -29,7 +29,7 @@
   "rules.3.body": ": Si un seul de deux PC reliés par un câble tourne sous Wingdows, une étincelle court le long du câble vers l'autre. Faire glisser le seau en haut à gauche sur une étincelle ne fait que la relancer depuis le début. Pour l'arrêter pour de bon, faites glisser un système tombé sur le PC sous Wingdows (elle s'arrête quand aucune extrémité n'est sous Wingdows). Un PC passé sous Wingdows à cause d'une étincelle ne lâche pas son ancien système : utilisez celui qu'un autre Bill a laissé tomber.",
   "rules.4": "La partie se termine quand il ne reste qu'un PC (ou aucun) en marche. À la fin de chaque niveau, vous recevez un bonus selon le taux de disponibilité.",
   "rules.5.head": "Terminez le niveau 10 pour tout finir !",
-  "rules.5.body": " Plus le niveau est élevé, plus les Bills arrivent nombreux, vite, et volent les systèmes rapidement.",
+  "rules.5.body": " Plus le niveau est élevé, plus les Bills arrivent nombreux, vite, et volent les systèmes rapidement. Terminez tous les niveaux pour télécharger un certificat (image) à votre nom.",
   "credit.line": "XBill 2.1  Copyright (C) Brian Wellington, Matias Duarte (GPL). Les règles et les graphismes viennent du jeu original.",
   "credit.source": "Code source de ce jeu (GPL-3.0 ou ultérieure) : ",
   "title.start": "🎮 JOUER (START)",

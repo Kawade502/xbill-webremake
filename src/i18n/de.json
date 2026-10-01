@@ -29,7 +29,7 @@
   "rules.3.body": ": Läuft nur einer von zwei per Kabel verbundenen PCs unter Wingdows, läuft ein Funke über das Kabel zum anderen. Ziehst du den Eimer oben links auf einen Funken, beginnt er nur von vorn. Um ihn endgültig zu stoppen, ziehe ein heruntergefallenes Betriebssystem auf den PC mit Wingdows (er stoppt, sobald kein Ende mehr Wingdows hat). Ein PC, der durch einen Funken zu Wingdows wurde, lässt sein altes System nicht fallen – nimm eines, das ein anderer Bill verloren hat.",
   "rules.4": "Das Spiel endet, wenn nur noch höchstens 1 PC läuft. Nach jedem Level gibt es einen Bonus entsprechend der Laufzeit.",
   "rules.5.head": "Schaffe Level 10 und gewinne!",
-  "rules.5.body": " Auf höheren Leveln kommen mehr Bills gleichzeitig, schneller, und sie stehlen Systeme schneller.",
+  "rules.5.body": " Auf höheren Leveln kommen mehr Bills gleichzeitig, schneller, und sie stehlen Systeme schneller. Wer alle Level schafft, kann eine Urkunde (Bild) mit seinem Namen herunterladen.",
   "credit.line": "XBill 2.1  Copyright (C) Brian Wellington, Matias Duarte (GPL). Regeln und Grafiken stammen aus dem Originalspiel.",
   "credit.source": "Quellcode dieses Spiels (GPL-3.0 oder neuer): ",
   "title.start": "🎮 START",
