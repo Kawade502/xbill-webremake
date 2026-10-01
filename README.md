@@ -21,7 +21,7 @@
 
 ## 多言語対応
 
-日本語・English・简体中文・繁體中文・한국어・Español・Français・Deutsch・Português に対応しています。ブラウザの言語設定から自動で選び、タイトル画面の 🌐 で切り替えられます（選んだ言語は端末に保存。`?lang=en` のようにURLでも指定できます）。
+日本語・English・简体中文・繁體中文・한국어・Español・Français・Deutsch・Português・Русский・हिन्दी・Bahasa Indonesia・Italiano・Nederlands・Polski・Türkçe の16言語に対応しています。ブラウザの言語設定から自動で選び、タイトル画面の 🌐 で切り替えられます（選んだ言語は端末に保存。`?lang=en` のようにURLでも指定できます）。
 
 - 辞書は `src/i18n/<言語>.json`（日本語が基準）。`python3 tools/check_i18n.py` で、鍵の過不足・`{n}` などの食い違い・日本語の混入を検査できます
 - 日本語以外の翻訳は AI による下書きです。不自然な表現があれば、JSON を直して PR か Issue でお知らせください

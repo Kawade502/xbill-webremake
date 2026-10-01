@@ -453,4 +453,11 @@
     padding: 4px 8px;
     max-width: 100%;
   }
+  /* キリル文字・デーヴァナーガリーは VT323 に無く、等幅の代替フォントでは字間が開くので、読みやすい通常のフォントにする */
+  :lang(ru) :is(.rules, .dialog-msg, .dialog-subtitle, .ranking-box, .status, .name-input),
+  :lang(hi) :is(.rules, .dialog-msg, .dialog-subtitle, .ranking-box, .status, .name-input) {
+    font-family: system-ui, -apple-system, 'Segoe UI', 'Noto Sans', 'Noto Sans Devanagari', sans-serif;
+    font-size: 14px;
+    letter-spacing: 0;
+  }
 </style>
