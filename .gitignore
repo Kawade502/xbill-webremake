@@ -12,3 +12,6 @@ worker/.dev.vars
 # Claude Code 用の作業メモ（計画・振り返り）。公開しない
 CLAUDE.md
 .steering/
+
+# 動画 CM の素材（公開しない）
+promo/
