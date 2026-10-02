@@ -8,3 +8,7 @@ src/xbill-2.1/
 node_modules/
 worker/.wrangler/
 worker/.dev.vars
+
+# Claude Code 用の作業メモ（計画・振り返り）。公開しない
+CLAUDE.md
+.steering/
