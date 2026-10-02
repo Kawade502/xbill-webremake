@@ -1,4 +1,5 @@
 {
   "siteUrl": "https://kawade502.github.io/xbill-webremake/",
-  "rankingApi": "https://xbill-ranking.xbill-ranking.workers.dev"
+  "rankingApi": "https://xbill-ranking.xbill-ranking.workers.dev",
+  "analyticsToken": "34c626b8f1b04253a2e2a4031595493f"
 }

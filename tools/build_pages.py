@@ -7,6 +7,8 @@
 使い方:  python3 tools/build_pages.py [--out 出力先] [--api ランキングAPIのURL]
   --out  出力先（既定は docs/）。手元での確認用に、別の場所へ出せる
   --api  pages.config.json の rankingApi を、この値で上書きする（手元の wrangler dev を指すときなど）
+pages.config.json の analyticsToken があれば、Cloudflare Web Analytics の計測スクリプトを入れる。
+手元の確認用（--out を付けたとき）には入れない（自分の確認でアクセス数が増えないように）。
 入力  :  src/index.html と、その <!-- @include 名前 --> で読み込む部品（src/*.html）、pages.config.json
 出力  :  docs/index.html, docs/.nojekyll
 
@@ -87,6 +89,15 @@ def head_extras(config):
     return '\n  '.join(tags)
 
 
+def analytics_tag(token):
+    """Cloudflare Web Analytics（Cookie を使わない）の計測スクリプト。"""
+    if not re.fullmatch(r'[0-9a-f]{32}', token or ''):
+        raise SystemExit('エラー: analyticsToken は 32 桁の16進数です: %r' % token)
+    beacon = html.escape(json.dumps({'token': token}), quote=True)
+    return ("<script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' "
+            "data-cf-beacon=\"%s\"></script>" % beacon)
+
+
 def check_scripts(page):
     """インラインの <script> を取り出して、node があれば構文を検査する。"""
     scripts = re.findall(r'<script>\n?([\s\S]*?)</script>', page)
@@ -139,6 +150,11 @@ def main():
 
     check_scripts(page)
 
+    token = config.get('analyticsToken', '')
+    use_analytics = bool(token) and out == DOCS
+    if use_analytics:
+        page = page.replace('</body>', '  ' + analytics_tag(token) + '\n</body>', 1)
+
     os.makedirs(out, exist_ok=True)
     with open(os.path.join(out, 'index.html'), 'w', encoding='utf-8') as f:
         f.write(page)
@@ -149,7 +165,8 @@ def main():
             print('警告: docs/%s がありません。tools/make_ogp.py を実行してください' % name)
         elif out != DOCS:
             shutil.copy(src, os.path.join(out, name))
-    print('wrote %s/index.html (%d KB), rankingApi=%r' % (out, len(page.encode('utf-8')) // 1024, config.get('rankingApi', '')))
+    print('wrote %s/index.html (%d KB), rankingApi=%r, analytics=%s' % (
+        out, len(page.encode('utf-8')) // 1024, config.get('rankingApi', ''), 'on' if use_analytics else 'off'))
 
 
 if __name__ == '__main__':
