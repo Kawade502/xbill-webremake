@@ -60,16 +60,16 @@
   // PC の台数（8+レベル、最大20）とケーブルの本数（レベル、または台数の半分）は原作の式のまま。
   // 調整するときはここだけ触ればよい（bills・rate・group・speed・spark は増やすと難しく、steal は減らすと難しい）。
   const LEVELS = [
-    { bills:  12, rate: 1.00, group: 3, speed:  38, steal: 1.75, spark: 8 },
-    { bills:  18, rate: 1.06, group: 3, speed:  44, steal: 1.69, spark: 10 },
-    { bills:  25, rate: 1.14, group: 4, speed:  50, steal: 1.61, spark: 11 },
-    { bills:  33, rate: 1.21, group: 4, speed:  57, steal: 1.54, spark: 13 },
-    { bills:  42, rate: 1.28, group: 4, speed:  65, steal: 1.46, spark: 15 },
-    { bills:  51, rate: 1.48, group: 4, speed:  71, steal: 1.38, spark: 16 },
-    { bills:  61, rate: 1.69, group: 4, speed:  78, steal: 1.29, spark: 18 },
-    { bills:  72, rate: 1.97, group: 5, speed:  86, steal: 1.21, spark: 19 },
-    { bills:  84, rate: 2.25, group: 5, speed:  93, steal: 1.12, spark: 21 },
-    { bills:  97, rate: 2.58, group: 6, speed: 100, steal: 1.04, spark: 22 }
+    { bills:  12, rate: 0.77, group: 3, speed:  38, steal: 1.75, spark: 8 },
+    { bills:  16, rate: 0.80, group: 3, speed:  44, steal: 1.69, spark: 10 },
+    { bills:  21, rate: 0.86, group: 3, speed:  50, steal: 1.61, spark: 11 },
+    { bills:  26, rate: 0.99, group: 4, speed:  57, steal: 1.54, spark: 13 },
+    { bills:  32, rate: 1.02, group: 4, speed:  65, steal: 1.46, spark: 15 },
+    { bills:  38, rate: 1.16, group: 4, speed:  71, steal: 1.38, spark: 16 },
+    { bills:  45, rate: 1.26, group: 4, speed:  78, steal: 1.29, spark: 18 },
+    { bills:  52, rate: 1.51, group: 5, speed:  86, steal: 1.21, spark: 19 },
+    { bills:  60, rate: 1.69, group: 5, speed:  93, steal: 1.12, spark: 21 },
+    { bills:  68, rate: 1.86, group: 5, speed: 100, steal: 1.04, spark: 22 }
   ];
 
   /** 出現イベントの平均間隔 (ms)。1 回に平均 (1+group)/2 体出るので、rate から逆算する。 */
