@@ -8,5 +8,5 @@
 import { safeHandle } from './ranking.js';
 
 export default {
-  fetch: (request, env) => safeHandle(request, env)
+  fetch: (request, env, ctx) => safeHandle(request, env, ctx)
 };

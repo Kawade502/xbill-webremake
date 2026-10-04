@@ -117,7 +117,7 @@ export async function readBody(request) {
   }
 }
 
-export async function handleRequest(request, env) {
+export async function handleRequest(request, env, ctx) {
   const url = new URL(request.url);
   const origin = request.headers.get('Origin');
 
@@ -155,16 +155,16 @@ export async function handleRequest(request, env) {
   }
 
   if (request.method === 'POST' && url.pathname === '/sbt-request') {
-    return handleSbtRequest(request, env);
+    return handleSbtRequest(request, env, ctx);
   }
 
   return json({ error: 'Not Found' }, 404, request, env);
 }
 
 /** 想定外の例外は 500 にして、Worker が落ちないようにする。 */
-export async function safeHandle(request, env) {
+export async function safeHandle(request, env, ctx) {
   try {
-    return await handleRequest(request, env);
+    return await handleRequest(request, env, ctx);
   } catch (e) {
     return json({ error: 'サーバーでエラーが起きました' }, 500, request, env);
   }

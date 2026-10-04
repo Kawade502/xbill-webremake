@@ -127,3 +127,66 @@ test('申請の一覧を読む口は無い（GET は 404）。ランキングに
   }
   assert.equal(env.store.has(RANKING_KEY), false);
 });
+
+test('受け付けたら、合言葉付きで運営者に知らせる（アドレスは一部だけ）。設定が無ければ知らせない', async () => {
+  const calls = [];
+  const realFetch = globalThis.fetch;
+  globalThis.fetch = async (url, init) => { calls.push({ url, init }); return new Response('ok', { status: 302 }); };
+  try {
+    const env = makeEnv();
+    assert.equal((await post(env, ok())).status, 201);
+    assert.equal(calls.length, 0);   // NOTIFY_URL が無い
+
+    env.NOTIFY_URL = 'https://script.example/exec';
+    env.NOTIFY_SECRET = 's3cret';
+    assert.equal((await post(env, ok({ address: '0x' + 'ab'.repeat(20) }))).status, 201);
+    assert.equal(calls.length, 1);
+    assert.equal(calls[0].url, 'https://script.example/exec');
+    const sent = JSON.parse(calls[0].init.body);
+    assert.equal(sent.secret, 's3cret');
+    assert.equal(sent.address, '0xabab…abab');
+    assert.equal(sent.name, 'Alice');
+
+    // 重複・不正では知らせない
+    await post(env, ok({ address: '0x' + 'ab'.repeat(20) }));
+    await post(env, ok({ address: 'bad' }));
+    assert.equal(calls.length, 1);
+  } finally {
+    globalThis.fetch = realFetch;
+  }
+});
+
+test('知らせるのに失敗しても、申請は 201 で受け付ける', async () => {
+  const realFetch = globalThis.fetch;
+  globalThis.fetch = async () => { throw new Error('network down'); };
+  try {
+    const env = makeEnv();
+    env.NOTIFY_URL = 'https://script.example/exec';
+    env.NOTIFY_SECRET = 's3cret';
+    assert.equal((await post(env, ok())).status, 201);
+    assert.ok(env.store.get(SBT_REQ_PREFIX + ADDR.toLowerCase()));
+  } finally {
+    globalThis.fetch = realFetch;
+  }
+});
+
+test('ctx.waitUntil があれば、通知は応答のあとに回す', async () => {
+  const realFetch = globalThis.fetch;
+  let resolveFetch;
+  globalThis.fetch = () => new Promise((r) => { resolveFetch = r; });
+  try {
+    const env = makeEnv();
+    env.NOTIFY_URL = 'https://script.example/exec';
+    env.NOTIFY_SECRET = 's3cret';
+    const waited = [];
+    const res = await worker.fetch(new Request('https://api.example/sbt-request', {
+      method: 'POST', headers: { 'Content-Type': 'application/json', Origin: ORIGIN }, body: JSON.stringify(ok())
+    }), env, { waitUntil: (p) => waited.push(p) });
+    assert.equal(res.status, 201);   // 通知の完了を待たずに返る
+    assert.equal(waited.length, 1);
+    resolveFetch(new Response('ok'));
+    assert.equal(await waited[0], true);
+  } finally {
+    globalThis.fetch = realFetch;
+  }
+});

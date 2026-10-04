@@ -9,6 +9,8 @@
  *
  * 申請は KV に `sbt:req:<小文字のアドレス>` で保存する。mint は運営者が後日、手元で行う。
  * 申請の一覧を読む API は作らない（運営者は wrangler kv で読む）。
+ * 受け付けたら、運営者に Gmail で知らせる（NOTIFY_URL の GAS ウェブアプリへ POST。合言葉は NOTIFY_SECRET。
+ * どちらも wrangler secret。設定が無ければ知らせない。知らせるのに失敗しても、申請は成功として返す）。
  * クリアしたかどうかはサーバーで確かめられない（ランキングと同じく自己申告）。最終判断は運営者が行う。
  */
 import { ValidationError, cleanName, toInteger, json, readBody, SCORE_MAX } from './ranking.js';
@@ -45,7 +47,7 @@ export function normalizeSbtRequest(body, now = Date.now()) {
   };
 }
 
-export async function handleSbtRequest(request, env, now = Date.now()) {
+export async function handleSbtRequest(request, env, ctx, now = Date.now()) {
   if (!sbtEnabled(env)) return json({ error: '現在、申請は受け付けていません' }, 503, request, env);
 
   let entry;
@@ -65,5 +67,36 @@ export async function handleSbtRequest(request, env, now = Date.now()) {
 
   await env.RANKING.put(key, JSON.stringify(entry));
   await env.RANKING.put(dayKey, String(count + 1), { expirationTtl: DAY_TTL_SECONDS });
+
+  const notice = notifyOperator(env, entry);
+  if (ctx && typeof ctx.waitUntil === 'function') ctx.waitUntil(notice);   // 応答を待たせない
+  else await notice;
   return json({ ok: true }, 201, request, env);
+}
+
+/** 0x5290…9ee7 の形（メールには全体を載せない） */
+export function maskAddress(address) {
+  return address.slice(0, 6) + '…' + address.slice(-4);
+}
+
+/** 運営者に知らせる。失敗しても例外を投げない。送ったかどうかを返す（テスト用）。 */
+export async function notifyOperator(env, entry) {
+  if (!env.NOTIFY_URL || !env.NOTIFY_SECRET) return false;
+  try {
+    const res = await fetch(env.NOTIFY_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        secret: env.NOTIFY_SECRET,
+        name: entry.name,
+        score: entry.score,
+        requestedAt: entry.requestedAt,
+        address: maskAddress(entry.address)
+      }),
+      redirect: 'manual'   // GAS は処理のあと別のドメインへ転送する。転送先は読まなくてよい
+    });
+    return res.status < 400;
+  } catch (e) {
+    return false;
+  }
 }
