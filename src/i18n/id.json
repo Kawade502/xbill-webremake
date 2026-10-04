@@ -29,7 +29,7 @@
   "rules.3.body": ": Jika hanya satu dari dua PC yang terhubung kabel menjalankan Wingdows, percikan api merambat lewat kabel ke PC satunya. Menyeret ember dari kiri atas ke percikan api hanya membuatnya mulai lagi dari awal. Untuk menghentikannya, seret OS yang jatuh ke PC yang menjalankan Wingdows (api berhenti saat tidak ada ujung yang menjalankan Wingdows). PC yang berubah menjadi Wingdows karena percikan api tidak menjatuhkan OS lamanya, jadi pakai OS yang dijatuhkan Bill lain.",
   "rules.4": "Permainan berakhir saat tersisa 1 PC atau kurang yang menyala. Setiap level selesai, kamu mendapat bonus sesuai lamanya PC tetap menyala.",
   "rules.5.head": "Selesaikan level 10 untuk menang!",
-  "rules.5.body": " Di level yang lebih tinggi, lebih banyak Bill datang bersamaan, lebih cepat, dan mencuri OS lebih cepat. Selesaikan semua level untuk mengunduh sertifikat (gambar) dengan namamu.",
+  "rules.5.body": " Di level yang lebih tinggi, lebih banyak Bill datang bersamaan, lebih cepat, dan mencuri OS lebih cepat. Selesaikan semua level untuk mengunduh sertifikat (gambar) dengan namamu. Jika mau, kamu juga bisa meminta SBT kenang-kenangan (NFT yang tidak dapat dipindahtangankan) (opsional).",
   "credit.line": "XBill 2.1  Copyright (C) Brian Wellington, Matias Duarte (GPL). Aturan dan gambar berasal dari permainan aslinya.",
   "credit.source": "Kode sumber permainan ini (GPL-3.0 atau lebih baru): ",
   "title.start": "🎮 MULAI (START)",

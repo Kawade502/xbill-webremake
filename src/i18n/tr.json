@@ -29,7 +29,7 @@
   "rules.3.body": ": Kabloyla bağlı iki bilgisayardan yalnızca birinde Wingdows varsa, kablo boyunca diğerine bir kıvılcım koşar. Sol üstteki kovayı kıvılcımın üstüne sürüklemek onu yalnızca baştan başlatır. Kalıcı olarak durdurmak için düşmüş bir sistemi Wingdows çalışan bilgisayara sürükle (iki ucunda da Wingdows kalmayınca durur). Kıvılcımla Wingdows olan bilgisayar eski sistemini düşürmez; başka bir Bill’in düşürdüğü sistemi kullan.",
   "rules.4": "Çalışan en fazla 1 bilgisayar kalırsa oyun biter. Her seviye sonunda çalışma süresine göre bonus alırsın.",
   "rules.5.head": "10. seviyeyi bitir, oyunu kazan!",
-  "rules.5.body": " Üst seviyelerde aynı anda daha çok Bill, daha hızlı gelir ve sistemleri daha çabuk çalar. Tüm seviyeleri bitirirsen, adının yazılı olduğu bir sertifikayı (görsel) indirebilirsin.",
+  "rules.5.body": " Üst seviyelerde aynı anda daha çok Bill, daha hızlı gelir ve sistemleri daha çabuk çalar. Tüm seviyeleri bitirirsen, adının yazılı olduğu bir sertifikayı (görsel) indirebilirsin. İstersen hatıra SBT’si (devredilemeyen bir NFT) de isteyebilirsin (isteğe bağlı).",
   "credit.line": "XBill 2.1  Copyright (C) Brian Wellington, Matias Duarte (GPL). Kurallar ve görseller orijinal oyundandır.",
   "credit.source": "Bu oyunun kaynak kodu (GPL-3.0 veya sonrası): ",
   "title.start": "🎮 BAŞLA (START)",
