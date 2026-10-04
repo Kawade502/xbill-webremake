@@ -75,7 +75,7 @@
   "story.p2": "Jako administrator systemu i tępiciel masz za zadanie nie pozwolić Billowi osiągnąć celu.",
   "sbt.summary": "🎖 Poproś o pamiątkowy SBT (opcjonalnie)",
   "sbt.note1": "SBT to pamiątkowy NFT, którego nie można przekazać innym. Nie ma wartości pieniężnej.",
-  "sbt.note2": "Po wydaniu twój adres, data ukończenia i numer seryjny zostaną publicznie zapisane w blockchainie (Polygon) i nie będzie można ich usunąć.",
+  "sbt.note2": "Po wydaniu twój adres, data ukończenia i numer seryjny zostaną publicznie zapisane w blockchainie (Polygon). Możesz sam usunąć SBT, ale zapis o jego wydaniu pozostanie w łańcuchu.",
   "sbt.note3": "Wydanie nastąpi później, według uznania operatora, i nie jest gwarantowane.",
   "sbt.note4": "Wpisz adres własnego portfela działającego w sieci Polygon (adresy depozytowe giełd nie zadziałają).",
   "sbt.placeholder": "Adres zaczynający się od 0x",

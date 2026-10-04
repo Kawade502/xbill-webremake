@@ -75,7 +75,7 @@
   "story.p2": "En tant qu'administrateur système et exterminateur, votre mission est d'empêcher Bill de parvenir à ses fins.",
   "sbt.summary": "🎖 Demander un SBT commémoratif (facultatif)",
   "sbt.note1": "Un SBT est un NFT commémoratif non transférable. Il n'a aucune valeur monétaire.",
-  "sbt.note2": "S'il est émis, votre adresse, la date de réussite et le numéro de série seront publics sur la blockchain (Polygon) et ne pourront pas être supprimés.",
+  "sbt.note2": "S’il est émis, votre adresse, la date de réussite et le numéro de série seront publics sur la blockchain (Polygon). Vous pourrez supprimer le SBT vous-même, mais la trace de son émission restera sur la chaîne.",
   "sbt.note3": "L'émission est faite plus tard, à la discrétion de l'opérateur, et n'est pas garantie.",
   "sbt.note4": "Saisissez l'adresse de votre propre portefeuille compatible Polygon (les adresses de dépôt des plateformes d'échange ne fonctionnent pas).",
   "sbt.placeholder": "Adresse commençant par 0x",

@@ -75,7 +75,7 @@
   "story.p2": "Als systeembeheerder en ongediertebestrijder is het jouw taak te voorkomen dat Bill zijn doel bereikt.",
   "sbt.summary": "🎖 Een herinnerings-SBT aanvragen (optioneel)",
   "sbt.note1": "Een SBT is een niet-overdraagbare herinnerings-NFT. Het heeft geen geldwaarde.",
-  "sbt.note2": "Als het wordt uitgegeven, worden je adres, de datum waarop je het spel uitspeelde en het serienummer openbaar op de blockchain (Polygon) en kunnen ze niet worden verwijderd.",
+  "sbt.note2": "Als het wordt uitgegeven, worden je adres, de datum waarop je het spel uitspeelde en het serienummer openbaar op de blockchain (Polygon). Je kunt de SBT zelf verwijderen, maar het bewijs van uitgifte blijft op de chain staan.",
   "sbt.note3": "Uitgifte gebeurt later naar oordeel van de beheerder en is niet gegarandeerd.",
   "sbt.note4": "Vul het adres in van je eigen wallet die op Polygon werkt (stortingsadressen van exchanges werken niet).",
   "sbt.placeholder": "Adres dat begint met 0x",

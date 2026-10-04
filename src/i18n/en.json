@@ -75,7 +75,7 @@
   "story.p2": "As System Administrator/Exterminator, your job is to keep Bill from succeeding at his task.",
   "sbt.summary": "🎖 Request a commemorative SBT (optional)",
   "sbt.note1": "An SBT is a non-transferable commemorative NFT. It has no monetary value.",
-  "sbt.note2": "If issued, your address, clear date and serial number will be public on the blockchain (Polygon) and cannot be removed.",
+  "sbt.note2": "If issued, your address, clear date and serial number will be public on the blockchain (Polygon). You can delete the SBT yourself later, but the record of its issuance stays on the chain.",
   "sbt.note3": "Issuance is done later at the operator's discretion and is not guaranteed.",
   "sbt.note4": "Enter the address of your own wallet that works on Polygon (exchange deposit addresses cannot be used).",
   "sbt.placeholder": "Address starting with 0x",

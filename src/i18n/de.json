@@ -75,7 +75,7 @@
   "story.p2": "Als Systemadministrator und Kammerjäger ist es deine Aufgabe, Bill daran zu hindern, sein Ziel zu erreichen.",
   "sbt.summary": "🎖 Erinnerungs-SBT anfordern (optional)",
   "sbt.note1": "Ein SBT ist ein nicht übertragbares Erinnerungs-NFT. Es hat keinen Geldwert.",
-  "sbt.note2": "Bei Ausgabe werden deine Adresse, das Abschlussdatum und die Seriennummer öffentlich auf der Blockchain (Polygon) gespeichert und können nicht gelöscht werden.",
+  "sbt.note2": "Bei Ausgabe werden deine Adresse, das Abschlussdatum und die Seriennummer öffentlich auf der Blockchain (Polygon) gespeichert. Du kannst das SBT selbst löschen, der Eintrag über die Ausgabe bleibt aber auf der Chain.",
   "sbt.note3": "Die Ausgabe erfolgt später nach Ermessen des Betreibers und ist nicht garantiert.",
   "sbt.note4": "Gib die Adresse deiner eigenen Wallet ein, die auf Polygon funktioniert (Einzahlungsadressen von Börsen sind nicht möglich).",
   "sbt.placeholder": "Adresse, die mit 0x beginnt",

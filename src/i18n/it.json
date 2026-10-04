@@ -75,7 +75,7 @@
   "story.p2": "Come amministratore di sistema e disinfestatore, il tuo compito è impedire a Bill di riuscire nel suo intento.",
   "sbt.summary": "🎖 Richiedi un SBT commemorativo (facoltativo)",
   "sbt.note1": "Un SBT è un NFT commemorativo non trasferibile. Non ha alcun valore economico.",
-  "sbt.note2": "Se emesso, il tuo indirizzo, la data di completamento e il numero di serie saranno pubblici sulla blockchain (Polygon) e non potranno essere rimossi.",
+  "sbt.note2": "Se emesso, il tuo indirizzo, la data di completamento e il numero di serie saranno pubblici sulla blockchain (Polygon). Puoi eliminare l’SBT da solo, ma la traccia dell’emissione resta sulla catena.",
   "sbt.note3": "L'emissione avviene più avanti, a discrezione del gestore, e non è garantita.",
   "sbt.note4": "Inserisci l'indirizzo del tuo portafoglio compatibile con Polygon (gli indirizzi di deposito degli exchange non funzionano).",
   "sbt.placeholder": "Indirizzo che inizia con 0x",

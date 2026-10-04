@@ -75,7 +75,7 @@
   "story.p2": "Sistem yöneticisi/haşere yok edici olarak senin görevin, Bill'in amacına ulaşmasını engellemek.",
   "sbt.summary": "🎖 Hatıra SBT'si iste (isteğe bağlı)",
   "sbt.note1": "SBT, devredilemeyen bir hatıra NFT'sidir. Parasal bir değeri yoktur.",
-  "sbt.note2": "Verilirse adresin, oyunu bitirdiğin tarih ve seri numarası blokzincirde (Polygon) herkese açık olur ve silinemez.",
+  "sbt.note2": "Verilirse adresin, oyunu bitirdiğin tarih ve seri numarası blokzincirde (Polygon) herkese açık olur. SBT’yi kendin silebilirsin, ancak verildiğine dair kayıt zincirde kalır.",
   "sbt.note3": "Verilmesi daha sonra işletmecinin takdirine bağlıdır; garanti edilmez.",
   "sbt.note4": "Polygon'da kullanılabilen kendi cüzdanının adresini gir (borsaların yatırma adresleri kullanılamaz).",
   "sbt.placeholder": "0x ile başlayan adres",
