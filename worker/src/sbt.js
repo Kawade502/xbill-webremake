@@ -18,6 +18,8 @@ import { ValidationError, cleanName, toInteger, json, readBody, SCORE_MAX } from
 export const SBT_REQ_PREFIX = 'sbt:req:';
 export const SBT_DAY_PREFIX = 'sbt:day:';
 export const SBT_DAILY_LIMIT = 20;
+export const SBT_IP_PREFIX = 'sbt:ip:';
+export const SBT_DAILY_LIMIT_PER_IP = 3;   // 1人（同じ IP）が1日の受付枠を使い切れないように
 const DAY_TTL_SECONDS = 2 * 24 * 60 * 60;
 const ADDRESS_RE = /^0x[0-9a-fA-F]{40}$/;
 
@@ -61,17 +63,33 @@ export async function handleSbtRequest(request, env, ctx, now = Date.now()) {
   const key = SBT_REQ_PREFIX + entry.address;
   if (await env.RANKING.get(key)) return json({ error: 'このアドレスは申請済みです', status: 'duplicate' }, 409, request, env);
 
-  const dayKey = SBT_DAY_PREFIX + entry.requestedAt.slice(0, 10);
+  const day = entry.requestedAt.slice(0, 10);
+  const dayKey = SBT_DAY_PREFIX + day;
   const count = toInteger(await env.RANKING.get(dayKey)) || 0;
   if (count >= SBT_DAILY_LIMIT) return json({ error: '本日の受付数の上限に達しました。明日もう一度お試しください', status: 'limit' }, 429, request, env);
 
+  // 同じ IP からの申請は1日3件まで（IP はそのまま保存せず、ハッシュにする）。Cloudflare 以外から呼ばれて IP が無いときは数えない
+  const ip = request.headers.get('CF-Connecting-IP');
+  let ipKey = null, ipCount = 0;
+  if (ip) {
+    ipKey = SBT_IP_PREFIX + day + ':' + await sha256Hex(`${env.NOTIFY_SECRET || ''}|${day}|${ip}`);
+    ipCount = toInteger(await env.RANKING.get(ipKey)) || 0;
+    if (ipCount >= SBT_DAILY_LIMIT_PER_IP) return json({ error: '本日の受付数の上限に達しました。明日もう一度お試しください', status: 'limit' }, 429, request, env);
+  }
+
   await env.RANKING.put(key, JSON.stringify(entry));
   await env.RANKING.put(dayKey, String(count + 1), { expirationTtl: DAY_TTL_SECONDS });
+  if (ipKey) await env.RANKING.put(ipKey, String(ipCount + 1), { expirationTtl: DAY_TTL_SECONDS });
 
   const notice = notifyOperator(env, entry);
   if (ctx && typeof ctx.waitUntil === 'function') ctx.waitUntil(notice);   // 応答を待たせない
   else await notice;
   return json({ ok: true }, 201, request, env);
+}
+
+async function sha256Hex(text) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
+  return [...new Uint8Array(buf)].map((b) => b.toString(16).padStart(2, '0')).join('');
 }
 
 /** 0x5290…9ee7 の形（メールには全体を載せない） */

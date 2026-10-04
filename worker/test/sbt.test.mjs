@@ -3,7 +3,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import worker from '../src/index.js';
-import { normalizeSbtRequest, SBT_REQ_PREFIX, SBT_DAY_PREFIX, SBT_DAILY_LIMIT } from '../src/sbt.js';
+import { normalizeSbtRequest, SBT_REQ_PREFIX, SBT_DAY_PREFIX, SBT_IP_PREFIX, SBT_DAILY_LIMIT, SBT_DAILY_LIMIT_PER_IP } from '../src/sbt.js';
 import { RANKING_KEY } from '../src/ranking.js';
 
 const ORIGIN = 'https://kawade502.github.io';
@@ -189,4 +189,20 @@ test('ctx.waitUntil があれば、通知は応答のあとに回す', async () 
   } finally {
     globalThis.fetch = realFetch;
   }
+});
+
+test('同じ IP からは1日3件まで。別の IP は受け付ける。IP はハッシュで保存する', async () => {
+  const env = makeEnv();
+  const postFrom = (ip, address) => worker.fetch(new Request('https://api.example/sbt-request', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Origin: ORIGIN, 'CF-Connecting-IP': ip },
+    body: JSON.stringify(ok({ address }))
+  }), env);
+  const addr = (i) => '0x' + (i + 100).toString(16).padStart(40, '0');
+  for (let i = 0; i < SBT_DAILY_LIMIT_PER_IP; i++) assert.equal((await postFrom('203.0.113.7', addr(i))).status, 201);
+  assert.equal((await postFrom('203.0.113.7', addr(50))).status, 429);
+  assert.equal((await postFrom('198.51.100.9', addr(51))).status, 201);
+  const ipKeys = [...env.store.keys()].filter((k) => k.startsWith(SBT_IP_PREFIX) && !k.endsWith('#opts'));
+  assert.equal(ipKeys.length, 2);
+  assert.ok(ipKeys.every((k) => !k.includes('203.0.113.7') && /:[0-9a-f]{64}$/.test(k)));
 });
