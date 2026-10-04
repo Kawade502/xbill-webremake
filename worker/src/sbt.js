@@ -17,7 +17,7 @@ import { ValidationError, cleanName, toInteger, json, readBody, SCORE_MAX } from
 
 export const SBT_REQ_PREFIX = 'sbt:req:';
 export const SBT_DAY_PREFIX = 'sbt:day:';
-export const SBT_DAILY_LIMIT = 20;
+export const SBT_DAILY_LIMIT = 50;
 export const SBT_IP_PREFIX = 'sbt:ip:';
 export const SBT_DAILY_LIMIT_PER_IP = 3;   // 1人（同じ IP）が1日の受付枠を使い切れないように
 const DAY_TTL_SECONDS = 2 * 24 * 60 * 60;
