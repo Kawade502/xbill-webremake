@@ -72,5 +72,19 @@
   "cert.anonymous": "Pemain",
   "story.button": "📖 Cerita",
   "story.p1": "Sekali lagi, nasib dunia ada di tanganmu! Seorang peretas komputer jahat yang hanya dikenal dengan nama «Bill» telah menciptakan virus komputer pamungkas. Virus yang begitu kuat sampai bisa mengubah komputer biasa menjadi oven pemanggang roti. (ooh!) «Bill» telah mengklon dirinya menjadi miliaran micro-Bill. Satu-satunya tujuan mereka adalah menyebarkan virus jahat itu, yang disamarkan dengan cerdik sebagai sistem operasi populer.",
-  "story.p2": "Sebagai administrator sistem sekaligus pembasmi, tugasmu adalah mencegah Bill berhasil menjalankan rencananya."
+  "story.p2": "Sebagai administrator sistem sekaligus pembasmi, tugasmu adalah mencegah Bill berhasil menjalankan rencananya.",
+  "sbt.summary": "🎖 Minta SBT kenang-kenangan (opsional)",
+  "sbt.note1": "SBT adalah NFT kenang-kenangan yang tidak dapat dipindahtangankan. Tidak memiliki nilai uang.",
+  "sbt.note2": "Jika diterbitkan, alamatmu, tanggal tamat, dan nomor seri akan tercatat publik di blockchain (Polygon) dan tidak dapat dihapus.",
+  "sbt.note3": "Penerbitan dilakukan nanti atas kebijakan pengelola dan tidak dijamin.",
+  "sbt.note4": "Masukkan alamat dompetmu sendiri yang bisa dipakai di Polygon (alamat deposit bursa tidak bisa digunakan).",
+  "sbt.placeholder": "Alamat yang diawali 0x",
+  "sbt.consent": "Saya menyetujui catatan di atas",
+  "sbt.submit": "Kirim permintaan",
+  "sbt.done": "Diterima. Pengelola akan menerbitkannya nanti.",
+  "sbt.invalid": "Format alamat tidak valid (42 karakter diawali 0x).",
+  "sbt.duplicate": "Alamat ini sudah pernah diajukan.",
+  "sbt.limit": "Batas permintaan hari ini sudah tercapai. Coba lagi besok.",
+  "sbt.error": "Gagal mengirim. Periksa koneksimu lalu coba lagi.",
+  "sbt.closed": "Saat ini permintaan tidak diterima."
 }

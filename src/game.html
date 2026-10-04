@@ -1264,6 +1264,73 @@
     }, 'image/png');
   }
 
+  // ============================================================
+  // 全クリア記念 SBT の申請（ビルドの sbtRequests が true で、ランキング API があるときだけ）
+  // ============================================================
+  function sbtRequestsEnabled() {
+    return !!(window.XBILL_CONFIG && window.XBILL_CONFIG.sbtRequests === true) && rankingTransport() === 'api';
+  }
+
+  /** 申請欄。getName() は送信時の名前（結果画面の入力欄）を返す。 */
+  function sbtRequestBox(getName, finalScore) {
+    const ADDRESS_RE = /^0x[0-9a-fA-F]{40}$/;
+    const input = el('input', {
+      class: 'name-input sbt-address',
+      type: 'text',
+      placeholder: t('sbt.placeholder'),
+      autocomplete: 'off',
+      autocapitalize: 'off',
+      spellcheck: 'false',
+      maxlength: 42,
+      'aria-label': t('sbt.placeholder')
+    });
+    const consent = el('input', { type: 'checkbox', id: 'sbtConsent' });
+    const submitBtn = el('button', { type: 'button', class: 'motif-btn', disabled: '' }, t('sbt.submit'));
+    const msg = el('p', { class: 'dialog-msg' });
+    const form = el('div', { class: 'sbt-form' },
+      el('ul', { class: 'sbt-notes' },
+        el('li', {}, t('sbt.note1')), el('li', {}, t('sbt.note2')),
+        el('li', {}, t('sbt.note3')), el('li', {}, t('sbt.note4'))),
+      el('div', { class: 'name-row' }, input),
+      el('label', { class: 'sbt-consent', for: 'sbtConsent' }, consent, ' ', t('sbt.consent')),
+      el('div', { class: 'name-row' }, submitBtn),
+      msg);
+    const box = el('details', { class: 'sbt-box' }, el('summary', {}, t('sbt.summary')), form);
+
+    const setMsg = (text, isError) => {
+      msg.textContent = text;
+      msg.classList.toggle('error', !!isError);
+    };
+    const refresh = () => {
+      submitBtn.disabled = !(consent.checked && ADDRESS_RE.test(input.value.trim()));
+    };
+    input.addEventListener('input', () => {
+      refresh();
+      const v = input.value.trim();
+      setMsg(v.length >= 42 && !ADDRESS_RE.test(v) ? t('sbt.invalid') : '', true);
+    });
+    consent.addEventListener('change', refresh);
+
+    submitBtn.addEventListener('click', async () => {
+      const address = input.value.trim();
+      if (!ADDRESS_RE.test(address) || !consent.checked) return;
+      input.disabled = consent.disabled = submitBtn.disabled = true;
+      setMsg(t('name.sending'));
+      try {
+        await callApi('POST', '/sbt-request', { address, name: getName(), score: finalScore, consent: true });
+        form.querySelectorAll('.name-row, .sbt-consent').forEach((n) => { n.hidden = true; });
+        setMsg(t('sbt.done'));
+      } catch (err) {
+        const key = { 400: 'sbt.invalid', 409: 'sbt.duplicate', 429: 'sbt.limit', 503: 'sbt.closed' }[err.status] || 'sbt.error';
+        const retry = key === 'sbt.invalid' || key === 'sbt.error';
+        input.disabled = consent.disabled = !retry;
+        if (retry) refresh();
+        setMsg(t(key), true);
+      }
+    });
+    return box;
+  }
+
   /** ゲームオーバー・全クリア共通の結果画面（スコア登録とランキング）。 */
   function showResultDialog({ cleared, finalScore, finalLevel, lines }) {
     const rankingBox = el('div', { class: 'ranking-box' });
@@ -1340,6 +1407,9 @@
     }
     if (finalScore > 0) body.push(nameRow);
     body.push(msg, rankingBox);
+    if (cleared && sbtRequestsEnabled()) {
+      body.push(sbtRequestBox(() => input.value.trim() || storage.get('xbill_name', ''), finalScore));
+    }
 
     showDialog({
       title: cleared ? 'ALL CLEAR!' : 'SYSTEM OVERRUN!',
@@ -1385,7 +1455,11 @@
         signal: controller ? controller.signal : undefined
       });
       const data = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
+      if (!res.ok) {
+        const err = new Error(data.error || `HTTP ${res.status}`);
+        err.status = res.status;
+        throw err;
+      }
       return data;
     } finally {
       clearTimeout(timer);

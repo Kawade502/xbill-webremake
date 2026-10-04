@@ -72,5 +72,19 @@
   "cert.anonymous": "Spieler",
   "story.button": "📖 Die Geschichte",
   "story.p1": "Wieder einmal liegt das Schicksal der Welt in deinen Händen! Ein böser Computer-Hacker, nur unter dem Namen „Bill“ bekannt, hat den ultimativen Computervirus erschaffen. Einen Virus, der so mächtig ist, dass er einen gewöhnlichen Computer in einen Toaster verwandeln kann. (oooh!) „Bill“ hat sich zu Milliarden und Abermilliarden Mikro-Bills geklont. Ihr einziger Zweck ist es, den üblen Virus zu verbreiten, der geschickt als beliebtes Betriebssystem getarnt wurde.",
-  "story.p2": "Als Systemadministrator und Kammerjäger ist es deine Aufgabe, Bill daran zu hindern, sein Ziel zu erreichen."
+  "story.p2": "Als Systemadministrator und Kammerjäger ist es deine Aufgabe, Bill daran zu hindern, sein Ziel zu erreichen.",
+  "sbt.summary": "🎖 Erinnerungs-SBT anfordern (optional)",
+  "sbt.note1": "Ein SBT ist ein nicht übertragbares Erinnerungs-NFT. Es hat keinen Geldwert.",
+  "sbt.note2": "Bei Ausgabe werden deine Adresse, das Abschlussdatum und die Seriennummer öffentlich auf der Blockchain (Polygon) gespeichert und können nicht gelöscht werden.",
+  "sbt.note3": "Die Ausgabe erfolgt später nach Ermessen des Betreibers und ist nicht garantiert.",
+  "sbt.note4": "Gib die Adresse deiner eigenen Wallet ein, die auf Polygon funktioniert (Einzahlungsadressen von Börsen sind nicht möglich).",
+  "sbt.placeholder": "Adresse, die mit 0x beginnt",
+  "sbt.consent": "Ich stimme den obigen Hinweisen zu",
+  "sbt.submit": "Anfordern",
+  "sbt.done": "Eingegangen. Der Betreiber stellt es später aus.",
+  "sbt.invalid": "Ungültiges Adressformat (42 Zeichen, beginnend mit 0x).",
+  "sbt.duplicate": "Für diese Adresse liegt bereits eine Anfrage vor.",
+  "sbt.limit": "Das heutige Anfragelimit ist erreicht. Bitte versuche es morgen erneut.",
+  "sbt.error": "Senden fehlgeschlagen. Prüfe deine Verbindung und versuche es erneut.",
+  "sbt.closed": "Derzeit werden keine Anfragen angenommen."
 }

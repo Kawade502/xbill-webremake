@@ -72,5 +72,19 @@
   "cert.anonymous": "Gracz",
   "story.button": "📖 Fabuła",
   "story.p1": "Po raz kolejny los świata spoczywa w twoich rękach! Zły haker komputerowy, znany tylko pod pseudonimem „Bill”, stworzył ostateczny wirus komputerowy. Wirus tak potężny, że potrafi zamienić zwykły komputer w toster. (ooo!) „Bill” sklonował siebie w miliardy mikro-Billów. Ich jedynym celem jest dostarczenie podstępnego wirusa, sprytnie zamaskowanego jako popularny system operacyjny.",
-  "story.p2": "Jako administrator systemu i tępiciel masz za zadanie nie pozwolić Billowi osiągnąć celu."
+  "story.p2": "Jako administrator systemu i tępiciel masz za zadanie nie pozwolić Billowi osiągnąć celu.",
+  "sbt.summary": "🎖 Poproś o pamiątkowy SBT (opcjonalnie)",
+  "sbt.note1": "SBT to pamiątkowy NFT, którego nie można przekazać innym. Nie ma wartości pieniężnej.",
+  "sbt.note2": "Po wydaniu twój adres, data ukończenia i numer seryjny zostaną publicznie zapisane w blockchainie (Polygon) i nie będzie można ich usunąć.",
+  "sbt.note3": "Wydanie nastąpi później, według uznania operatora, i nie jest gwarantowane.",
+  "sbt.note4": "Wpisz adres własnego portfela działającego w sieci Polygon (adresy depozytowe giełd nie zadziałają).",
+  "sbt.placeholder": "Adres zaczynający się od 0x",
+  "sbt.consent": "Akceptuję powyższe uwagi",
+  "sbt.submit": "Wyślij prośbę",
+  "sbt.done": "Przyjęto. Operator wyda SBT później.",
+  "sbt.invalid": "Nieprawidłowy format adresu (42 znaki zaczynające się od 0x).",
+  "sbt.duplicate": "Dla tego adresu prośba została już wysłana.",
+  "sbt.limit": "Osiągnięto dzisiejszy limit próśb. Spróbuj jutro.",
+  "sbt.error": "Nie udało się wysłać. Sprawdź połączenie i spróbuj ponownie.",
+  "sbt.closed": "Obecnie prośby nie są przyjmowane."
 }

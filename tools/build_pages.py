@@ -7,6 +7,7 @@
 使い方:  python3 tools/build_pages.py [--out 出力先] [--api ランキングAPIのURL]
   --out  出力先（既定は docs/）。手元での確認用に、別の場所へ出せる
   --api  pages.config.json の rankingApi を、この値で上書きする（手元の wrangler dev を指すときなど）
+  --sbt  全クリア記念 SBT の申請欄を有効にする（pages.config.json の sbtRequests を true で上書き。手元の確認用）
 pages.config.json の analyticsToken があれば、Cloudflare Web Analytics の計測スクリプトを入れる。
 手元の確認用（--out を付けたとき）には入れない（自分の確認でアクセス数が増えないように）。
 入力  :  src/index.html と、その <!-- @include 名前 --> で読み込む部品（src/*.html）、pages.config.json
@@ -84,7 +85,7 @@ def head_extras(config):
         '<meta name="twitter:description" content="%s">' % e(DESCRIPTION, quote=True),
         '<meta name="twitter:image" content="%sogp.png">' % e(site),
         # ランキング API の URL。空なら、この端末だけのランキングになる
-        '<script>window.XBILL_CONFIG = %s;</script>' % json.dumps({'rankingApi': config.get('rankingApi', '')}, ensure_ascii=False),
+        '<script>window.XBILL_CONFIG = %s;</script>' % json.dumps({'rankingApi': config.get('rankingApi', ''), 'sbtRequests': config.get('sbtRequests') is True}, ensure_ascii=False),
     ]
     return '\n  '.join(tags)
 
@@ -121,14 +122,17 @@ def check_scripts(page):
 
 
 def parse_args(argv):
-    opts = {'out': DOCS, 'api': None}
+    opts = {'out': DOCS, 'api': None, 'sbt': False}
     i = 0
     while i < len(argv):
-        if argv[i] in ('--out', '--api') and i + 1 < len(argv):
+        if argv[i] == '--sbt':
+            opts['sbt'] = True
+            i += 1
+        elif argv[i] in ('--out', '--api') and i + 1 < len(argv):
             opts[argv[i][2:]] = argv[i + 1]
             i += 2
         else:
-            raise SystemExit('使い方: build_pages.py [--out 出力先] [--api ランキングAPIのURL]')
+            raise SystemExit('使い方: build_pages.py [--out 出力先] [--api ランキングAPIのURL] [--sbt]')
     return opts
 
 
@@ -138,6 +142,8 @@ def main():
     config = json.loads(read(os.path.join(ROOT, 'pages.config.json')))
     if opts['api'] is not None:
         config['rankingApi'] = opts['api']
+    if opts['sbt']:
+        config['sbtRequests'] = True
     page = expand_includes(read(os.path.join(SRC, 'index.html')))
 
     if '@include' in page:

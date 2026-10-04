@@ -72,5 +72,19 @@
   "cert.anonymous": "Jugador",
   "story.button": "📖 Historia",
   "story.p1": "¡Una vez más, el destino del mundo está en tus manos! Un malvado hacker informático, conocido solo por su alias «Bill», ha creado el virus informático definitivo. Un virus tan potente que puede transformar un ordenador normal en un horno tostador. (¡oooh!) «Bill» se ha clonado en miles de millones de micro-Bills. Su único propósito es propagar el perverso virus, hábilmente disfrazado de un sistema operativo popular.",
-  "story.p2": "Como administrador de sistemas y exterminador, tu misión es impedir que Bill logre su objetivo."
+  "story.p2": "Como administrador de sistemas y exterminador, tu misión es impedir que Bill logre su objetivo.",
+  "sbt.summary": "🎖 Solicitar un SBT conmemorativo (opcional)",
+  "sbt.note1": "Un SBT es un NFT conmemorativo intransferible. No tiene valor monetario.",
+  "sbt.note2": "Si se emite, tu dirección, la fecha en que lo superaste y el número de serie serán públicos en la blockchain (Polygon) y no se podrán borrar.",
+  "sbt.note3": "La emisión la hace el operador más adelante, a su criterio, y no está garantizada.",
+  "sbt.note4": "Introduce la dirección de tu propia cartera compatible con Polygon (no sirven las direcciones de depósito de exchanges).",
+  "sbt.placeholder": "Dirección que empieza por 0x",
+  "sbt.consent": "Acepto las notas anteriores",
+  "sbt.submit": "Solicitar",
+  "sbt.done": "Recibido. El operador lo emitirá más adelante.",
+  "sbt.invalid": "Formato de dirección no válido (42 caracteres que empiezan por 0x).",
+  "sbt.duplicate": "Esta dirección ya se ha solicitado.",
+  "sbt.limit": "Se ha alcanzado el límite de solicitudes de hoy. Inténtalo mañana.",
+  "sbt.error": "No se pudo enviar. Comprueba tu conexión e inténtalo de nuevo.",
+  "sbt.closed": "Ahora mismo no se aceptan solicitudes."
 }

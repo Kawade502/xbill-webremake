@@ -72,5 +72,19 @@
   "cert.anonymous": "Speler",
   "story.button": "📖 Het verhaal",
   "story.p1": "Opnieuw ligt het lot van de wereld in jouw handen! Een kwaadaardige computerhacker, alleen bekend onder de naam „Bill”, heeft het ultieme computervirus gemaakt. Een virus zo krachtig dat het een gewone computer in een broodrooster kan veranderen. (oooh!) „Bill” heeft zichzelf gekloond tot miljarden micro-Bills. Hun enige doel is het snode virus te verspreiden, slim vermomd als een populair besturingssysteem.",
-  "story.p2": "Als systeembeheerder en ongediertebestrijder is het jouw taak te voorkomen dat Bill zijn doel bereikt."
+  "story.p2": "Als systeembeheerder en ongediertebestrijder is het jouw taak te voorkomen dat Bill zijn doel bereikt.",
+  "sbt.summary": "🎖 Een herinnerings-SBT aanvragen (optioneel)",
+  "sbt.note1": "Een SBT is een niet-overdraagbare herinnerings-NFT. Het heeft geen geldwaarde.",
+  "sbt.note2": "Als het wordt uitgegeven, worden je adres, de datum waarop je het spel uitspeelde en het serienummer openbaar op de blockchain (Polygon) en kunnen ze niet worden verwijderd.",
+  "sbt.note3": "Uitgifte gebeurt later naar oordeel van de beheerder en is niet gegarandeerd.",
+  "sbt.note4": "Vul het adres in van je eigen wallet die op Polygon werkt (stortingsadressen van exchanges werken niet).",
+  "sbt.placeholder": "Adres dat begint met 0x",
+  "sbt.consent": "Ik ga akkoord met de opmerkingen hierboven",
+  "sbt.submit": "Aanvragen",
+  "sbt.done": "Ontvangen. De beheerder geeft het later uit.",
+  "sbt.invalid": "Ongeldig adresformaat (42 tekens, beginnend met 0x).",
+  "sbt.duplicate": "Voor dit adres is al een aanvraag gedaan.",
+  "sbt.limit": "Het maximale aantal aanvragen voor vandaag is bereikt. Probeer het morgen opnieuw.",
+  "sbt.error": "Versturen mislukt. Controleer je verbinding en probeer opnieuw.",
+  "sbt.closed": "Er worden op dit moment geen aanvragen aangenomen."
 }

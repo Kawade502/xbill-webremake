@@ -72,5 +72,19 @@
   "cert.anonymous": "Joueur",
   "story.button": "📖 Histoire",
   "story.p1": "Une fois de plus, le sort du monde est entre vos mains ! Un affreux pirate informatique, connu seulement sous le pseudonyme de « Bill », a créé le virus informatique ultime. Un virus si puissant qu'il peut transformer un ordinateur ordinaire en grille-pain. (oooh !) « Bill » s'est cloné en des milliards de micro-Bills. Leur unique but : diffuser ce virus infâme, astucieusement déguisé en système d'exploitation populaire.",
-  "story.p2": "En tant qu'administrateur système et exterminateur, votre mission est d'empêcher Bill de parvenir à ses fins."
+  "story.p2": "En tant qu'administrateur système et exterminateur, votre mission est d'empêcher Bill de parvenir à ses fins.",
+  "sbt.summary": "🎖 Demander un SBT commémoratif (facultatif)",
+  "sbt.note1": "Un SBT est un NFT commémoratif non transférable. Il n'a aucune valeur monétaire.",
+  "sbt.note2": "S'il est émis, votre adresse, la date de réussite et le numéro de série seront publics sur la blockchain (Polygon) et ne pourront pas être supprimés.",
+  "sbt.note3": "L'émission est faite plus tard, à la discrétion de l'opérateur, et n'est pas garantie.",
+  "sbt.note4": "Saisissez l'adresse de votre propre portefeuille compatible Polygon (les adresses de dépôt des plateformes d'échange ne fonctionnent pas).",
+  "sbt.placeholder": "Adresse commençant par 0x",
+  "sbt.consent": "J'accepte les remarques ci-dessus",
+  "sbt.submit": "Demander",
+  "sbt.done": "Demande reçue. L'opérateur l'émettra plus tard.",
+  "sbt.invalid": "Format d'adresse invalide (42 caractères commençant par 0x).",
+  "sbt.duplicate": "Cette adresse a déjà fait une demande.",
+  "sbt.limit": "La limite de demandes du jour est atteinte. Réessayez demain.",
+  "sbt.error": "Envoi impossible. Vérifiez votre connexion et réessayez.",
+  "sbt.closed": "Les demandes ne sont pas acceptées pour le moment."
 }
