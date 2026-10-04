@@ -86,5 +86,6 @@
   "sbt.duplicate": "Cette adresse a déjà fait une demande.",
   "sbt.limit": "La limite de demandes du jour est atteinte. Réessayez demain.",
   "sbt.error": "Envoi impossible. Vérifiez votre connexion et réessayez.",
-  "sbt.closed": "Les demandes ne sont pas acceptées pour le moment."
+  "sbt.closed": "Les demandes ne sont pas acceptées pour le moment.",
+  "sbt.checksum": "L’adresse semble contenir une faute de frappe (les majuscules et minuscules ne correspondent pas). Copiez-la à nouveau depuis votre portefeuille."
 }

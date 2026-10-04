@@ -86,5 +86,6 @@
   "sbt.duplicate": "Dla tego adresu prośba została już wysłana.",
   "sbt.limit": "Osiągnięto dzisiejszy limit próśb. Spróbuj jutro.",
   "sbt.error": "Nie udało się wysłać. Sprawdź połączenie i spróbuj ponownie.",
-  "sbt.closed": "Obecnie prośby nie są przyjmowane."
+  "sbt.closed": "Obecnie prośby nie są przyjmowane.",
+  "sbt.checksum": "Wygląda na to, że w adresie jest literówka (układ wielkich i małych liter się nie zgadza). Skopiuj go ponownie z portfela."
 }

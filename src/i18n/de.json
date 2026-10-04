@@ -86,5 +86,6 @@
   "sbt.duplicate": "Für diese Adresse liegt bereits eine Anfrage vor.",
   "sbt.limit": "Das heutige Anfragelimit ist erreicht. Bitte versuche es morgen erneut.",
   "sbt.error": "Senden fehlgeschlagen. Prüfe deine Verbindung und versuche es erneut.",
-  "sbt.closed": "Derzeit werden keine Anfragen angenommen."
+  "sbt.closed": "Derzeit werden keine Anfragen angenommen.",
+  "sbt.checksum": "Die Adresse scheint einen Tippfehler zu enthalten (Groß-/Kleinschreibung passt nicht). Bitte kopiere sie erneut aus deiner Wallet."
 }

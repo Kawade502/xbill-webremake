@@ -86,5 +86,6 @@
   "sbt.duplicate": "Questo indirizzo ha già fatto richiesta.",
   "sbt.limit": "È stato raggiunto il limite di richieste di oggi. Riprova domani.",
   "sbt.error": "Invio non riuscito. Controlla la connessione e riprova.",
-  "sbt.closed": "Al momento le richieste non sono accettate."
+  "sbt.closed": "Al momento le richieste non sono accettate.",
+  "sbt.checksum": "L’indirizzo sembra contenere un errore di battitura (maiuscole e minuscole non corrispondono). Copialo di nuovo dal tuo portafoglio."
 }

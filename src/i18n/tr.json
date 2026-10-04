@@ -86,5 +86,6 @@
   "sbt.duplicate": "Bu adres için zaten istekte bulunuldu.",
   "sbt.limit": "Bugünkü istek sınırına ulaşıldı. Lütfen yarın tekrar dene.",
   "sbt.error": "Gönderilemedi. Bağlantını kontrol edip tekrar dene.",
-  "sbt.closed": "Şu anda istek kabul edilmiyor."
+  "sbt.closed": "Şu anda istek kabul edilmiyor.",
+  "sbt.checksum": "Adreste bir yazım hatası var gibi görünüyor (büyük/küçük harf düzeni uyuşmuyor). Lütfen cüzdanından tekrar kopyala."
 }

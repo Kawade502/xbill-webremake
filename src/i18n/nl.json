@@ -86,5 +86,6 @@
   "sbt.duplicate": "Voor dit adres is al een aanvraag gedaan.",
   "sbt.limit": "Het maximale aantal aanvragen voor vandaag is bereikt. Probeer het morgen opnieuw.",
   "sbt.error": "Versturen mislukt. Controleer je verbinding en probeer opnieuw.",
-  "sbt.closed": "Er worden op dit moment geen aanvragen aangenomen."
+  "sbt.closed": "Er worden op dit moment geen aanvragen aangenomen.",
+  "sbt.checksum": "Het adres lijkt een typefout te bevatten (hoofdletters en kleine letters kloppen niet). Kopieer het opnieuw uit je wallet."
 }

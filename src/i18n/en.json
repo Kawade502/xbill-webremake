@@ -86,5 +86,6 @@
   "sbt.duplicate": "This address has already been requested.",
   "sbt.limit": "Today's request limit has been reached. Please try again tomorrow.",
   "sbt.error": "Could not send. Check your connection and try again.",
-  "sbt.closed": "Requests are not being accepted right now."
+  "sbt.closed": "Requests are not being accepted right now.",
+  "sbt.checksum": "The address seems to contain a typo (its upper/lower case pattern does not match). Please copy it again from your wallet."
 }

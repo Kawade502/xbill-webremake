@@ -86,5 +86,6 @@
   "sbt.duplicate": "Alamat ini sudah pernah diajukan.",
   "sbt.limit": "Batas permintaan hari ini sudah tercapai. Coba lagi besok.",
   "sbt.error": "Gagal mengirim. Periksa koneksimu lalu coba lagi.",
-  "sbt.closed": "Saat ini permintaan tidak diterima."
+  "sbt.closed": "Saat ini permintaan tidak diterima.",
+  "sbt.checksum": "Sepertinya ada salah ketik pada alamat (pola huruf besar/kecil tidak cocok). Salin ulang dari dompetmu."
 }

@@ -86,5 +86,6 @@
   "sbt.duplicate": "Esta dirección ya se ha solicitado.",
   "sbt.limit": "Se ha alcanzado el límite de solicitudes de hoy. Inténtalo mañana.",
   "sbt.error": "No se pudo enviar. Comprueba tu conexión e inténtalo de nuevo.",
-  "sbt.closed": "Ahora mismo no se aceptan solicitudes."
+  "sbt.closed": "Ahora mismo no se aceptan solicitudes.",
+  "sbt.checksum": "La dirección parece tener un error (las mayúsculas y minúsculas no coinciden). Cópiala de nuevo desde tu cartera."
 }
