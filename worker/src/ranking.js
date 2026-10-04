@@ -8,11 +8,14 @@
  *
  *   GET  /ranking  -> { ranking: [...上位10件] }
  *   POST /score    -> { ranking: [...上位10件], rank }   本文: { name, score, level, cleared }
+ *   POST /sbt-request -> 全クリア記念 SBT の申請（sbt.js）
  *
  * ランキングはクライアントから申告されたスコアをそのまま保存する遊び用途のものです。
  * 改ざんは防げないため、値の範囲チェックと件数の上限だけを設けています。
  * KV には排他制御がなく、反映に最大 1 分ほどかかることがあります（同時登録が重なると、まれに 1 件失われます）。
  */
+
+import { handleSbtRequest } from './sbt.js';
 
 export const RANKING_KEY = 'ranking';
 export const RANKING_STORE_MAX = 20;
@@ -41,7 +44,7 @@ export function cleanName(name) {
 }
 
 /** 数値、または数字だけの文字列を整数にする。null・未指定・真偽値・空文字などは null（不正）。 */
-function toInteger(v) {
+export function toInteger(v) {
   const isNumeric = typeof v === 'number' || (typeof v === 'string' && v.trim() !== '');
   if (!isNumeric) return null;
   const n = Number(v);
@@ -79,7 +82,7 @@ async function readRanking(env) {
 
 // ---- HTTP ----
 
-function allowedOrigins(env) {
+export function allowedOrigins(env) {
   return String(env.ALLOWED_ORIGINS || '').split(',').map((s) => s.trim()).filter(Boolean);
 }
 
@@ -95,14 +98,14 @@ function corsHeaders(request, env) {
   return headers;
 }
 
-function json(data, status, request, env) {
+export function json(data, status, request, env) {
   return new Response(JSON.stringify(data), {
     status,
     headers: { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store', ...corsHeaders(request, env) }
   });
 }
 
-async function readBody(request) {
+export async function readBody(request) {
   const declared = Number(request.headers.get('Content-Length') || 0);
   if (declared > BODY_MAX_BYTES) throw new ValidationError('リクエストが大きすぎます');
   const text = await request.text();
@@ -149,6 +152,10 @@ export async function handleRequest(request, env) {
 
     const top = stored.slice(0, RANKING_RETURN_MAX);
     return json({ ranking: top, rank: top.indexOf(entry) + 1 }, 200, request, env);
+  }
+
+  if (request.method === 'POST' && url.pathname === '/sbt-request') {
+    return handleSbtRequest(request, env);
   }
 
   return json({ error: 'Not Found' }, 404, request, env);
