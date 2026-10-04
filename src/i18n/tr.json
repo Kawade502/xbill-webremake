@@ -87,5 +87,6 @@
   "sbt.limit": "Bugünkü istek sınırına ulaşıldı. Lütfen yarın tekrar dene.",
   "sbt.error": "Gönderilemedi. Bağlantını kontrol edip tekrar dene.",
   "sbt.closed": "Şu anda istek kabul edilmiyor.",
-  "sbt.checksum": "Adreste bir yazım hatası var gibi görünüyor (büyük/küçük harf düzeni uyuşmuyor). Lütfen cüzdanından tekrar kopyala."
+  "sbt.checksum": "Adreste bir yazım hatası var gibi görünüyor (büyük/küçük harf düzeni uyuşmuyor). Lütfen cüzdanından tekrar kopyala.",
+  "sbt.note5": "İstekte bulunduğunda adresin, ismin ve puanın, işletmecinin incelemesi için sunucumuza gönderilir. İsim ve puan, istek karşılandıktan veya reddedildikten sonra silinir. Kötüye kullanımı önlemek için bağlantına ait geri döndürülemeyen bir iz 2 gün saklanır."
 }

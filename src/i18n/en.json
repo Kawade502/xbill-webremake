@@ -87,5 +87,6 @@
   "sbt.limit": "Today's request limit has been reached. Please try again tomorrow.",
   "sbt.error": "Could not send. Check your connection and try again.",
   "sbt.closed": "Requests are not being accepted right now.",
-  "sbt.checksum": "The address seems to contain a typo (its upper/lower case pattern does not match). Please copy it again from your wallet."
+  "sbt.checksum": "The address seems to contain a typo (its upper/lower case pattern does not match). Please copy it again from your wallet.",
+  "sbt.note5": "When you apply, your address, name and score are sent to our server for the operator to review. The name and score are deleted after the request is issued or declined. To prevent abuse, a non-reversible fingerprint of your connection is kept for 2 days."
 }

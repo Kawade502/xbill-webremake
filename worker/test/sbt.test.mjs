@@ -3,7 +3,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import worker from '../src/index.js';
-import { normalizeSbtRequest, SBT_REQ_PREFIX, SBT_DAY_PREFIX, SBT_IP_PREFIX, SBT_DAILY_LIMIT, SBT_DAILY_LIMIT_PER_IP } from '../src/sbt.js';
+import { normalizeSbtRequest, ipForLimit, SBT_REQ_PREFIX, SBT_DAY_PREFIX, SBT_IP_PREFIX, SBT_DAILY_LIMIT, SBT_DAILY_LIMIT_PER_IP } from '../src/sbt.js';
 import { RANKING_KEY } from '../src/ranking.js';
 
 const ORIGIN = 'https://kawade502.github.io';
@@ -205,4 +205,22 @@ test('同じ IP からは1日3件まで。別の IP は受け付ける。IP は�
   const ipKeys = [...env.store.keys()].filter((k) => k.startsWith(SBT_IP_PREFIX) && !k.endsWith('#opts'));
   assert.equal(ipKeys.length, 2);
   assert.ok(ipKeys.every((k) => !k.includes('203.0.113.7') && /:[0-9a-f]{64}$/.test(k)));
+});
+
+test('IPv6 は /64 ごとに数える（同じ回線でアドレスを変えても、すり抜けられない）', async () => {
+  assert.equal(ipForLimit('203.0.113.7'), '203.0.113.7');
+  assert.equal(ipForLimit('2001:db8:1:2:aaaa::1'), '2001:db8:1:2::/64');
+  assert.equal(ipForLimit('2001:0DB8:0001:0002:ffff:ffff:ffff:ffff'), '2001:db8:1:2::/64');
+  assert.equal(ipForLimit('2001:db8::5'), '2001:db8:0:0::/64');
+  assert.equal(ipForLimit('::1'), '0:0:0:0::/64');
+  assert.equal(ipForLimit(null), null);
+  const env = makeEnv();
+  const postFrom = (ip, i) => worker.fetch(new Request('https://api.example/sbt-request', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Origin: ORIGIN, 'CF-Connecting-IP': ip },
+    body: JSON.stringify(ok({ address: '0x' + (i + 300).toString(16).padStart(40, '0') }))
+  }), env);
+  for (let i = 0; i < SBT_DAILY_LIMIT_PER_IP; i++) assert.equal((await postFrom(`2001:db8:1:2::${i + 1}`, i)).status, 201);
+  assert.equal((await postFrom('2001:db8:1:2:dead:beef:0:9', 9)).status, 429);
+  assert.equal((await postFrom('2001:db8:1:3::1', 10)).status, 201);   // 別の /64 は別に数える
 });

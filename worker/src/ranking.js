@@ -26,13 +26,9 @@ export const SCORE_MAX = 10000000;
 export const LEVEL_MAX = 99;
 export const BODY_MAX_BYTES = 1024;
 
-// 制御文字・ゼロ幅文字・双方向制御文字（code.gs の cleanName_ と同じ範囲）
-const INVISIBLE = new RegExp(
-  '[' + [
-    [0x0000, 0x001f], [0x007f, 0x009f], [0x200b, 0x200f], [0x2028, 0x202e], [0x2066, 0x2069], [0xfeff, 0xfeff]
-  ].map(([a, b]) => String.fromCharCode(a) + (a === b ? '' : '-' + String.fromCharCode(b))).join('') + ']',
-  'g'
-);
+// 制御文字・ゼロ幅文字・双方向制御文字（code.gs の cleanName_ と同じ範囲）に加え、
+// 見えない書式文字（ソフトハイフン・単語結合子・異体字セレクター・タグ文字など）も除く
+const INVISIBLE = /[\u0000-\u001f\u007f-\u009f\u00ad\u034f\u061c\u115f\u1160\u17b4\u17b5\u180b-\u180f\u200b-\u200f\u2028-\u202e\u2060-\u206f\u3164\ufe00-\ufe0f\ufeff\uffa0\u{e0000}-\u{e007f}\u{e0100}-\u{e01ef}]/gu;
 
 export class ValidationError extends Error {}
 

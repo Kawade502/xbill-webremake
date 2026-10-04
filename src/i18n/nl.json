@@ -87,5 +87,6 @@
   "sbt.limit": "Het maximale aantal aanvragen voor vandaag is bereikt. Probeer het morgen opnieuw.",
   "sbt.error": "Versturen mislukt. Controleer je verbinding en probeer opnieuw.",
   "sbt.closed": "Er worden op dit moment geen aanvragen aangenomen.",
-  "sbt.checksum": "Het adres lijkt een typefout te bevatten (hoofdletters en kleine letters kloppen niet). Kopieer het opnieuw uit je wallet."
+  "sbt.checksum": "Het adres lijkt een typefout te bevatten (hoofdletters en kleine letters kloppen niet). Kopieer het opnieuw uit je wallet.",
+  "sbt.note5": "Bij een aanvraag worden je adres, naam en score naar onze server gestuurd, zodat de beheerder ze kan controleren. Naam en score worden verwijderd nadat de aanvraag is uitgegeven of afgewezen. Ter voorkoming van misbruik wordt een niet-terug te herleiden vingerafdruk van je verbinding 2 dagen bewaard."
 }

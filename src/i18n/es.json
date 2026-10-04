@@ -87,5 +87,6 @@
   "sbt.limit": "Se ha alcanzado el límite de solicitudes de hoy. Inténtalo mañana.",
   "sbt.error": "No se pudo enviar. Comprueba tu conexión e inténtalo de nuevo.",
   "sbt.closed": "Ahora mismo no se aceptan solicitudes.",
-  "sbt.checksum": "La dirección parece tener un error (las mayúsculas y minúsculas no coinciden). Cópiala de nuevo desde tu cartera."
+  "sbt.checksum": "La dirección parece tener un error (las mayúsculas y minúsculas no coinciden). Cópiala de nuevo desde tu cartera.",
+  "sbt.note5": "Al solicitarlo, tu dirección, nombre y puntuación se envían a nuestro servidor para que el operador los revise. El nombre y la puntuación se borran tras emitir o rechazar la solicitud. Para evitar abusos, se guarda durante 2 días una huella no reversible de tu conexión."
 }

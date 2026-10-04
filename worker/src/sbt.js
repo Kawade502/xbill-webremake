@@ -69,7 +69,7 @@ export async function handleSbtRequest(request, env, ctx, now = Date.now()) {
   if (count >= SBT_DAILY_LIMIT) return json({ error: '本日の受付数の上限に達しました。明日もう一度お試しください', status: 'limit' }, 429, request, env);
 
   // 同じ IP からの申請は1日3件まで（IP はそのまま保存せず、ハッシュにする）。Cloudflare 以外から呼ばれて IP が無いときは数えない
-  const ip = request.headers.get('CF-Connecting-IP');
+  const ip = ipForLimit(request.headers.get('CF-Connecting-IP'));
   let ipKey = null, ipCount = 0;
   if (ip) {
     ipKey = SBT_IP_PREFIX + day + ':' + await sha256Hex(`${env.NOTIFY_SECRET || ''}|${day}|${ip}`);
@@ -85,6 +85,21 @@ export async function handleSbtRequest(request, env, ctx, now = Date.now()) {
   if (ctx && typeof ctx.waitUntil === 'function') ctx.waitUntil(notice);   // 応答を待たせない
   else await notice;
   return json({ ok: true }, 201, request, env);
+}
+
+/**
+ * 上限を数える単位。IPv4 はアドレスそのもの、IPv6 は先頭 64 ビット（/64、ふつう1回線ぶん）。
+ * IPv6 は1回線に膨大な数のアドレスがあるので、アドレス単位だと上限をすり抜けられる。
+ */
+export function ipForLimit(ip) {
+  if (!ip) return null;
+  const text = String(ip).trim().toLowerCase();
+  if (!text.includes(':')) return text;
+  const [head, tail = ''] = text.split('::');
+  const h = head ? head.split(':') : [];
+  const t = tail ? tail.split(':') : [];
+  const groups = text.includes('::') ? [...h, ...Array(Math.max(0, 8 - h.length - t.length)).fill('0'), ...t] : h;
+  return groups.slice(0, 4).map((g) => (g || '0').replace(/^0+(?=.)/, '')).join(':') + '::/64';
 }
 
 async function sha256Hex(text) {

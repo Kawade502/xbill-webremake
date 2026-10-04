@@ -87,5 +87,6 @@
   "sbt.limit": "O limite de solicitações de hoje foi atingido. Tente novamente amanhã.",
   "sbt.error": "Não foi possível enviar. Verifique sua conexão e tente novamente.",
   "sbt.closed": "No momento, não estamos aceitando solicitações.",
-  "sbt.checksum": "O endereço parece ter um erro de digitação (as maiúsculas e minúsculas não conferem). Copie-o novamente da sua carteira."
+  "sbt.checksum": "O endereço parece ter um erro de digitação (as maiúsculas e minúsculas não conferem). Copie-o novamente da sua carteira.",
+  "sbt.note5": "Ao solicitar, seu endereço, nome e pontuação são enviados ao nosso servidor para análise do operador. O nome e a pontuação são apagados após a emissão ou recusa. Para evitar abusos, uma impressão irreversível da sua conexão é guardada por 2 dias."
 }

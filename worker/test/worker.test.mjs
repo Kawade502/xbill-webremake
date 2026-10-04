@@ -103,6 +103,13 @@ test('不正な score / level は 400 で、保存しない', async () => {
   assert.equal(env.store.has(RANKING_KEY), false);
 });
 
+test('名前の整形: 見えない書式文字（ソフトハイフン・単語結合子・異体字セレクター・タグ文字など）も除く', () => {
+  const s = 'a' + ch(0xad) + 'b' + ch(0x2060) + 'c' + ch(0x034f) + 'd' + ch(0xfe0f) + 'e' + String.fromCodePoint(0xe0041) + 'f' + ch(0x3164) + 'g';
+  assert.equal(cleanName(s), 'abcdefg');
+  assert.equal(cleanName(String.fromCodePoint(0xe0041, 0xe0042)), 'NO NAME');
+  assert.equal(cleanName('Ｘビル 太郎'), 'Ｘビル 太郎');   // ふつうの全角・日本語・空白は残す
+});
+
 test('数値文字列・小数は整数に丸める', () => {
   const e = normalizeEntry({ name: 'x', score: '1234.9', level: '2.7' });
   assert.equal(e.score, 1234);
