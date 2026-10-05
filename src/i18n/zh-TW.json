@@ -77,7 +77,7 @@
   "sbt.note1": "SBT 是不可轉讓的紀念 NFT，沒有任何金錢價值。",
   "sbt.note2": "發行後，你的地址、通關日期和編號將公開在區塊鏈（Polygon）上。你可以自行刪除收到的 SBT，但發行紀錄會保留在鏈上。",
   "sbt.note3": "是否發行由營運者日後決定，不保證一定發行。",
-  "sbt.note4": "請輸入可在 Polygon 上使用的你自己的錢包地址（不能使用交易所的入金地址）。",
+  "sbt.note4": "請輸入你在 Ethereum 或 Polygon 上使用的自己錢包的地址（MetaMask 等，以 0x 開頭的 42 個字元）。同一地址即可接收 Polygon 上的 SBT（不能使用交易所的入金地址）。",
   "sbt.placeholder": "以 0x 開頭的地址",
   "sbt.consent": "我同意上述注意事項",
   "sbt.submit": "申請",
@@ -89,5 +89,5 @@
   "sbt.closed": "目前不受理申請。",
   "sbt.checksum": "地址似乎有輸入錯誤（大小寫不符）。請從錢包重新複製。",
   "sbt.note5": "申請時，地址、名字和得分會傳送到伺服器，由營運者確認。名字和得分會在發行或婉拒後刪除。為防止惡作劇，會以無法還原的形式記錄連線來源資訊，僅保存 2 天。",
-  "sbt.notEvm": "這個地址太長了，似乎是 Aptos、Sui 等其他類型區塊鏈的地址。請輸入 Polygon（MetaMask 等）的地址（以 0x 開頭的 42 個字元）。"
+  "sbt.notEvm": "這個地址太長了，似乎是 Aptos、Sui 等其他類型區塊鏈的地址。請輸入在 Ethereum 或 Polygon 上使用的地址（MetaMask 等，以 0x 開頭的 42 個字元）。"
 }

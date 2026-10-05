@@ -77,7 +77,7 @@
   "sbt.note1": "SBT to pamiątkowy NFT, którego nie można przekazać innym. Nie ma wartości pieniężnej.",
   "sbt.note2": "Po wydaniu twój adres, data ukończenia i numer seryjny zostaną publicznie zapisane w blockchainie (Polygon). Możesz sam usunąć SBT, ale zapis o jego wydaniu pozostanie w łańcuchu.",
   "sbt.note3": "Wydanie nastąpi później, według uznania operatora, i nie jest gwarantowane.",
-  "sbt.note4": "Wpisz adres własnego portfela działającego w sieci Polygon (adresy depozytowe giełd nie zadziałają).",
+  "sbt.note4": "Wpisz adres własnego portfela używanego w Ethereum lub Polygon (taki jak w MetaMask: 42 znaki zaczynające się od 0x). Na ten sam adres trafi SBT w sieci Polygon (adresy depozytowe giełd nie zadziałają).",
   "sbt.placeholder": "Adres zaczynający się od 0x",
   "sbt.consent": "Akceptuję powyższe uwagi",
   "sbt.submit": "Wyślij prośbę",
@@ -89,5 +89,5 @@
   "sbt.closed": "Obecnie prośby nie są przyjmowane.",
   "sbt.checksum": "Wygląda na to, że w adresie jest literówka (układ wielkich i małych liter się nie zgadza). Skopiuj go ponownie z portfela.",
   "sbt.note5": "Po wysłaniu prośby twój adres, imię i wynik trafiają na nasz serwer do sprawdzenia przez operatora. Imię i wynik są usuwane po wydaniu lub odrzuceniu prośby. Aby zapobiec nadużyciom, nieodwracalny odcisk twojego połączenia jest przechowywany przez 2 dni.",
-  "sbt.notEvm": "Ten adres jest za długi. Wygląda na adres innego rodzaju sieci (np. Aptos lub Sui). Wpisz adres Polygon (taki jak w MetaMask: 42 znaki zaczynające się od 0x)."
+  "sbt.notEvm": "Ten adres jest za długi. Wygląda na adres innego rodzaju sieci (np. Aptos lub Sui). Wpisz adres używany w Ethereum lub Polygon (taki jak w MetaMask: 42 znaki zaczynające się od 0x)."
 }

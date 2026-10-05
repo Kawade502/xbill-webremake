@@ -77,7 +77,7 @@
   "sbt.note1": "SBT adalah NFT kenang-kenangan yang tidak dapat dipindahtangankan. Tidak memiliki nilai uang.",
   "sbt.note2": "Jika diterbitkan, alamatmu, tanggal tamat, dan nomor seri akan tercatat publik di blockchain (Polygon). Kamu bisa menghapus SBT sendiri, tetapi catatan penerbitannya tetap ada di chain.",
   "sbt.note3": "Penerbitan dilakukan nanti atas kebijakan pengelola dan tidak dijamin.",
-  "sbt.note4": "Masukkan alamat dompetmu sendiri yang bisa dipakai di Polygon (alamat deposit bursa tidak bisa digunakan).",
+  "sbt.note4": "Masukkan alamat dompetmu sendiri yang dipakai di Ethereum atau Polygon (seperti di MetaMask: 42 karakter diawali 0x). Alamat yang sama menerima SBT di Polygon (alamat deposit bursa tidak bisa digunakan).",
   "sbt.placeholder": "Alamat yang diawali 0x",
   "sbt.consent": "Saya menyetujui catatan di atas",
   "sbt.submit": "Kirim permintaan",
@@ -89,5 +89,5 @@
   "sbt.closed": "Saat ini permintaan tidak diterima.",
   "sbt.checksum": "Sepertinya ada salah ketik pada alamat (pola huruf besar/kecil tidak cocok). Salin ulang dari dompetmu.",
   "sbt.note5": "Saat mengajukan, alamat, nama, dan skormu dikirim ke server kami untuk diperiksa pengelola. Nama dan skor dihapus setelah permintaan diterbitkan atau ditolak. Untuk mencegah penyalahgunaan, sidik jari koneksimu yang tidak dapat dikembalikan disimpan selama 2 hari.",
-  "sbt.notEvm": "Alamat ini terlalu panjang. Sepertinya ini alamat jenis chain lain (seperti Aptos atau Sui). Masukkan alamat Polygon (seperti di MetaMask: 42 karakter diawali 0x)."
+  "sbt.notEvm": "Alamat ini terlalu panjang. Sepertinya ini alamat jenis chain lain (seperti Aptos atau Sui). Masukkan alamat yang dipakai di Ethereum atau Polygon (seperti di MetaMask: 42 karakter diawali 0x)."
 }

@@ -77,7 +77,7 @@
   "sbt.note1": "Un SBT es un NFT conmemorativo intransferible. No tiene valor monetario.",
   "sbt.note2": "Si se emite, tu dirección, la fecha en que lo superaste y el número de serie serán públicos en la blockchain (Polygon). Puedes borrar el SBT tú mismo, pero el registro de la emisión permanece en la cadena.",
   "sbt.note3": "La emisión la hace el operador más adelante, a su criterio, y no está garantizada.",
-  "sbt.note4": "Introduce la dirección de tu propia cartera compatible con Polygon (no sirven las direcciones de depósito de exchanges).",
+  "sbt.note4": "Introduce la dirección de tu propia cartera que usas en Ethereum o Polygon (como la de MetaMask, etc.: 42 caracteres que empiezan por 0x). Esa misma dirección recibe el SBT en Polygon (no sirven las direcciones de depósito de exchanges).",
   "sbt.placeholder": "Dirección que empieza por 0x",
   "sbt.consent": "Acepto las notas anteriores",
   "sbt.submit": "Solicitar",
@@ -89,5 +89,5 @@
   "sbt.closed": "Ahora mismo no se aceptan solicitudes.",
   "sbt.checksum": "La dirección parece tener un error (las mayúsculas y minúsculas no coinciden). Cópiala de nuevo desde tu cartera.",
   "sbt.note5": "Al solicitarlo, tu dirección, nombre y puntuación se envían a nuestro servidor para que el operador los revise. El nombre y la puntuación se borran tras emitir o rechazar la solicitud. Para evitar abusos, se guarda durante 2 días una huella no reversible de tu conexión.",
-  "sbt.notEvm": "Esta dirección es demasiado larga. Parece de otro tipo de cadena (como Aptos o Sui). Introduce una dirección de Polygon (la que usa MetaMask, etc.: 42 caracteres que empiezan por 0x)."
+  "sbt.notEvm": "Esta dirección es demasiado larga. Parece de otro tipo de cadena (como Aptos o Sui). Introduce una dirección de Ethereum o Polygon (como la de MetaMask, etc.: 42 caracteres que empiezan por 0x)."
 }

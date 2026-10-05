@@ -77,7 +77,7 @@
   "sbt.note1": "Un SBT è un NFT commemorativo non trasferibile. Non ha alcun valore economico.",
   "sbt.note2": "Se emesso, il tuo indirizzo, la data di completamento e il numero di serie saranno pubblici sulla blockchain (Polygon). Puoi eliminare l’SBT da solo, ma la traccia dell’emissione resta sulla catena.",
   "sbt.note3": "L'emissione avviene più avanti, a discrezione del gestore, e non è garantita.",
-  "sbt.note4": "Inserisci l'indirizzo del tuo portafoglio compatibile con Polygon (gli indirizzi di deposito degli exchange non funzionano).",
+  "sbt.note4": "Inserisci l’indirizzo del tuo portafoglio usato su Ethereum o Polygon (come quello di MetaMask: 42 caratteri che iniziano con 0x). Lo stesso indirizzo riceve l’SBT su Polygon (gli indirizzi di deposito degli exchange non funzionano).",
   "sbt.placeholder": "Indirizzo che inizia con 0x",
   "sbt.consent": "Accetto le note qui sopra",
   "sbt.submit": "Richiedi",
@@ -89,5 +89,5 @@
   "sbt.closed": "Al momento le richieste non sono accettate.",
   "sbt.checksum": "L’indirizzo sembra contenere un errore di battitura (maiuscole e minuscole non corrispondono). Copialo di nuovo dal tuo portafoglio.",
   "sbt.note5": "Con la richiesta, indirizzo, nome e punteggio vengono inviati al nostro server per la verifica del gestore. Nome e punteggio vengono cancellati dopo l’emissione o il rifiuto. Per evitare abusi, un’impronta non reversibile della tua connessione viene conservata per 2 giorni.",
-  "sbt.notEvm": "Questo indirizzo è troppo lungo. Sembra di un altro tipo di blockchain (come Aptos o Sui). Inserisci un indirizzo Polygon (come quello di MetaMask: 42 caratteri che iniziano con 0x)."
+  "sbt.notEvm": "Questo indirizzo è troppo lungo. Sembra di un altro tipo di blockchain (come Aptos o Sui). Inserisci un indirizzo usato su Ethereum o Polygon (come quello di MetaMask: 42 caratteri che iniziano con 0x)."
 }

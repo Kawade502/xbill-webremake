@@ -77,7 +77,7 @@
   "sbt.note1": "Ein SBT ist ein nicht übertragbares Erinnerungs-NFT. Es hat keinen Geldwert.",
   "sbt.note2": "Bei Ausgabe werden deine Adresse, das Abschlussdatum und die Seriennummer öffentlich auf der Blockchain (Polygon) gespeichert. Du kannst das SBT selbst löschen, der Eintrag über die Ausgabe bleibt aber auf der Chain.",
   "sbt.note3": "Die Ausgabe erfolgt später nach Ermessen des Betreibers und ist nicht garantiert.",
-  "sbt.note4": "Gib die Adresse deiner eigenen Wallet ein, die auf Polygon funktioniert (Einzahlungsadressen von Börsen sind nicht möglich).",
+  "sbt.note4": "Gib die Adresse deiner eigenen Wallet ein, die du auf Ethereum oder Polygon nutzt (wie bei MetaMask: 42 Zeichen, beginnend mit 0x). Mit derselben Adresse erhältst du das SBT auf Polygon (Einzahlungsadressen von Börsen sind nicht möglich).",
   "sbt.placeholder": "Adresse, die mit 0x beginnt",
   "sbt.consent": "Ich stimme den obigen Hinweisen zu",
   "sbt.submit": "Anfordern",
@@ -89,5 +89,5 @@
   "sbt.closed": "Derzeit werden keine Anfragen angenommen.",
   "sbt.checksum": "Die Adresse scheint einen Tippfehler zu enthalten (Groß-/Kleinschreibung passt nicht). Bitte kopiere sie erneut aus deiner Wallet.",
   "sbt.note5": "Bei der Anfrage werden deine Adresse, dein Name und deine Punktzahl zur Prüfung durch den Betreiber an unseren Server gesendet. Name und Punktzahl werden nach der Ausgabe oder Ablehnung gelöscht. Zum Schutz vor Missbrauch wird ein nicht umkehrbarer Fingerabdruck deiner Verbindung 2 Tage lang gespeichert.",
-  "sbt.notEvm": "Diese Adresse ist zu lang. Sie scheint zu einer anderen Art von Blockchain zu gehören (z. B. Aptos oder Sui). Bitte gib eine Polygon-Adresse ein (wie bei MetaMask: 42 Zeichen, beginnend mit 0x)."
+  "sbt.notEvm": "Diese Adresse ist zu lang. Sie scheint zu einer anderen Art von Blockchain zu gehören (z. B. Aptos oder Sui). Bitte gib eine Adresse für Ethereum oder Polygon ein (wie bei MetaMask: 42 Zeichen, beginnend mit 0x)."
 }

@@ -77,7 +77,7 @@
   "sbt.note1": "SBT, devredilemeyen bir hatıra NFT'sidir. Parasal bir değeri yoktur.",
   "sbt.note2": "Verilirse adresin, oyunu bitirdiğin tarih ve seri numarası blokzincirde (Polygon) herkese açık olur. SBT’yi kendin silebilirsin, ancak verildiğine dair kayıt zincirde kalır.",
   "sbt.note3": "Verilmesi daha sonra işletmecinin takdirine bağlıdır; garanti edilmez.",
-  "sbt.note4": "Polygon'da kullanılabilen kendi cüzdanının adresini gir (borsaların yatırma adresleri kullanılamaz).",
+  "sbt.note4": "Ethereum veya Polygon’da kullandığın kendi cüzdanının adresini gir (MetaMask vb.: 0x ile başlayan 42 karakter). Aynı adres Polygon’daki SBT’yi alır (borsaların yatırma adresleri kullanılamaz).",
   "sbt.placeholder": "0x ile başlayan adres",
   "sbt.consent": "Yukarıdaki notları kabul ediyorum",
   "sbt.submit": "Gönder",
@@ -89,5 +89,5 @@
   "sbt.closed": "Şu anda istek kabul edilmiyor.",
   "sbt.checksum": "Adreste bir yazım hatası var gibi görünüyor (büyük/küçük harf düzeni uyuşmuyor). Lütfen cüzdanından tekrar kopyala.",
   "sbt.note5": "İstekte bulunduğunda adresin, ismin ve puanın, işletmecinin incelemesi için sunucumuza gönderilir. İsim ve puan, istek karşılandıktan veya reddedildikten sonra silinir. Kötüye kullanımı önlemek için bağlantına ait geri döndürülemeyen bir iz 2 gün saklanır.",
-  "sbt.notEvm": "Bu adres çok uzun. Aptos veya Sui gibi farklı türde bir zincirin adresi gibi görünüyor. Lütfen bir Polygon adresi gir (MetaMask vb.: 0x ile başlayan 42 karakter)."
+  "sbt.notEvm": "Bu adres çok uzun. Aptos veya Sui gibi farklı türde bir zincirin adresi gibi görünüyor. Lütfen Ethereum veya Polygon’da kullanılan bir adres gir (MetaMask vb.: 0x ile başlayan 42 karakter)."
 }

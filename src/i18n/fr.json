@@ -77,7 +77,7 @@
   "sbt.note1": "Un SBT est un NFT commémoratif non transférable. Il n'a aucune valeur monétaire.",
   "sbt.note2": "S’il est émis, votre adresse, la date de réussite et le numéro de série seront publics sur la blockchain (Polygon). Vous pourrez supprimer le SBT vous-même, mais la trace de son émission restera sur la chaîne.",
   "sbt.note3": "L'émission est faite plus tard, à la discrétion de l'opérateur, et n'est pas garantie.",
-  "sbt.note4": "Saisissez l'adresse de votre propre portefeuille compatible Polygon (les adresses de dépôt des plateformes d'échange ne fonctionnent pas).",
+  "sbt.note4": "Saisissez l’adresse de votre propre portefeuille utilisé sur Ethereum ou Polygon (comme celle de MetaMask, etc. : 42 caractères commençant par 0x). La même adresse reçoit le SBT sur Polygon (les adresses de dépôt des plateformes d’échange ne fonctionnent pas).",
   "sbt.placeholder": "Adresse commençant par 0x",
   "sbt.consent": "J'accepte les remarques ci-dessus",
   "sbt.submit": "Demander",
@@ -89,5 +89,5 @@
   "sbt.closed": "Les demandes ne sont pas acceptées pour le moment.",
   "sbt.checksum": "L’adresse semble contenir une faute de frappe (les majuscules et minuscules ne correspondent pas). Copiez-la à nouveau depuis votre portefeuille.",
   "sbt.note5": "Lors de la demande, votre adresse, votre nom et votre score sont envoyés à notre serveur pour vérification par l’opérateur. Le nom et le score sont supprimés après l’émission ou le refus. Pour éviter les abus, une empreinte non réversible de votre connexion est conservée 2 jours.",
-  "sbt.notEvm": "Cette adresse est trop longue. Elle semble appartenir à un autre type de chaîne (Aptos, Sui…). Saisissez une adresse Polygon (celle de MetaMask, etc. : 42 caractères commençant par 0x)."
+  "sbt.notEvm": "Cette adresse est trop longue. Elle semble appartenir à un autre type de chaîne (Aptos, Sui…). Saisissez une adresse Ethereum ou Polygon (comme celle de MetaMask, etc. : 42 caractères commençant par 0x)."
 }
