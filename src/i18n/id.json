@@ -88,5 +88,6 @@
   "sbt.error": "Gagal mengirim. Periksa koneksimu lalu coba lagi.",
   "sbt.closed": "Saat ini permintaan tidak diterima.",
   "sbt.checksum": "Sepertinya ada salah ketik pada alamat (pola huruf besar/kecil tidak cocok). Salin ulang dari dompetmu.",
-  "sbt.note5": "Saat mengajukan, alamat, nama, dan skormu dikirim ke server kami untuk diperiksa pengelola. Nama dan skor dihapus setelah permintaan diterbitkan atau ditolak. Untuk mencegah penyalahgunaan, sidik jari koneksimu yang tidak dapat dikembalikan disimpan selama 2 hari."
+  "sbt.note5": "Saat mengajukan, alamat, nama, dan skormu dikirim ke server kami untuk diperiksa pengelola. Nama dan skor dihapus setelah permintaan diterbitkan atau ditolak. Untuk mencegah penyalahgunaan, sidik jari koneksimu yang tidak dapat dikembalikan disimpan selama 2 hari.",
+  "sbt.notEvm": "Alamat ini terlalu panjang. Sepertinya ini alamat jenis chain lain (seperti Aptos atau Sui). Masukkan alamat Polygon (seperti di MetaMask: 42 karakter diawali 0x)."
 }

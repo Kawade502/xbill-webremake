@@ -88,5 +88,6 @@
   "sbt.error": "Envoi impossible. Vérifiez votre connexion et réessayez.",
   "sbt.closed": "Les demandes ne sont pas acceptées pour le moment.",
   "sbt.checksum": "L’adresse semble contenir une faute de frappe (les majuscules et minuscules ne correspondent pas). Copiez-la à nouveau depuis votre portefeuille.",
-  "sbt.note5": "Lors de la demande, votre adresse, votre nom et votre score sont envoyés à notre serveur pour vérification par l’opérateur. Le nom et le score sont supprimés après l’émission ou le refus. Pour éviter les abus, une empreinte non réversible de votre connexion est conservée 2 jours."
+  "sbt.note5": "Lors de la demande, votre adresse, votre nom et votre score sont envoyés à notre serveur pour vérification par l’opérateur. Le nom et le score sont supprimés après l’émission ou le refus. Pour éviter les abus, une empreinte non réversible de votre connexion est conservée 2 jours.",
+  "sbt.notEvm": "Cette adresse est trop longue. Elle semble appartenir à un autre type de chaîne (Aptos, Sui…). Saisissez une adresse Polygon (celle de MetaMask, etc. : 42 caractères commençant par 0x)."
 }

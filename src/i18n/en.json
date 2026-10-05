@@ -88,5 +88,6 @@
   "sbt.error": "Could not send. Check your connection and try again.",
   "sbt.closed": "Requests are not being accepted right now.",
   "sbt.checksum": "The address seems to contain a typo (its upper/lower case pattern does not match). Please copy it again from your wallet.",
-  "sbt.note5": "When you apply, your address, name and score are sent to our server for the operator to review. The name and score are deleted after the request is issued or declined. To prevent abuse, a non-reversible fingerprint of your connection is kept for 2 days."
+  "sbt.note5": "When you apply, your address, name and score are sent to our server for the operator to review. The name and score are deleted after the request is issued or declined. To prevent abuse, a non-reversible fingerprint of your connection is kept for 2 days.",
+  "sbt.notEvm": "This address is too long. It looks like an address for a different kind of chain (such as Aptos or Sui). Please enter a Polygon address (as used by MetaMask etc.: 42 characters starting with 0x)."
 }

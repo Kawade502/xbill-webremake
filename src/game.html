@@ -1361,7 +1361,7 @@
       autocomplete: 'off',
       autocapitalize: 'off',
       spellcheck: 'false',
-      maxlength: 42,
+      maxlength: 120,   // 42 にすると、長いアドレス（Aptos など）を貼ったときに黙って切られて、別のアドレスになってしまう
       'aria-label': t('sbt.placeholder')
     });
     const consent = el('input', { type: 'checkbox', id: 'sbtConsent' });
@@ -1389,7 +1389,8 @@
       refresh();
       const v = input.value.trim();
       let text = '';
-      if (v.length >= 42 && !ADDRESS_RE.test(v)) text = t('sbt.invalid');
+      if (/^0x[0-9a-fA-F]{41,}$/.test(v)) text = t('sbt.notEvm');   // Aptos・Sui などの長いアドレス
+      else if (v.length >= 42 && !ADDRESS_RE.test(v)) text = t('sbt.invalid');
       else if (ADDRESS_RE.test(v) && !checksumOk(v)) text = t('sbt.checksum');   // 大文字小文字の並びが合わない = 打ち間違い
       setMsg(text, true);
     });

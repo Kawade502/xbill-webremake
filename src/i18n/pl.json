@@ -88,5 +88,6 @@
   "sbt.error": "Nie udało się wysłać. Sprawdź połączenie i spróbuj ponownie.",
   "sbt.closed": "Obecnie prośby nie są przyjmowane.",
   "sbt.checksum": "Wygląda na to, że w adresie jest literówka (układ wielkich i małych liter się nie zgadza). Skopiuj go ponownie z portfela.",
-  "sbt.note5": "Po wysłaniu prośby twój adres, imię i wynik trafiają na nasz serwer do sprawdzenia przez operatora. Imię i wynik są usuwane po wydaniu lub odrzuceniu prośby. Aby zapobiec nadużyciom, nieodwracalny odcisk twojego połączenia jest przechowywany przez 2 dni."
+  "sbt.note5": "Po wysłaniu prośby twój adres, imię i wynik trafiają na nasz serwer do sprawdzenia przez operatora. Imię i wynik są usuwane po wydaniu lub odrzuceniu prośby. Aby zapobiec nadużyciom, nieodwracalny odcisk twojego połączenia jest przechowywany przez 2 dni.",
+  "sbt.notEvm": "Ten adres jest za długi. Wygląda na adres innego rodzaju sieci (np. Aptos lub Sui). Wpisz adres Polygon (taki jak w MetaMask: 42 znaki zaczynające się od 0x)."
 }

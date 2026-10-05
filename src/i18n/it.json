@@ -88,5 +88,6 @@
   "sbt.error": "Invio non riuscito. Controlla la connessione e riprova.",
   "sbt.closed": "Al momento le richieste non sono accettate.",
   "sbt.checksum": "L’indirizzo sembra contenere un errore di battitura (maiuscole e minuscole non corrispondono). Copialo di nuovo dal tuo portafoglio.",
-  "sbt.note5": "Con la richiesta, indirizzo, nome e punteggio vengono inviati al nostro server per la verifica del gestore. Nome e punteggio vengono cancellati dopo l’emissione o il rifiuto. Per evitare abusi, un’impronta non reversibile della tua connessione viene conservata per 2 giorni."
+  "sbt.note5": "Con la richiesta, indirizzo, nome e punteggio vengono inviati al nostro server per la verifica del gestore. Nome e punteggio vengono cancellati dopo l’emissione o il rifiuto. Per evitare abusi, un’impronta non reversibile della tua connessione viene conservata per 2 giorni.",
+  "sbt.notEvm": "Questo indirizzo è troppo lungo. Sembra di un altro tipo di blockchain (come Aptos o Sui). Inserisci un indirizzo Polygon (come quello di MetaMask: 42 caratteri che iniziano con 0x)."
 }

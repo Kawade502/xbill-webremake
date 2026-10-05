@@ -88,5 +88,6 @@
   "sbt.error": "Senden fehlgeschlagen. Prüfe deine Verbindung und versuche es erneut.",
   "sbt.closed": "Derzeit werden keine Anfragen angenommen.",
   "sbt.checksum": "Die Adresse scheint einen Tippfehler zu enthalten (Groß-/Kleinschreibung passt nicht). Bitte kopiere sie erneut aus deiner Wallet.",
-  "sbt.note5": "Bei der Anfrage werden deine Adresse, dein Name und deine Punktzahl zur Prüfung durch den Betreiber an unseren Server gesendet. Name und Punktzahl werden nach der Ausgabe oder Ablehnung gelöscht. Zum Schutz vor Missbrauch wird ein nicht umkehrbarer Fingerabdruck deiner Verbindung 2 Tage lang gespeichert."
+  "sbt.note5": "Bei der Anfrage werden deine Adresse, dein Name und deine Punktzahl zur Prüfung durch den Betreiber an unseren Server gesendet. Name und Punktzahl werden nach der Ausgabe oder Ablehnung gelöscht. Zum Schutz vor Missbrauch wird ein nicht umkehrbarer Fingerabdruck deiner Verbindung 2 Tage lang gespeichert.",
+  "sbt.notEvm": "Diese Adresse ist zu lang. Sie scheint zu einer anderen Art von Blockchain zu gehören (z. B. Aptos oder Sui). Bitte gib eine Polygon-Adresse ein (wie bei MetaMask: 42 Zeichen, beginnend mit 0x)."
 }
