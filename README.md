@@ -83,6 +83,7 @@ npm test                                     # テスト
 
 `wrangler.toml` の `ALLOWED_ORIGINS` に、ゲームを公開する URL の Origin（例: `https://ユーザー名.github.io`）を入れます。
 API の URL が空のままだと、ランキングはその端末のブラウザにだけ保存されます。
+同じ Worker は、[ビールジョッキ](https://github.com/Kawade502/beer-jug) の杯数の記念 SBT の申請も `POST /beer-sbt-request` で受け付けます（受け付けるかどうかは `wrangler.toml` の `BEER_SBT_REQUESTS_ENABLED` で切り替えます）。
 
 ### 2. ページのビルドと公開（GitHub Pages）
 

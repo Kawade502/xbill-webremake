@@ -9,6 +9,7 @@
  *   GET  /ranking  -> { ranking: [...上位10件] }
  *   POST /score    -> { ranking: [...上位10件], rank }   本文: { name, score, level, cleared }
  *   POST /sbt-request -> 全クリア記念 SBT の申請（sbt.js）
+ *   POST /beer-sbt-request -> ビールジョッキの杯数の記念 SBT の申請（beer-sbt.js）
  *
  * ランキングはクライアントから申告されたスコアをそのまま保存する遊び用途のものです。
  * 改ざんは防げないため、値の範囲チェックと件数の上限だけを設けています。
@@ -16,6 +17,7 @@
  */
 
 import { handleSbtRequest } from './sbt.js';
+import { handleBeerSbtRequest } from './beer-sbt.js';
 
 export const RANKING_KEY = 'ranking';
 export const RANKING_STORE_MAX = 20;
@@ -152,6 +154,10 @@ export async function handleRequest(request, env, ctx) {
 
   if (request.method === 'POST' && url.pathname === '/sbt-request') {
     return handleSbtRequest(request, env, ctx);
+  }
+
+  if (request.method === 'POST' && url.pathname === '/beer-sbt-request') {
+    return handleBeerSbtRequest(request, env, ctx);
   }
 
   return json({ error: 'Not Found' }, 404, request, env);

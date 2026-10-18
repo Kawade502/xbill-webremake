@@ -9,6 +9,8 @@ compatibility_date = "2026-09-01"
 ALLOWED_ORIGINS = "https://kawade502.github.io"
 # 全クリア記念 SBT の申請を受け付けるか（"true" で受付。mint の準備が揃うまでは "false"）
 SBT_REQUESTS_ENABLED = "true"
+# ビールジョッキ（beer-jug）の杯数の記念 SBT の申請を受け付けるか（"true" で受付。止めるときは "false"）
+BEER_SBT_REQUESTS_ENABLED = "true"
 
 [[kv_namespaces]]
 binding = "RANKING"

@@ -20,8 +20,8 @@ export const SBT_DAY_PREFIX = 'sbt:day:';
 export const SBT_DAILY_LIMIT = 50;
 export const SBT_IP_PREFIX = 'sbt:ip:';
 export const SBT_DAILY_LIMIT_PER_IP = 3;   // 1人（同じ IP）が1日の受付枠を使い切れないように
-const DAY_TTL_SECONDS = 2 * 24 * 60 * 60;
-const ADDRESS_RE = /^0x[0-9a-fA-F]{40}$/;
+export const DAY_TTL_SECONDS = 2 * 24 * 60 * 60;
+export const ADDRESS_RE = /^0x[0-9a-fA-F]{40}$/;
 
 /** 受付中か。wrangler.toml の SBT_REQUESTS_ENABLED が "true" のときだけ受け付ける。 */
 export function sbtEnabled(env) {
@@ -102,7 +102,7 @@ export function ipForLimit(ip) {
   return groups.slice(0, 4).map((g) => (g || '0').replace(/^0+(?=.)/, '')).join(':') + '::/64';
 }
 
-async function sha256Hex(text) {
+export async function sha256Hex(text) {
   const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
   return [...new Uint8Array(buf)].map((b) => b.toString(16).padStart(2, '0')).join('');
 }
