@@ -11,6 +11,8 @@ ALLOWED_ORIGINS = "https://kawade502.github.io"
 SBT_REQUESTS_ENABLED = "true"
 # ビールジョッキ（beer-jug）の杯数の記念 SBT の申請を受け付けるか（"true" で受付。止めるときは "false"）
 BEER_SBT_REQUESTS_ENABLED = "true"
+# ビールジョッキの記念 SBT のコントラクトアドレス（Polygon Mainnet）。Worker は使わないが、mint のときの参照用
+BEER_SBT_CONTRACT = "0x7CF5663c1afa9123a3aB94800aF65ffCB2456ef2"
 
 [[kv_namespaces]]
 binding = "RANKING"
