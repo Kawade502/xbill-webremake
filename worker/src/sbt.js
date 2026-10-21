@@ -112,8 +112,11 @@ export function maskAddress(address) {
   return address.slice(0, 6) + '…' + address.slice(-4);
 }
 
-/** 運営者に知らせる。失敗しても例外を投げない。送ったかどうかを返す（テスト用）。 */
-export async function notifyOperator(env, entry) {
+/**
+ * 運営者に知らせる。失敗しても例外を投げない。送ったかどうかを返す（テスト用）。
+ * extra は、知らせる中身に足す項目（ビールジョッキの申請で、GAS がメールを書き分けるのに使う）。
+ */
+export async function notifyOperator(env, entry, extra = {}) {
   if (!env.NOTIFY_URL || !env.NOTIFY_SECRET) return false;
   try {
     const res = await fetch(env.NOTIFY_URL, {
@@ -124,7 +127,8 @@ export async function notifyOperator(env, entry) {
         name: entry.name,
         score: entry.score,
         requestedAt: entry.requestedAt,
-        address: maskAddress(entry.address)
+        address: maskAddress(entry.address),
+        ...extra
       }),
       redirect: 'manual'   // GAS は処理のあと別のドメインへ転送する。転送先は読まなくてよい
     });

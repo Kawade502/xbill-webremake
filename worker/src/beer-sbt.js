@@ -87,12 +87,21 @@ export async function handleBeerSbtRequest(request, env, ctx, now = Date.now()) 
   await env.RANKING.put(dayKey, String(count + 1), { expirationTtl: DAY_TTL_SECONDS });
   if (ipKey) await env.RANKING.put(ipKey, String(ipCount + 1), { expirationTtl: DAY_TTL_SECONDS });
 
-  // 知らせる中身は XBill と同じ形（名前の欄に記念の名前、スコアの欄に杯数）
+  // 知らせる中身は XBill と同じ形（名前の欄に記念の名前、スコアの欄に杯数）に、ビールジョッキの項目を足す。
+  // GAS は app を見て、ビールジョッキ用の件名と本文にする（app を知らない GAS でも、今までどおりのメールになる）
+  const badge = BEER_BADGES[entry.badge];
   const notice = notifyOperator(env, {
-    name: `ビールジョッキ「${BEER_BADGES[entry.badge].title}」`,
+    name: `ビールジョッキ「${badge.title}」`,
     score: entry.cups,
     requestedAt: entry.requestedAt,
     address: entry.address
+  }, {
+    app: 'beer-jug',
+    badge: entry.badge,
+    badgeTitle: badge.title,
+    cups: entry.cups,
+    kind: badge.kind,
+    contract: env.BEER_SBT_CONTRACT || ''
   });
   if (ctx && typeof ctx.waitUntil === 'function') ctx.waitUntil(notice);   // 応答を待たせない
   else await notice;

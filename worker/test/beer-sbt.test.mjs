@@ -234,7 +234,13 @@ test('受け付けたら、XBill と同じ形で運営者に知らせる（名�
     assert.equal(calls.length, 1);
     assert.equal(calls[0].url, 'https://script.example/exec');
     const sent = JSON.parse(calls[0].init.body);
-    assert.deepEqual(Object.keys(sent).sort(), ['address', 'name', 'requestedAt', 'score', 'secret']);
+    assert.deepEqual(Object.keys(sent).sort(), ['address', 'app', 'badge', 'badgeTitle', 'contract', 'cups', 'kind', 'name', 'requestedAt', 'score', 'secret']);
+    assert.equal(sent.app, 'beer-jug');
+    assert.equal(sent.badge, 'joren');
+    assert.equal(sent.badgeTitle, '常連さん');
+    assert.equal(sent.cups, 6);
+    assert.equal(sent.kind, 2);
+    assert.equal(sent.contract, '');   // BEER_SBT_CONTRACT が無いとき
     assert.equal(sent.secret, 's3cret');
     assert.equal(sent.name, 'ビールジョッキ「常連さん」');
     assert.equal(sent.score, 6);
@@ -243,6 +249,7 @@ test('受け付けたら、XBill と同じ形で運営者に知らせる（名�
 
     assert.equal((await post(env, ok({ address: '0x' + 'ab'.repeat(20), badge: 'meiyo', cups: 11 }))).status, 201);
     assert.equal(JSON.parse(calls[1].init.body).name, 'ビールジョッキ「名誉店主」');
+    assert.equal(JSON.parse(calls[1].init.body).kind, 3);
 
     // 重複・不正では知らせない
     await post(env, ok({ address: '0x' + 'ab'.repeat(20) }));
