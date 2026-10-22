@@ -85,6 +85,12 @@ npm test                                     # テスト
 API の URL が空のままだと、ランキングはその端末のブラウザにだけ保存されます。
 同じ Worker は、[ビールジョッキ](https://github.com/Kawade502/beer-jug) の杯数の記念 SBT の申請も `POST /beer-sbt-request` で受け付けます（受け付けるかどうかは `wrangler.toml` の `BEER_SBT_REQUESTS_ENABLED` で切り替えます）。
 
+いたずらへの備え（`worker/src/limit.js`、`wrangler.toml` の `[[ratelimits]]`）：
+
+- ランキングの送信は、同じ送り元から1分10回まで。SBT の申請（XBill・ビールジョッキ）は、同じ送り元から1分3件、全体で1分20件まで。超えると 429
+- 送り元は、IPv4 はアドレス、IPv6 は先頭の /56 で数える（1日の上限も同じ）
+- 運営者へのお知らせのメールは、2つの SBT を合わせて1日8通まで（GAS の送信の上限 10 通に余裕を残す）。超えた分の申請も KV には残るので、`npx wrangler kv key list --binding RANKING --remote --prefix sbt:req:`（ビールジョッキは `beer:sbt:req:`）で見る
+
 ### 2. ページのビルドと公開（GitHub Pages）
 
 ```bash

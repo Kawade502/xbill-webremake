@@ -207,12 +207,13 @@ test('同じ IP からは1日3件まで。別の IP は受け付ける。IP は�
   assert.ok(ipKeys.every((k) => !k.includes('203.0.113.7') && /:[0-9a-f]{64}$/.test(k)));
 });
 
-test('IPv6 は /64 ごとに数える（同じ回線でアドレスを変えても、すり抜けられない）', async () => {
+test('IPv6 は /56 ごとに数える（同じ回線や同じ契約でアドレスを変えても、すり抜けられない）', async () => {
   assert.equal(ipForLimit('203.0.113.7'), '203.0.113.7');
-  assert.equal(ipForLimit('2001:db8:1:2:aaaa::1'), '2001:db8:1:2::/64');
-  assert.equal(ipForLimit('2001:0DB8:0001:0002:ffff:ffff:ffff:ffff'), '2001:db8:1:2::/64');
-  assert.equal(ipForLimit('2001:db8::5'), '2001:db8:0:0::/64');
-  assert.equal(ipForLimit('::1'), '0:0:0:0::/64');
+  assert.equal(ipForLimit('2001:db8:1:2:aaaa::1'), '2001:db8:1:0::/56');
+  assert.equal(ipForLimit('2001:0DB8:0001:02ab:ffff:ffff:ffff:ffff'), '2001:db8:1:200::/56');
+  assert.equal(ipForLimit('2001:0DB8:0001:02ff::1'), ipForLimit('2001:db8:1:200::9'));   // 同じ /56 は同じ単位
+  assert.equal(ipForLimit('2001:db8::5'), '2001:db8:0:0::/56');
+  assert.equal(ipForLimit('::1'), '0:0:0:0::/56');
   assert.equal(ipForLimit(null), null);
   const env = makeEnv();
   const postFrom = (ip, i) => worker.fetch(new Request('https://api.example/sbt-request', {
@@ -222,5 +223,6 @@ test('IPv6 は /64 ごとに数える（同じ回線でアドレスを変えて�
   }), env);
   for (let i = 0; i < SBT_DAILY_LIMIT_PER_IP; i++) assert.equal((await postFrom(`2001:db8:1:2::${i + 1}`, i)).status, 201);
   assert.equal((await postFrom('2001:db8:1:2:dead:beef:0:9', 9)).status, 429);
-  assert.equal((await postFrom('2001:db8:1:3::1', 10)).status, 201);   // 別の /64 は別に数える
+  assert.equal((await postFrom('2001:db8:1:3::1', 10)).status, 429);   // 同じ /56 の別の /64 も同じに数える
+  assert.equal((await postFrom('2001:db8:2::1', 11)).status, 201);      // 別の /56 は別に数える
 });

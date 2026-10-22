@@ -14,12 +14,15 @@
  * クリアしたかどうかはサーバーで確かめられない（ランキングと同じく自己申告）。最終判断は運営者が行う。
  */
 import { ValidationError, cleanName, toInteger, json, readBody, SCORE_MAX } from './ranking.js';
+import { overLimit } from './limit.js';
 
 export const SBT_REQ_PREFIX = 'sbt:req:';
 export const SBT_DAY_PREFIX = 'sbt:day:';
 export const SBT_DAILY_LIMIT = 50;
 export const SBT_IP_PREFIX = 'sbt:ip:';
 export const SBT_DAILY_LIMIT_PER_IP = 3;   // 1人（同じ IP）が1日の受付枠を使い切れないように
+export const NOTIFY_DAY_PREFIX = 'notify:day:';
+export const NOTIFY_DAILY_LIMIT = 8;   // 運営者へのメールは1日8通まで（GAS の送信の上限 10 通に余裕を残す。XBill とビールジョッキで共通）
 export const DAY_TTL_SECONDS = 2 * 24 * 60 * 60;
 export const ADDRESS_RE = /^0x[0-9a-fA-F]{40}$/;
 
@@ -49,8 +52,22 @@ export function normalizeSbtRequest(body, now = Date.now()) {
   };
 }
 
+/**
+ * SBT の申請（XBill・ビールジョッキ共通）の、短い時間の回数制限。超えていれば 429 の応答を返す。
+ * 同じ送り元は1分3件、全体で1分20件まで（同時にたくさん送って KV の上限をすり抜けるのを止める）。
+ */
+export async function sbtRateLimited(request, env) {
+  const ip = ipForLimit(request.headers.get('CF-Connecting-IP')) || 'unknown';
+  if (await overLimit(env.SBT_IP_LIMITER, ip) || await overLimit(env.SBT_ALL_LIMITER, 'all')) {
+    return json({ error: '本日の受付数の上限に達しました。明日もう一度お試しください', status: 'limit' }, 429, request, env);
+  }
+  return null;
+}
+
 export async function handleSbtRequest(request, env, ctx, now = Date.now()) {
   if (!sbtEnabled(env)) return json({ error: '現在、申請は受け付けていません' }, 503, request, env);
+  const limited = await sbtRateLimited(request, env);
+  if (limited) return limited;
 
   let entry;
   try {
@@ -77,9 +94,10 @@ export async function handleSbtRequest(request, env, ctx, now = Date.now()) {
     if (ipCount >= SBT_DAILY_LIMIT_PER_IP) return json({ error: '本日の受付数の上限に達しました。明日もう一度お試しください', status: 'limit' }, 429, request, env);
   }
 
-  await env.RANKING.put(key, JSON.stringify(entry));
+  // 数を先に増やしてから、申請を書く（途中で失敗しても、数えずに申請だけ残ることがないように）
   await env.RANKING.put(dayKey, String(count + 1), { expirationTtl: DAY_TTL_SECONDS });
   if (ipKey) await env.RANKING.put(ipKey, String(ipCount + 1), { expirationTtl: DAY_TTL_SECONDS });
+  await env.RANKING.put(key, JSON.stringify(entry));
 
   const notice = notifyOperator(env, entry);
   if (ctx && typeof ctx.waitUntil === 'function') ctx.waitUntil(notice);   // 応答を待たせない
@@ -88,8 +106,8 @@ export async function handleSbtRequest(request, env, ctx, now = Date.now()) {
 }
 
 /**
- * 上限を数える単位。IPv4 はアドレスそのもの、IPv6 は先頭 64 ビット（/64、ふつう1回線ぶん）。
- * IPv6 は1回線に膨大な数のアドレスがあるので、アドレス単位だと上限をすり抜けられる。
+ * 上限を数える単位。IPv4 はアドレスそのもの、IPv6 は先頭 56 ビット（/56）。
+ * IPv6 は1回線に膨大な数のアドレスがあり、サーバーの契約では /64 を何百も持てることがあるので、広めに /56 で数える。
  */
 export function ipForLimit(ip) {
   if (!ip) return null;
@@ -99,7 +117,9 @@ export function ipForLimit(ip) {
   const h = head ? head.split(':') : [];
   const t = tail ? tail.split(':') : [];
   const groups = text.includes('::') ? [...h, ...Array(Math.max(0, 8 - h.length - t.length)).fill('0'), ...t] : h;
-  return groups.slice(0, 4).map((g) => (g || '0').replace(/^0+(?=.)/, '')).join(':') + '::/64';
+  const g = groups.slice(0, 4).map((x) => (x || '0').padStart(4, '0'));
+  g[3] = g[3].slice(0, 2) + '00';   // 4つ目のまとまりは前半 8 ビットだけ残す（/56）
+  return g.map((x) => x.replace(/^0+(?=.)/, '')).join(':') + '::/56';
 }
 
 export async function sha256Hex(text) {
@@ -119,6 +139,11 @@ export function maskAddress(address) {
 export async function notifyOperator(env, entry, extra = {}) {
   if (!env.NOTIFY_URL || !env.NOTIFY_SECRET) return false;
   try {
+    // 1日の通数を数え、上限を超えたら送らない（申請は KV に残っているので、wrangler の一覧で見られる）
+    const dayKey = NOTIFY_DAY_PREFIX + String(entry.requestedAt || new Date().toISOString()).slice(0, 10);
+    const sent = toInteger(await env.RANKING.get(dayKey)) || 0;
+    if (sent >= NOTIFY_DAILY_LIMIT) return false;
+    await env.RANKING.put(dayKey, String(sent + 1), { expirationTtl: DAY_TTL_SECONDS });
     const res = await fetch(env.NOTIFY_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },

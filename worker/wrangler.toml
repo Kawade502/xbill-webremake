@@ -14,6 +14,31 @@ BEER_SBT_REQUESTS_ENABLED = "true"
 # ビールジョッキの記念 SBT のコントラクトアドレス（Polygon Mainnet）。Worker は使わないが、mint のときの参照用
 BEER_SBT_CONTRACT = "0x7CF5663c1afa9123a3aB94800aF65ffCB2456ef2"
 
+# 短い時間の回数制限（Rate Limiting binding）。namespace_id はこのアカウントの中で重ならない番号なら何でもよい。
+# ランキングの送信は、同じ送り元から1分10回まで
+[[ratelimits]]
+name = "SCORE_LIMITER"
+namespace_id = "1001"
+  [ratelimits.simple]
+  limit = 10
+  period = 60
+
+# SBT の申請（XBill・ビールジョッキ）は、同じ送り元から1分3件まで
+[[ratelimits]]
+name = "SBT_IP_LIMITER"
+namespace_id = "1002"
+  [ratelimits.simple]
+  limit = 3
+  period = 60
+
+# SBT の申請は、全体で1分20件まで
+[[ratelimits]]
+name = "SBT_ALL_LIMITER"
+namespace_id = "1003"
+  [ratelimits.simple]
+  limit = 20
+  period = 60
+
 [[kv_namespaces]]
 binding = "RANKING"
 # `npx wrangler kv namespace create RANKING` で出た id に置き換える（秘密ではない）

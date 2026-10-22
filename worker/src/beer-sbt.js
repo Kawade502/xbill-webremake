@@ -13,7 +13,7 @@
  * 杯数は端末の localStorage に貯めた自己申告で、サーバーでは確かめられない。最終判断は運営者が行う。
  */
 import { ValidationError, toInteger, json, readBody } from './ranking.js';
-import { ADDRESS_RE, DAY_TTL_SECONDS, ipForLimit, sha256Hex, notifyOperator } from './sbt.js';
+import { ADDRESS_RE, DAY_TTL_SECONDS, ipForLimit, sha256Hex, notifyOperator, sbtRateLimited } from './sbt.js';
 
 export const BEER_SBT_REQ_PREFIX = 'beer:sbt:req:';
 export const BEER_SBT_DAY_PREFIX = 'beer:sbt:day:';
@@ -57,6 +57,8 @@ export function normalizeBeerSbtRequest(body, now = Date.now()) {
 
 export async function handleBeerSbtRequest(request, env, ctx, now = Date.now()) {
   if (!beerSbtEnabled(env)) return json({ error: '現在、申請は受け付けていません' }, 503, request, env);
+  const limited = await sbtRateLimited(request, env);
+  if (limited) return limited;
 
   let entry;
   try {
@@ -83,9 +85,10 @@ export async function handleBeerSbtRequest(request, env, ctx, now = Date.now()) 
     if (ipCount >= BEER_SBT_DAILY_LIMIT_PER_IP) return json({ error: '本日の受付数の上限に達しました。明日もう一度お試しください', status: 'limit' }, 429, request, env);
   }
 
-  await env.RANKING.put(key, JSON.stringify(entry));
+  // 数を先に増やしてから、申請を書く（途中で失敗しても、数えずに申請だけ残ることがないように）
   await env.RANKING.put(dayKey, String(count + 1), { expirationTtl: DAY_TTL_SECONDS });
   if (ipKey) await env.RANKING.put(ipKey, String(ipCount + 1), { expirationTtl: DAY_TTL_SECONDS });
+  await env.RANKING.put(key, JSON.stringify(entry));
 
   // 知らせる中身は XBill と同じ形（名前の欄に記念の名前、スコアの欄に杯数）に、ビールジョッキの項目を足す。
   // GAS は app を見て、ビールジョッキ用の件名と本文にする（app を知らない GAS でも、今までどおりのメールになる）

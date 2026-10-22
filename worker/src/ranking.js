@@ -16,7 +16,8 @@
  * KV には排他制御がなく、反映に最大 1 分ほどかかることがあります（同時登録が重なると、まれに 1 件失われます）。
  */
 
-import { handleSbtRequest } from './sbt.js';
+import { handleSbtRequest, ipForLimit } from './sbt.js';
+import { overLimit } from './limit.js';
 import { handleBeerSbtRequest } from './beer-sbt.js';
 
 export const RANKING_KEY = 'ranking';
@@ -134,6 +135,10 @@ export async function handleRequest(request, env, ctx) {
   }
 
   if (request.method === 'POST' && url.pathname === '/score') {
+    // 同じ送り元から1分に何度も送られたら止める（KV の書き込みの無料枠を使い切られないように）
+    if (await overLimit(env.SCORE_LIMITER, ipForLimit(request.headers.get('CF-Connecting-IP')) || 'unknown')) {
+      return json({ error: '送信が多すぎます。少し待ってからもう一度お試しください', status: 'limit' }, 429, request, env);
+    }
     let entry;
     try {
       entry = normalizeEntry(await readBody(request));
